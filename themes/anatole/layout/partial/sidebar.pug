@@ -29,4 +29,17 @@
       li
         a(href="http://weibo.com/" + theme.weibo)
           i.fa.fa-weibo
+
+    h3(title="")
+    
+    if site.tags
+      li
+        i.fa.fa-tag
+        - site.categories.sort('posts').each(function(item) {
+            a.tag(href=config.root + item.path, title= item.name)= item.name + " "
+        - });
+        - site.tags.sort('posts').each(function(item) {
+            a.tag(href=config.root + item.path, title= item.name)= item.name + " "
+        - });
+
   include footer

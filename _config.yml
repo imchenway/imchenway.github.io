@@ -113,3 +113,14 @@ archive_generator:
   yearly: false
   monthly: false
   daily: false
+
+# toc
+toc:
+  maxdepth: 3
+  class: toc
+  slugify: transliteration
+  decodeEntities: false
+  anchor:
+    position: after
+    symbol: '#'
+    style: header-anchor

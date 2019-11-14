@@ -1,4 +1,10 @@
-[toc]
+---
+tags: ['#Google']
+---
+
+### 本文目录
+<!-- toc -->
+
 # 1. 常用搜索命令
 ### 双引号`""`
 - 将整个短语作为关键字,并严格按照短语顺序
@@ -160,6 +166,6 @@ hangzhou to jiangxi distance
 - [迅雷仓](http://www.xunleicang.com/)
 
 # 5. 图解
-![](http://ww1.sinaimg.cn/large/7c2d7f0egy1fs8arv4nxqj20go54cqv6.jpg)
+[](http://ww1.sinaimg.cn/large/7c2d7f0egy1fs8arv4nxqj20go54cqv6.jpg)
 
 

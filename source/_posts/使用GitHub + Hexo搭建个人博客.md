@@ -1,8 +1,11 @@
 ---
 title: 使用GitHub + Hexo搭建个人博客
 date: 2019-11-12 18:33:09
-tags:
+tags: ['#GitHub','#Hexo']
 ---
+
+### 本文目录
+<!-- toc -->
 
 # 1. 准备环境
 - `node.js`
@@ -193,7 +196,7 @@ backup:
 - 终端执行
 ```
 hexo backup
-git push origin hexo
+git push
 ```
 
 ### 7.2 恢复博客
@@ -202,4 +205,26 @@ git clone https://github.com/imchenway/imchenway.github.io.git
 npm install hexo-cli
 npm install
 npm install hexo-deployer-git --save
+```
+
+# 开启TOC支持
+- 安装插件
+```
+npm install hexo-toc --save
+```
+- 修改`_config.yml`
+```
+toc:
+  maxdepth: 3
+  class: toc
+  slugify: transliteration
+  decodeEntities: false
+  anchor:
+    position: after
+    symbol: '#'
+    style: header-anchor
+```
+- 文章中加入
+```
+<!-- toc -->
 ```
