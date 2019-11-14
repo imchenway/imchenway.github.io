@@ -90,7 +90,7 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: anatole
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -102,14 +102,14 @@ deploy:
 ## BackUp
 backup:
   type: git
-  theme: landscape
+  theme: anatole
   message: Back up my imchenway.com blog
   repository:
     github: https://github.com/imchenway/imchenway.github.io.git,hexo
 
 # anatole
-# archive_generator:
-#   per_page: 0  
-#   yearly: false
-#   monthly: false
-#   daily: false
+archive_generator:
+  per_page: 0  
+  yearly: false
+  monthly: false
+  daily: false
