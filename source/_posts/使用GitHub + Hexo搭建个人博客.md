@@ -228,3 +228,6 @@ toc:
 ```
 <!-- toc -->
 ```
+
+# 文章标题区分大小写
+- 将主题文件夹`/source/css/`目录中的`.scss`文件里面的`text-transform: uppercase;`全去掉
