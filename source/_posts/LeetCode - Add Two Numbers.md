@@ -1,5 +1,5 @@
 ---
-tags: ['#LeetCode','#LinkedList']
+tags: ['#LeetCode']
 ---
 
 ### 本文目录

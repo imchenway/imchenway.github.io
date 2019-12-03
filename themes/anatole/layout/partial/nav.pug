@@ -16,11 +16,11 @@
     //    a.current(href="/about")= __('About')
     //  else
     //    a(href="/about")= __('About')
-    //li
-    //  if is_current('Guestbook')
-    //    a.current(href="/guestbook")= __('Guestbook')
-    //  else
-    //    a(href="/guestbook")= __('Guestbook')
+    li
+      if is_current('Guestbook')
+        a.current(href="/guestbook")= __('Guestbook')
+      else
+        a(href="/guestbook")= __('Guestbook')
   .information
     .back_btn
       li

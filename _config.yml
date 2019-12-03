@@ -25,6 +25,7 @@ source_dir: source
 public_dir: public
 tag_dir: tags
 archive_dir: archives
+guestbook_dir: guestbook
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
@@ -124,3 +125,15 @@ toc:
     position: after
     symbol: '#'
     style: header-anchor
+
+#gitalk settings
+plugins:
+  gitalk:
+    enable: false
+    owner: imchenway
+    repo: imchenway.github.io
+    admin: imchenway
+    clientID: a29466c6e1aa2b1cb130
+    clientSecret: 12c4168a7d4cb01e96a1a9beb0c35d49d6c5f18b
+    distractionFreeMode: false
+
