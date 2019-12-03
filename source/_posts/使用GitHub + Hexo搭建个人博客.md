@@ -271,3 +271,20 @@ plugins:
     clientSecret: 12c4168a7d4cb01e96a1a9beb0c35d49d6c5f18b
     distractionFreeMode: false
 ```
+
+# 10. 集成百度统计
+- 1. [注册百度统计](https://tongji.baidu.com/web/10000111788/welcome/login)
+- 2. 添加你的博客地址
+- 3. 在`hexo\themes\anatole\layout\partial` 目录下打开`head.pug`, 在末尾加上以下内容:
+```pug
+script.
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+    })();
+```
+- 4. 等待20分钟后点击代码检查，显示代码安装正确即可
+![](https://tva1.sinaimg.cn/large/006tNbRwly1g9ju6jbbdpj30uu0bkdh3.jpg)
