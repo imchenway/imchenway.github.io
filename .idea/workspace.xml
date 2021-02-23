@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7d93df82-eebf-4b21-86b5-6d608b4c47c4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/themes/anatole/layout/partial/footer.pug" beforeDir="false" afterPath="$PROJECT_DIR$/themes/anatole/layout/partial/footer.pug" afterDir="false" />
-    </list>
+    <list default="true" id="7d93df82-eebf-4b21-86b5-6d608b4c47c4" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,7 +51,7 @@
       <option name="presentableId" value="Default" />
       <updated>1614044786788</updated>
       <workItem from="1614044788100" duration="2683000" />
-      <workItem from="1614064609180" duration="1228000" />
+      <workItem from="1614064609180" duration="1528000" />
     </task>
     <servers />
   </component>
