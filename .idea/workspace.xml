@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d93df82-eebf-4b21-86b5-6d608b4c47c4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/_config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/_config.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/_posts/Add Two Numbers - LeetCode.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/Add Two Numbers - LeetCode.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/_posts/MacOS下Charles与Shadowsocks共存.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/MacOS下Charles与Shadowsocks共存.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/_posts/使用GitHub + Hexo搭建个人博客.md" beforeDir="false" afterPath="$PROJECT_DIR$/source/_posts/使用GitHub + Hexo搭建个人博客.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/anatole/_config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/anatole/_config.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +53,7 @@
       <option name="presentableId" value="Default" />
       <updated>1614044786788</updated>
       <workItem from="1614044788100" duration="2683000" />
-      <workItem from="1614064609180" duration="493000" />
+      <workItem from="1614064609180" duration="832000" />
     </task>
     <servers />
   </component>
