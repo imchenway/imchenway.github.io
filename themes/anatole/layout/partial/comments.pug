@@ -85,6 +85,7 @@ if theme.gitalk
                 id: md5(location.pathname),
                 repo: '#{theme.gitalk.repo}',
                 owner: '#{theme.gitalk.owner}',
-             admin: '#{theme.gitalk.admin}'
+                admin: '#{theme.gitalk.admin}',
+                proxy: '#{theme.gitalk.proxy}',
             })
             gitalk.render('gitalk-container');

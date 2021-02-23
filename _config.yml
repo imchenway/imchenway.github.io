@@ -135,5 +135,6 @@ plugins:
     admin: imchenway
     clientID: a29466c6e1aa2b1cb130
     clientSecret: f041c544d96dfa8336709cf38784bac1bb89a80f
-    distractionFreeMode: false
+    distractionFreeMode: true
+    proxy: https://netnr-proxy.cloudno.de/https://github.com/login/oauth/access_token
 
