@@ -129,11 +129,11 @@ toc:
 #gitalk settings
 plugins:
   gitalk:
-    enable: false
+    enable: true
     owner: imchenway
     repo: imchenway.github.io
     admin: imchenway
     clientID: a29466c6e1aa2b1cb130
-    clientSecret: 12c4168a7d4cb01e96a1a9beb0c35d49d6c5f18b
+    clientSecret: f041c544d96dfa8336709cf38784bac1bb89a80f
     distractionFreeMode: false
 
