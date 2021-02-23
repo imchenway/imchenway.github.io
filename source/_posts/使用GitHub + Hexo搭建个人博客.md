@@ -288,3 +288,5 @@ script.
 ```
 - 4. 等待20分钟后点击代码检查，显示代码安装正确即可
 ![](https://tva1.sinaimg.cn/large/006tNbRwly1g9ju6jbbdpj30uu0bkdh3.jpg)
+
+# 11. 集成Google Adsense
