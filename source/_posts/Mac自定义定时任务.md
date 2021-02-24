@@ -15,7 +15,7 @@ tags: ['#Mac']
 Launchd是MacOS用来管理系统和用户级别的守护进程的工具。
 该工具由两部分组成：
 - launchd
-  - 开机时，launchd会加载`/System/Library/LaunchDaemons`和`/Library/LaunchDaemons`中的所有<a href="#0-2-shen-me-shi-launchd-plist">plist</a>文件，然后根据需要启动launchctl
+  - 开机时，launchd会加载`/System/Library/LaunchDaemons`和`/Library/LaunchDaemons`中的所有<a href="#0-2-shi-me-shi-launchd-plist">plist</a>文件，然后根据需要启动launchctl
 - launchctl
 
 [Wiki](https://en.wikipedia.org/wiki/Launchd)对launchd有如下定义：
