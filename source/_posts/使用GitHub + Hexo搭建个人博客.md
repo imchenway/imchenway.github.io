@@ -1,6 +1,4 @@
 ---
-title: 使用GitHub + Hexo搭建个人博客
-date: 2019-11-12 18:33:09
 tags: ['#Blog']
 ---
 
