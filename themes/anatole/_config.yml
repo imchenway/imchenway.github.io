@@ -6,7 +6,7 @@ avatar: /images/favicon.png
 # Social Accounts
 # 整个url
 github: https://github.com/imchenway
-mail: imchenway@gmail.com
+mail: mailto:imchenway@gmail.com
 twitter:
 rss: /atom.xml
 weibo:
