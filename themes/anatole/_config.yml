@@ -1,12 +1,12 @@
 keywords: DavidChan,imchenway
 author: DavidChan,imchenway@gmail.com
 description: 自我驱动 自我管理
-avatar: /images/favicon.png
+avatar: /source/images/favicon.png
 
 # Social Accounts
 # 整个url
 github: https://github.com/imchenway
-mail: "mailto:imchenway@gmail.com"
+mail: mailto:imchenway@gmail.com
 twitter:
 rss: /atom.xml
 weibo:
