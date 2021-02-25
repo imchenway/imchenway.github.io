@@ -138,3 +138,11 @@ plugins:
     distractionFreeMode: false
     proxy: https://netnr-proxy.cloudno.de/https://github.com/login/oauth/access_token
 
+feed:
+    type: atom
+    path: atom.xml
+    limit: 20
+    hub:
+    content:
+    content_limit:
+    content_limit_delim: ' '
