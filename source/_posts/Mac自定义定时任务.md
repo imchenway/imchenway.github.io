@@ -107,7 +107,7 @@ networksetup -setairportpower en0 on
 ### 1.2. 创建 plist 并放入所需目录
 
 - 这两个文件用于执行对应的需求，以下几点需要注意
-  - 具体放哪个目录的参考[plist 放在不同位置时的区别](0-3-plist-fang-zai-bu-tong-wei-zhi-shi-de-qu-bie)，我的放在`/Library/LaunchAgents`下，这样只要电脑开机，就算未输入密码，plist 文件也会被执行到
+  - 具体放哪个目录的参考[plist 放在不同位置时的区别](#0-3-plist-fang-zai-bu-tong-wei-zhi-shi-de-qu-bie)，我的放在`/Library/LaunchAgents`下，这样只要电脑开机，就算未输入密码，plist 文件也会被执行到
   - `Label`标签的值，不能与其他 plist 文件中的`Label`标签中的值完全重复
   - `ProgramArguments`标签中放入 shell 所在的路径
   - `StartCalendarInterval`用于控制在指定的时间执行 shell
