@@ -139,10 +139,7 @@ plugins:
     proxy: https://netnr-proxy.cloudno.de/https://github.com/login/oauth/access_token
 
 #RSS订阅
-plugin:
-- hexo-generator-feed
-#Feed Atom
 feed:
-type: atom
-path: atom.xml
-limit: 20
+  type: atom
+  path: atom.xml
+  limit: 20
