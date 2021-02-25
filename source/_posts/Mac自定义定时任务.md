@@ -196,7 +196,7 @@ networksetup -setairportpower en0 on
 - `launchctl stop`
   停止一个 plist 任务
 
-# 更多高级用法请参考
+# 3. 更多高级用法参考
 
 [A launchd Tutorial](https://www.launchd.info)
 [launchctl](https://ss64.com/osx/launchctl.html)
