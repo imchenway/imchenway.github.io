@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7d93df82-eebf-4b21-86b5-6d608b4c47c4" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/themes/anatole/_config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/anatole/_config.yml" afterDir="false" />
-    </list>
+    <list default="true" id="7d93df82-eebf-4b21-86b5-6d608b4c47c4" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,7 +58,7 @@
       <workItem from="1614064609180" duration="1528000" />
       <workItem from="1614066468788" duration="4857000" />
       <workItem from="1614133147304" duration="2094000" />
-      <workItem from="1614246296967" duration="1913000" />
+      <workItem from="1614246296967" duration="2251000" />
     </task>
     <servers />
   </component>
