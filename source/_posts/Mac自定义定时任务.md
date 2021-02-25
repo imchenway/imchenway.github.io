@@ -25,7 +25,7 @@ tags: ["#Mac"]
   - launchd 主要有两个任务：
     - 一是启动系统
     - 二是加载和维护服务
-  - 系统启动时，launchd 会加载`/System/Library/LaunchDaemons`和`/Library/LaunchDaemons`中的所有[plist 文件](#0-2-shi-me-shi-launchd-plist)，然后根据需要启动 launchctl。
+  - 系统启动时，launchd 会加载`/System/Library/LaunchDaemons`和`/Library/LaunchDaemons`中的所有[plist 文件](#0-2-shi-me-shi-plist)，然后根据需要启动 launchctl。
 - launchctl
   - 在 launchd 中，对服务的控制集中在`launchctl`中。
 
@@ -107,7 +107,7 @@ networksetup -setairportpower en0 on
 ### 1.2. 创建 plist 并放入所需目录
 
 - 这两个文件用于执行对应的需求，以下几点需要注意
-  - 具体放哪个目录的参考[plist 放在不同位置时的区别](###-0-3-plist-fang-zai-bu-tong-wei-zhi-shi-de-qu-bie)，我的放在`/Library/LaunchAgents`下，这样只要电脑开机，就算未输入密码，plist 文件也会被执行到
+  - 具体放哪个目录的参考[plist 放在不同位置时的区别](0-3-plist-fang-zai-bu-tong-wei-zhi-shi-de-qu-bie)，我的放在`/Library/LaunchAgents`下，这样只要电脑开机，就算未输入密码，plist 文件也会被执行到
   - `Label`标签的值，不能与其他 plist 文件中的`Label`标签中的值完全重复
   - `ProgramArguments`标签中放入 shell 所在的路径
   - `StartCalendarInterval`用于控制在指定的时间执行 shell
