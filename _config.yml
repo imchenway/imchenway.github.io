@@ -138,7 +138,7 @@ plugins:
     distractionFreeMode: false
     proxy: https://netnr-proxy.cloudno.de/https://github.com/login/oauth/access_token
 
-#RSS订阅
+#RSS
 feed:
   type: atom
   path: atom.xml
