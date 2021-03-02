@@ -179,7 +179,7 @@ networksetup -setairportpower en0 on
 
 - `launchctl list`
   列出已加载的所有 plist
-  ![](https://tva1.sinaimg.cn/large/008eGmZEgy1gnzlpmcsutj30gr0790um.jpg)
+  ![](https://tva1.sinaimg.cn/large/e6c9d24egy1go4nwbz4j9j20zw0ga0zj.jpg)
   其中 PID 为`-`的表示虽然已加载，但是未启动，PID 为数字的表示已启动并且这个数字就时它的 PID
 
 - `launchctl load`
