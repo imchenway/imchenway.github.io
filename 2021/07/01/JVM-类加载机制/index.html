@@ -1,40 +1,47 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>JVM(1) - 类加载运行的全过程 · DavidChan's Blog</title><meta name="description" content="本文目录#
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>JVM - 类加载运行的全过程 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
 
 
 
 
 
-
-
-
-
-
-众所周知，Java的slogan就是”Write once, run anywhere”，这也就意味着无论我们在什么平台的机器上用Java去做实现，都可以在任何支持Java的系统上直接运行，无需做任何额外操作。那么Java是如何做到这些的呢？
-
-
-
-
-
-		
-		va"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+引言#
+众所周知，Java的slogan就是”Write once, run anywhere.”，这也就意味着无论我们在什么平台的机器上用Java去做实现，都可以在任何支持Java的系统上直接运行，无需做任何额外操作。那么Java是如何做到这些的呢？答案是JRE"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");
     hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
     var s = document.getElementsByTagName("script")[0]; 
     s.parentNode.insertBefore(hm, s);
 })();
-</script><script data-ad-client="ca-pub-1946575658110055" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><!--img(src= url_for('images/logo@2x.png'),style="width:127px;")--><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> DavidChan</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM(1) - 类加载运行的全过程</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+</script><script data-ad-client="ca-pub-1946575658110055" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><!--img(src= url_for('images/logo@2x.png'),style="width:127px;")--><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> DavidChan</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM - 类加载运行的全过程</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
 
 <!-- toc -->
 
-
-
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+</ul>
 <!-- tocstop -->
 
 </div>
 
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>众所周知，Java的slogan就是”Write once, run anywhere.”，这也就意味着无论我们在什么平台的机器上用Java去做实现，都可以在任何支持Java的系统上直接运行，无需做任何额外操作。<br>那么Java是如何做到这些的呢？答案是JRE。</p>
+<p>那么什么是JRE？为什么叫JRE？</p>
 <blockquote>
-<p>众所周知，Java的slogan就是”Write once, run anywhere”，这也就意味着无论我们在什么平台的机器上用Java去做实现，都可以在任何支持Java的系统上直接运行，无需做任何额外操作。<br>那么Java是如何做到这些的呢？</p>
+<p>JRE（Java Runtime Environment），是一个Java代码的运行时环境，属于软件层，运行在操作系统软件之上，属于JDK的一部分。</p>
+</blockquote>
+<p>什么是JDK？</p>
+<blockquote>
+<p>JDK（Java Development Kit），每一个JDK都包含了一个兼容的JRE和一个JVM，并且JDK包含了许多Java开发人员常用的工具以及类库，比如<code>javac</code>、<code>java</code>、<code>jar</code>、<code>jmap</code>、<code>jstat</code>、<code>jstack</code>、<code>jinfo</code>、<code>rt.jar</code>等。</p>
+</blockquote>
+<p>什么是JVM？</p>
+<blockquote>
+<p>JVM(Java Virtual Machine),JVM可以理解为是一个运行在操作系统之上的虚拟电脑，当我们通过<code>javac</code>将<code>*.java</code>编译成JVM可识别<code>*.class</code>字节码文件后，再执行<code>java</code>，此时JVM会将<code>*.class</code>字节码文件解释成当前操作系统平台可识别的机器码去执行。这样的话就实现了”Write once, run anywhere.”。</p>
+</blockquote>
 </blockquote>
 
 <div id="gitalk-container"></div>
