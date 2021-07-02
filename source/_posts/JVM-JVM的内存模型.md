@@ -1,5 +1,5 @@
 ---
-title: JVM - JVM内存模型
+title: JVM内存模型
 date: 2021-07-01
 tags: ['#JVM']
 ---
