@@ -4,9 +4,10 @@
 
 
 引言
-JVM类加载机制
+JVM类加载的过程
 加载阶段：
 链接阶段（linking）
+初始化
 
 
 总结
@@ -20,7 +21,7 @@ JVM类加载机制
 
 
 引言#
-众所周知，Java的slogan就是”Writ"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+众所周知，Java的slogan就是"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");
     hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
@@ -33,14 +34,15 @@ JVM类加载机制
 
 <ul>
 <li><a href="#yin-yan">引言</a></li>
-<li><a href="#jvm-lei-jia-zai-ji-zhi">JVM类加载机制</a><ul>
+<li><a href="#jvm-lei-jia-zai-de-guo-cheng">JVM类加载的过程</a><ul>
 <li><a href="#jia-zai-jie-duan">加载阶段：</a></li>
 <li><a href="#lian-jie-jie-duan-linking">链接阶段（linking）</a></li>
+<li><a href="#chu-shi-hua">初始化</a></li>
 </ul>
 </li>
 <li><a href="#zong-jie">总结</a></li>
 <li><a href="#zhui-wen">追问</a><ul>
-<li><a href="#zai-jia-zai-jie-duan-zhong-de-tong-guo-lei-de-quan-xian-ding-ming-lai-du-qu-class-zi-jie-ma-wen-jian-de-er-jin-zhi-liu-xu-ni-ji-shi-ru-he-zuo-dao-tong-guo-lei-de-quan-xian-ding-ming-qu-zhao-dao-dui-ying-de-class-wen-jian-de">在加载阶段中的<code>通过类的全限定名来读取class字节码文件的二进制流</code>，虚拟机是如何做到通过类的全限定名去找到对应的Class文件的？</a></li>
+<li><a href="#zai-jia-zai-jie-duan-zhong-de-tong-guo-lei-de-quan-xian-ding-ming-lai-du-qu-class-zi-jie-ma-wen-jian-de-er-jin-zhi-liu-xu-ni-ji-shi-ru-he-zuo-dao-tong-guo-lei-de-quan-xian-ding-ming-qu-zhao-dao-dui-ying-de-class-wen-jian-de-https-imchenway-com-2021-07-01-jvm-de-nei-cun-mo-xing">在加载阶段中的<code>通过类的全限定名来读取class字节码文件的二进制流</code>，虚拟机是如何做到通过类的全限定名去找到对应的Class文件的？</a></li>
 </ul>
 </li>
 </ul>
@@ -68,7 +70,7 @@ JVM类加载机制
 <li>那么JVM中的ClassCloader是如何运行的呢？本文将带你揭开它神秘的面纱</li>
 </ul>
 </blockquote>
-<h1><span id="jvm-lei-jia-zai-ji-zhi">JVM类加载机制</span><a href="#jvm-lei-jia-zai-ji-zhi" class="header-anchor">#</a></h1><p><img src="/images/posts/JVMClassLoader.png" alt><br>加载一个class类的过程总体分三个步骤，<code>加载、链接、初始化</code>，其中链接阶段分为<code>验证、准备、解析</code>三个阶段</p>
+<h1><span id="jvm-lei-jia-zai-de-guo-cheng">JVM类加载的过程</span><a href="#jvm-lei-jia-zai-de-guo-cheng" class="header-anchor">#</a></h1><p><img src="/images/posts/JVMClassLoader.png" alt><br>加载一个class类的过程总体分三个步骤，<code>加载、链接、初始化</code>，其中链接阶段分为<code>验证、准备、解析</code>三个阶段</p>
 <h3><span id="jia-zai-jie-duan">加载阶段：</span><a href="#jia-zai-jie-duan" class="header-anchor">#</a></h3><ol>
 <li>通过类的全限定名来读取class字节码文件的二进制流</li>
 <li>将字节流中的静态数据结构转化为方法区的运行时数据结构</li>
@@ -82,8 +84,7 @@ JVM类加载机制
 </li>
 </ol>
 <h3><span id="lian-jie-jie-duan-linking">链接阶段（linking）</span><a href="#lian-jie-jie-duan-linking" class="header-anchor">#</a></h3><ol>
-<li><p>验证</p>
-<ol>
+<li>验证<ol>
 <li>文件格式验证：确保class文件的字节流中包含的信息符合虚拟机规范，并且不会危害虚拟机自身的安全</li>
 <li>元数据验证：语义分析<ol>
 <li>是否有父类（除<code>java.lang.Object</code>外，所有的类都必须有父类）</li>
@@ -105,29 +106,25 @@ JVM类加载机制
 </li>
 </ol>
 </li>
-<li><p>准备：</p>
-<ol>
+<li>准备：<ol>
 <li>为类变量（被static修饰的）在方法区中分配内存，实例变量在对象实例化时分配在Java堆中</li>
 <li>设置初始值，此时是赋零值，真正的值在初始化时完成赋值；finnal例外，直接赋值；<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static int value = 99；</span><br><span class="line">public static final int value = 99；</span><br><span class="line">准备阶段结束后</span><br><span class="line">public static int value = 0；</span><br><span class="line">public static final int value = 99；</span><br></pre></td></tr></table></figure></li>
 </ol>
 </li>
-<li><p>解析：将常量池中的符号引用替换为直接引用<br>//TODO 什么是符号引用和直接引用？</p>
-<ol>
+<li>解析：将常量池中的符号引用替换为直接引用<br>//TODO 什么是符号引用和直接引用？<ol>
 <li>类或接口解析</li>
 <li>字段解析</li>
 <li>类方法解析</li>
 <li>接口方法解析</li>
 </ol>
 </li>
-<li><p>初始化</p>
-<ol>
+</ol>
+<h3><span id="chu-shi-hua">初始化</span><a href="#chu-shi-hua" class="header-anchor">#</a></h3><ol>
 <li>这是类加载过程的最后一步，除了在加载阶段用户可以通过自定义类加载器参与，其他阶段皆由虚拟机主导和控制</li>
 <li>在该阶段开始真正初始化类中定义的Java程序代码，调用<code>&lt;clinit&gt;()</code></li>
 </ol>
-</li>
-</ol>
 <p>至此，一个字节码文件便已经初始化完成。</p>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><h1><span id="zhui-wen">追问</span><a href="#zhui-wen" class="header-anchor">#</a></h1><h3><span id="zai-jia-zai-jie-duan-zhong-de-tong-guo-lei-de-quan-xian-ding-ming-lai-du-qu-class-zi-jie-ma-wen-jian-de-er-jin-zhi-liu-xu-ni-ji-shi-ru-he-zuo-dao-tong-guo-lei-de-quan-xian-ding-ming-qu-zhao-dao-dui-ying-de-class-wen-jian-de">在加载阶段中的<code>通过类的全限定名来读取class字节码文件的二进制流</code>，虚拟机是如何做到通过类的全限定名去找到对应的Class文件的？</span><a href="#zai-jia-zai-jie-duan-zhong-de-tong-guo-lei-de-quan-xian-ding-ming-lai-du-qu-class-zi-jie-ma-wen-jian-de-er-jin-zhi-liu-xu-ni-ji-shi-ru-he-zuo-dao-tong-guo-lei-de-quan-xian-ding-ming-qu-zhao-dao-dui-ying-de-class-wen-jian-de" class="header-anchor">#</a></h3><hr>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><h1><span id="zhui-wen">追问</span><a href="#zhui-wen" class="header-anchor">#</a></h1><h3><span id="zai-jia-zai-jie-duan-zhong-de-tong-guo-lei-de-quan-xian-ding-ming-lai-du-qu-class-zi-jie-ma-wen-jian-de-er-jin-zhi-liu-xu-ni-ji-shi-ru-he-zuo-dao-tong-guo-lei-de-quan-xian-ding-ming-qu-zhao-dao-dui-ying-de-class-wen-jian-de"></span><a href="#zai-jia-zai-jie-duan-zhong-de-tong-guo-lei-de-quan-xian-ding-ming-lai-du-qu-class-zi-jie-ma-wen-jian-de-er-jin-zhi-liu-xu-ni-ji-shi-ru-he-zuo-dao-tong-guo-lei-de-quan-xian-ding-ming-qu-zhao-dao-dui-ying-de-class-wen-jian-de" class="header-anchor">#</a></h3><hr>
 <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank">
 <img alt="知识共享许可协议" style="border-width:0" src="https://tva1.sinaimg.cn/large/008eGmZEly1gpeqj55ryjj302g00vwea.jpg">
 </a>
