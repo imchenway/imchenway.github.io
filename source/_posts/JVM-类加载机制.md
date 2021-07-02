@@ -18,6 +18,7 @@ tags: ['#JVM']
 >   - JVM(Java Virtual Machine),JVM可以理解为是一个运行在操作系统之上的虚拟电脑，当我们通过`javac`将`*.java`编译成JVM可识别`*.class`字节码文件后，再执行`java`，此时JVM会将`*.class`字节码文件解释成当前操作系统平台可识别的机器码去执行。这样的话就实现了"Write once, run anywhere."。
 > - 整体流程如下所示
 > ![javaCli](/images/posts/javaCli.png)
+> ![javaCli](/images/posts/javaCli2.png)
 > - 至此，可以看到ClassLoader在`java`命令执行后起到了承上启下的重要作用
 > - 那么JVM中的ClassCloader是如何运行的呢？本文将带你揭开它神秘的面纱
 
