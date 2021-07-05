@@ -9,6 +9,7 @@ JVM类加载器
 类与类加载器的关系
 类加载器是如何去加载类的？
 双亲委派模型
+双亲委派模型工作过程
 
 
 
@@ -24,7 +25,7 @@ JVM类加载器
 引言#
 在上文JVM-类加载机制中，描述了在java命令执行后，JVM类加载的整个流程。
 
-在上文中可以看到ClassLoader在jav"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+在上文中可以看到Clas"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");
     hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
@@ -42,6 +43,7 @@ JVM类加载器
 <li><a href="#lei-yu-lei-jia-zai-qi-de-guan-xi">类与类加载器的关系</a></li>
 <li><a href="#lei-jia-zai-qi-shi-ru-he-qu-jia-zai-lei-de">类加载器是如何去加载类的？</a><ul>
 <li><a href="#shuang-qin-wei-pai-mo-xing">双亲委派模型</a></li>
+<li><a href="#shuang-qin-wei-pai-mo-xing-gong-zuo-guo-cheng">双亲委派模型工作过程</a></li>
 </ul>
 </li>
 </ul>
@@ -77,6 +79,7 @@ JVM类加载器
 </ul>
 </li>
 </ul>
+<h3><span id="shuang-qin-wei-pai-mo-xing-gong-zuo-guo-cheng">双亲委派模型工作过程</span><a href="#shuang-qin-wei-pai-mo-xing-gong-zuo-guo-cheng" class="header-anchor">#</a></h3><p><img src="/images/posts/%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%A8%A1%E5%9E%8B.png" alt></p>
 <h1><span id="ben-wen-zong-jie">本文总结</span><a href="#ben-wen-zong-jie" class="header-anchor">#</a></h1><h1><span id="xiang-guan-wen-ti">相关问题</span><a href="#xiang-guan-wen-ti" class="header-anchor">#</a></h1><hr>
 <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank">
 <img alt="知识共享许可协议" style="border-width:0" src="https://tva1.sinaimg.cn/large/008eGmZEly1gpeqj55ryjj302g00vwea.jpg">
