@@ -161,11 +161,9 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 > CommonClassLoader能加载的类都可以被`Catalina ClassLoader`和`SharedClassLoader`使用，从而实现了公有类库的共用，而`CatalinaClassLoader`和`Shared ClassLoader`自己能加载的类则与对方相互隔离。
 > WebAppClassLoader可以使用`SharedClassLoader`加载到的类，但各个`WebAppClassLoader`实例之间相互隔离。
 
-
-### 如何破坏双亲委派模型？
-破坏双亲委托模型，只需要在`loadClass(String name, boolean resolve)` 方法中，不调用父类加载器去加载类就可以了。
-
 # 本文总结
 它的好处可以用一句话总结，即防止内存中出现多份同样的字节码。
 
 # 相关问题
+## 如何破坏双亲委派模型？
+破坏双亲委托模型，只需要在`loadClass(String name, boolean resolve)` 方法中，不调用父类加载器去加载类就可以了。
