@@ -11,21 +11,13 @@ JVM类加载器
 双亲委派模型
 双亲委派模型工作过程
 为什么需要双亲委派？
+
+
 破坏双亲委派模型
-
-
-
-
-本文总结
-相关问题
-
-
-
-
-
-
-引言#
-在上文JVM-类加载机制中，描述了在java命令执行后，JVM类加载"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+双亲委派是如何实现的？
+为什么要破坏双亲委派模型？
+有哪些破坏了双亲委派模型的例子？分别是为了什么目的？
+如何破"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");
     hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
@@ -45,7 +37,13 @@ JVM类加载器
 <li><a href="#shuang-qin-wei-pai-mo-xing">双亲委派模型</a></li>
 <li><a href="#shuang-qin-wei-pai-mo-xing-gong-zuo-guo-cheng">双亲委派模型工作过程</a></li>
 <li><a href="#wei-shi-me-xu-yao-shuang-qin-wei-pai">为什么需要双亲委派？</a></li>
-<li><a href="#po-pi-shuang-qin-wei-pai-mo-xing">破坏双亲委派模型</a></li>
+</ul>
+</li>
+<li><a href="#po-pi-shuang-qin-wei-pai-mo-xing">破坏双亲委派模型</a><ul>
+<li><a href="#shuang-qin-wei-pai-shi-ru-he-shi-xian-de">双亲委派是如何实现的？</a></li>
+<li><a href="#wei-shi-me-yao-po-pi-shuang-qin-wei-pai-mo-xing">为什么要破坏双亲委派模型？</a></li>
+<li><a href="#you-na-xie-po-pi-liao-shuang-qin-wei-pai-mo-xing-de-li-zi-fen-bie-shi-wei-liao-shi-me-mu-de">有哪些破坏了双亲委派模型的例子？分别是为了什么目的？</a></li>
+<li><a href="#ru-he-po-pi-shuang-qin-wei-pai-mo-xing">如何破坏双亲委派模型？</a></li>
 </ul>
 </li>
 </ul>
@@ -84,9 +82,44 @@ JVM类加载器
 <h3><span id="shuang-qin-wei-pai-mo-xing-gong-zuo-guo-cheng">双亲委派模型工作过程</span><a href="#shuang-qin-wei-pai-mo-xing-gong-zuo-guo-cheng" class="header-anchor">#</a></h3><img src="/images/posts/双亲委派模型.png" width="400px">
 
 <p>当一个类加载器收到了类加载的请求时，首先是交给自己的父类加载器去加载，最终都会到达顶层的引导类加载器，当父类加载器反馈无法完成这个加载请求时，子加载器尝试自己去加载。</p>
-<h3><span id="wei-shi-me-xu-yao-shuang-qin-wei-pai">为什么需要双亲委派？</span><a href="#wei-shi-me-xu-yao-shuang-qin-wei-pai" class="header-anchor">#</a></h3><p>在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，试想如果我们在自定义类加载器中定义了<code>java.lang.Object</code>这个类并放在classpath中的话，那么程序中将出现两个Object根类，类之间的比较将变得毫无意义。</p>
+<h3><span id="wei-shi-me-xu-yao-shuang-qin-wei-pai">为什么需要双亲委派？</span><a href="#wei-shi-me-xu-yao-shuang-qin-wei-pai" class="header-anchor">#</a></h3><ol>
+<li>可以避免类的重复加载，当父加载器已经加载过某一个类时，子加载器就不会再重新加载这个类。</li>
+<li>保证应用程序的安全性，防止核心API被篡改。<blockquote>
+<p>在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，设想如果应⽤程序类加载器想要 加载⼀个有破坏性的<code>java.lang.System</code>类，双亲委派模型会⼀层层向上委派，最终委派给启动类加载器，而启动类加载器中检查到缓存中已经有了这个类，并不会再加载这个有破坏性的System类。</p>
+</blockquote>
+</li>
+</ol>
 <p>当然，实际上自定义包名<code>java</code>开头的类将无法加载成功<br><img src="/images/posts/preDefineClass.png" width="500px"></p>
-<h3><span id="po-pi-shuang-qin-wei-pai-mo-xing">破坏双亲委派模型</span><a href="#po-pi-shuang-qin-wei-pai-mo-xing" class="header-anchor">#</a></h3><h1><span id="ben-wen-zong-jie">本文总结</span><a href="#ben-wen-zong-jie" class="header-anchor">#</a></h1><p>它的好处可以用一句话总结，即防止内存中出现多份同样的字节码。</p>
+<h2><span id="po-pi-shuang-qin-wei-pai-mo-xing">破坏双亲委派模型</span><a href="#po-pi-shuang-qin-wei-pai-mo-xing" class="header-anchor">#</a></h2><h3><span id="shuang-qin-wei-pai-shi-ru-he-shi-xian-de">双亲委派是如何实现的？</span><a href="#shuang-qin-wei-pai-shi-ru-he-shi-xian-de" class="header-anchor">#</a></h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="keyword">boolean</span> resolve)</span><br><span class="line">    <span class="keyword">throws</span> ClassNotFoundException</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (getClassLoadingLock(name)) &#123;</span><br><span class="line">        <span class="comment">// First, check if the class has already been loaded</span></span><br><span class="line">        Class&lt;?&gt; c = findLoadedClass(name);</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">long</span> t0 = System.nanoTime();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (parent != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    c = parent.loadClass(name, <span class="keyword">false</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    c = findBootstrapClassOrNull(name);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">                <span class="comment">// ClassNotFoundException thrown if class not found</span></span><br><span class="line">                <span class="comment">// from the non-null parent class loader</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// If still not found, then invoke findClass in order</span></span><br><span class="line">                <span class="comment">// to find the class.</span></span><br><span class="line">                <span class="keyword">long</span> t1 = System.nanoTime();</span><br><span class="line">                c = findClass(name);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// this is the defining class loader; record the stats</span></span><br><span class="line">                sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);</span><br><span class="line">                sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);</span><br><span class="line">                sun.misc.PerfCounter.getFindClasses().increment();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (resolve) &#123;</span><br><span class="line">            resolveClass(c);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><code>findLoadedClass(name);</code>判断该类是否已经加载，如果加载过，则使用缓存</li>
+<li>如果加载器不为null，则继续调用父类加载器的<code>loadClass(String name, boolean resolve)</code>方法</li>
+<li>如果加载器为null，说明当前为引导类加载器（bootstrapClassLoader），在<code>findBootstrapClassOrNull(name)</code>中调用本地方法（C++实现）</li>
+</ol>
+<h3><span id="wei-shi-me-yao-po-pi-shuang-qin-wei-pai-mo-xing">为什么要破坏双亲委派模型？</span><a href="#wei-shi-me-yao-po-pi-shuang-qin-wei-pai-mo-xing" class="header-anchor">#</a></h3><p>由于<code>类的唯一性由是否是同一个类加载器和是否同一个字节码文件同时决定的</code>这一特性，可以为应用程序提供类库的隔离性。</p>
+<h3><span id="you-na-xie-po-pi-liao-shuang-qin-wei-pai-mo-xing-de-li-zi-fen-bie-shi-wei-liao-shi-me-mu-de">有哪些破坏了双亲委派模型的例子？分别是为了什么目的？</span><a href="#you-na-xie-po-pi-liao-shuang-qin-wei-pai-mo-xing-de-li-zi-fen-bie-shi-wei-liao-shi-me-mu-de" class="header-anchor">#</a></h3><ol>
+<li>Tomcat：我们经常会在一个Tomcat中部署多个应用程序，多个应用程序之前可能用着不同版本的类库，也可能共享着一部分类库。这个时候自定类加载器就可以派上用场了<ul>
+<li>在Tomcat中主要用自定义类加载器解决以下几个问题：<ol>
+<li>同一个Tomcat中，各个Web应用之前各自使用的Java类库要互相隔离</li>
+<li>同一个Tomcat中，各个Web应用之间可以共享有共享的Java类库</li>
+<li>为了使Tomcat不受web应用的影响，服务器的类库应该与应用程序的类库互相独立</li>
+<li>使Tomcat支持热部署</li>
+</ol>
+</li>
+</ul>
+</li>
+</ol>
+<h4><span id="tomcat-zhong-lei-jia-zai-qi-de-jia-gou">Tomcat中类加载器的架构</span><a href="#tomcat-zhong-lei-jia-zai-qi-de-jia-gou" class="header-anchor">#</a></h4><img src="/images/posts/双亲委派模型.png" width="400px">
+- CommonClassLoader：Tomcat最基本的类加载器，加载路径中的Class对Tomcat本身和每个WebApp可见
+- CatalinaClassLoader：Tomcat的容器私有类加载器，加载路径中的Class对WebApp不可见
+- SharedClassLoader：Tomcat的共享类加载器，加载路径中的Class可以被每个WebApp可见，但是对Tomcat不可见
+- WebAppClassLoader：各个WebApp的私有类加载器，加载路径中的Class仅对当前WebApp可见
+
+<blockquote>
+<p>CommonClassLoader能加载的类都可以被<code>Catalina ClassLoader</code>和<code>SharedClassLoader</code>使用，从而实现了公有类库的共用，而<code>CatalinaClassLoader</code>和<code>Shared ClassLoader</code>自己能加载的类则与对方相互隔离。<br>WebAppClassLoader可以使用<code>SharedClassLoader</code>加载到的类，但各个<code>WebAppClassLoader</code>实例之间相互隔离。</p>
+</blockquote>
+<h3><span id="ru-he-po-pi-shuang-qin-wei-pai-mo-xing">如何破坏双亲委派模型？</span><a href="#ru-he-po-pi-shuang-qin-wei-pai-mo-xing" class="header-anchor">#</a></h3><p>破坏双亲委托模型，只需要在<code>loadClass(String name, boolean resolve)</code> 方法中，不调用父类加载器去加载类就可以了。</p>
+<h1><span id="ben-wen-zong-jie">本文总结</span><a href="#ben-wen-zong-jie" class="header-anchor">#</a></h1><p>它的好处可以用一句话总结，即防止内存中出现多份同样的字节码。</p>
 <h1><span id="xiang-guan-wen-ti">相关问题</span><a href="#xiang-guan-wen-ti" class="header-anchor">#</a></h1><hr>
 <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank">
 <img alt="知识共享许可协议" style="border-width:0" src="https://tva1.sinaimg.cn/large/008eGmZEly1gpeqj55ryjj302g00vwea.jpg">
