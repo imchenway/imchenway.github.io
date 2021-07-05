@@ -151,7 +151,8 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 
 #### Tomcat中类加载器的架构
 
-<img src="/images/posts/双亲委派模型.png" width="400px" />
+<img src="/images/posts/Tomcat双亲委派模型.png" width="400px" />
+
 - CommonClassLoader：Tomcat最基本的类加载器，加载路径中的Class对Tomcat本身和每个WebApp可见
 - CatalinaClassLoader：Tomcat的容器私有类加载器，加载路径中的Class对WebApp不可见
 - SharedClassLoader：Tomcat的共享类加载器，加载路径中的Class可以被每个WebApp可见，但是对Tomcat不可见
