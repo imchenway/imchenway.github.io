@@ -3,37 +3,62 @@
 
 
 
+引言
+JVM类加载器
+什么是类加载器？
+类与类加载器的关系
+
+
+本文总结
+相关问题
 
 
 
 
-___
 
 
+引言#
+在上文JVM-类加载机制中，描述了在java命令执行后，JVM类加载的整个流程。
 
-
-本作品采用知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议进行许可，转载请注明出处。
-
-
-
-		
-		var gitalkConfig = {&quot;enable&quot;:true,&quot;owner&quot;:&quot;imchenway&quot;,&quot;repo&quot;:&quot;imchenwa"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+可以看到ClassLoader在java命令执行后起到了承上启下的重要作用
+那么JVM中的C"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");
     hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
     var s = document.getElementsByTagName("script")[0]; 
     s.parentNode.insertBefore(hm, s);
 })();
-</script><script data-ad-client="ca-pub-1946575658110055" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><!--img(src= url_for('images/logo@2x.png'),style="width:127px;")--><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> DavidChan</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM类加载器与双亲委派模型</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+</script><script data-ad-client="ca-pub-1946575658110055" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><!--img(src= url_for('images/logo@2x.png'),style="width:127px;")--><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> DavidChan</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM类加载器与双亲委派模型</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
 
 <!-- toc -->
 
-
-
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#jvm-lei-jia-zai-qi">JVM类加载器</a><ul>
+<li><a href="#shi-me-shi-lei-jia-zai-qi">什么是类加载器？</a></li>
+<li><a href="#lei-yu-lei-jia-zai-qi-de-guan-xi">类与类加载器的关系</a></li>
+</ul>
+</li>
+<li><a href="#ben-wen-zong-jie">本文总结</a></li>
+<li><a href="#xiang-guan-wen-ti">相关问题</a></li>
+</ul>
 <!-- tocstop -->
 
 </div>
-___
+
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>在上文<a href="https://imchenway.com/2021/07/01/JVM-类加载机制" target="_blank" rel="noopener">JVM-类加载机制</a>中，描述了在<code>java</code>命令执行后，JVM类加载的整个流程。<br><img src="/images/posts/javaCli.png" alt="javaCli"></p>
+<ul>
+<li>可以看到ClassLoader在<code>java</code>命令执行后起到了承上启下的重要作用</li>
+<li>那么JVM中的ClassCloader是如何运行的呢？本文将带你揭开它神秘的面纱</li>
+</ul>
+</blockquote>
+<h1><span id="jvm-lei-jia-zai-qi">JVM类加载器</span><a href="#jvm-lei-jia-zai-qi" class="header-anchor">#</a></h1><h3><span id="shi-me-shi-lei-jia-zai-qi">什么是类加载器？</span><a href="#shi-me-shi-lei-jia-zai-qi" class="header-anchor">#</a></h3><p>虚拟机的设计团队把类加载阶段中的“通过类的全限定名去找到对应的Class文件”这个动作放到Java虚拟机的外部去实现，为了便于让应用程序自己决定如何去获取所需要的类，实现这个动作的代码模块就叫做“类加载器”。</p>
+<h3><span id="lei-yu-lei-jia-zai-qi-de-guan-xi">类与类加载器的关系</span><a href="#lei-yu-lei-jia-zai-qi-de-guan-xi" class="header-anchor">#</a></h3><p>类加载器只用于类的加载动作，但是在我们的Java程序中起到的作用却不至于类的加载。在我们比较两个类是否相等时（<code>equals()</code>、<code>isInstance()</code>、关键字<code>instanceof</code>），即使两个类来源于同一个Class文件，被同一个虚拟机加载，当它们的类加载不同时，那么这两个类也会不相等。</p>
+<iframe src="https://tool.lu/coderunner/embed/bdT.html" width="650" height="550" frameborder="0" mozallowfullscreen webkitallowfullscreen allowfullscreen></iframe>
+
+<h1><span id="ben-wen-zong-jie">本文总结</span><a href="#ben-wen-zong-jie" class="header-anchor">#</a></h1><h1><span id="xiang-guan-wen-ti">相关问题</span><a href="#xiang-guan-wen-ti" class="header-anchor">#</a></h1><hr>
 <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank">
 <img alt="知识共享许可协议" style="border-width:0" src="https://tva1.sinaimg.cn/large/008eGmZEly1gpeqj55ryjj302g00vwea.jpg">
 </a>
