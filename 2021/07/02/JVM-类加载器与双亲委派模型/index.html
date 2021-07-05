@@ -85,7 +85,7 @@ JVM类加载器
 
 <p>当一个类加载器收到了类加载的请求时，首先是交给自己的父类加载器去加载，最终都会到达顶层的引导类加载器，当父类加载器反馈无法完成这个加载请求时，子加载器尝试自己去加载。</p>
 <h3><span id="wei-shi-me-xu-yao-shuang-qin-wei-pai">为什么需要双亲委派？</span><a href="#wei-shi-me-xu-yao-shuang-qin-wei-pai" class="header-anchor">#</a></h3><p>在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，试想如果我们在自定义类加载器中定义了<code>java.lang.Object</code>这个类并放在classpath中的话，那么程序中将出现两个Object根类，类之间的比较将变得毫无意义。</p>
-<p>当然，实际上自定义包名<code>java</code>开头的类将无法加载成功<br><img src="/public/images/posts/preDefineClass.png" width="400px"></p>
+<p>当然，实际上自定义包名<code>java</code>开头的类将无法加载成功<br><img src="/images/posts/preDefineClass.png" width="400px"></p>
 <h3><span id="po-pi-shuang-qin-wei-pai-mo-xing">破坏双亲委派模型</span><a href="#po-pi-shuang-qin-wei-pai-mo-xing" class="header-anchor">#</a></h3><h1><span id="ben-wen-zong-jie">本文总结</span><a href="#ben-wen-zong-jie" class="header-anchor">#</a></h1><p>它的好处可以用一句话总结，即防止内存中出现多份同样的字节码。</p>
 <h1><span id="xiang-guan-wen-ti">相关问题</span><a href="#xiang-guan-wen-ti" class="header-anchor">#</a></h1><hr>
 <a rel="license noopener" href="https://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank">
