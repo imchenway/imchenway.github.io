@@ -15,7 +15,7 @@ tags: ['#JVM']
 
 # JVM类加载器
 ## 什么是类加载器？
-虚拟机的设计团队把类加载阶段中的“通过类的全限定名去找到对应的Class文件”这个动作放到Java虚拟机的外部去实现，为了便于让应用程序自己决定如何去获取所需要的类，实现这个动作的代码模块就叫做“类加载器”。
+虚拟机的设计团队把类加载阶段中的`通过类的全限定名去找到对应的Class文件`这个动作放到Java虚拟机的外部去实现，为了便于让应用程序自己决定如何去获取所需要的类，实现这个动作的代码模块就叫做“类加载器”。
 
 ## 类与类加载器的关系
 类加载器只用于类的加载动作，但是在我们的Java程序中起到的作用却不至于类的加载。在我们比较两个类是否相等时（`equals()`、`isInstance()`、关键字`instanceof`），即使两个类来源于同一个Class文件，被同一个虚拟机加载，当它们的类加载不同时，那么这两个类也会不相等。
@@ -93,7 +93,6 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 <img src="/images/posts/preDefineClass.png" width="500px">
 
 
-## 破坏双亲委派模型
 ### 双亲委派是如何实现的？
 ```java
     protected Class<?> loadClass(String name, boolean resolve)
@@ -138,10 +137,19 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 2. 如果加载器不为null，则继续调用父类加载器的`loadClass(String name, boolean resolve)`方法
 3. 如果加载器为null，说明当前为引导类加载器（bootstrapClassLoader），在`findBootstrapClassOrNull(name)`中调用本地方法（C++实现）
 
-### 为什么要破坏双亲委派模型？
+
+# 本文总结
+- 在类的加载阶段，Java虚拟机通过类加载器模块去实现`通过类的全限定名去找到对应的Class文件`，同时通过类加载器的唯一实例对象地址和字节码文件的相同来判定类的唯一性，正时因为这个特性，也让类加载机制可以拥有隔离性。
+- 类加载的过程中，使用双亲委派机制来避免类的重复加载，同时也保障了核心类库API不被篡改。
+
+# 相关问题
+## 如何破坏双亲委派模型？
+破坏双亲委托模型，只需要在`loadClass(String name, boolean resolve)` 方法中，不调用父类加载器去加载类就可以了。
+
+## 为什么要破坏双亲委派模型？
 由于`类的唯一性由是否是同一个类加载器和是否同一个字节码文件同时决定的`这一特性，可以为应用程序提供类库的隔离性。
 
-### 有哪些破坏了双亲委派模型的例子？分别是为了什么目的？
+## 有哪些破坏了双亲委派模型的例子？分别是为了什么目的？
 1. Tomcat：我们经常会在一个Tomcat中部署多个应用程序，多个应用程序之前可能用着不同版本的类库，也可能共享着一部分类库。这个时候自定类加载器就可以派上用场了
    - 在Tomcat中主要用自定义类加载器解决以下几个问题：
      1. 同一个Tomcat中，各个Web应用之前各自使用的Java类库要互相隔离
@@ -149,7 +157,7 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
      3. 为了使Tomcat不受web应用的影响，服务器的类库应该与应用程序的类库互相独立
      4. 使Tomcat支持热部署
 
-#### Tomcat中类加载器的架构
+### Tomcat中类加载器的架构是怎么样的？
 
 <img src="/images/posts/Tomcat双亲委派模型.png" width="400px" />
 
@@ -160,10 +168,3 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 
 > CommonClassLoader能加载的类都可以被`Catalina ClassLoader`和`SharedClassLoader`使用，从而实现了公有类库的共用，而`CatalinaClassLoader`和`Shared ClassLoader`自己能加载的类则与对方相互隔离。
 > WebAppClassLoader可以使用`SharedClassLoader`加载到的类，但各个`WebAppClassLoader`实例之间相互隔离。
-
-# 本文总结
-它的好处可以用一句话总结，即防止内存中出现多份同样的字节码。
-
-# 相关问题
-## 如何破坏双亲委派模型？
-破坏双亲委托模型，只需要在`loadClass(String name, boolean resolve)` 方法中，不调用父类加载器去加载类就可以了。
