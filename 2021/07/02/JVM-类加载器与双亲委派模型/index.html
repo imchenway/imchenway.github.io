@@ -109,12 +109,14 @@ JVM类加载器
 </ul>
 </li>
 </ol>
-<h4><span id="tomcat-zhong-lei-jia-zai-qi-de-jia-gou">Tomcat中类加载器的架构</span><a href="#tomcat-zhong-lei-jia-zai-qi-de-jia-gou" class="header-anchor">#</a></h4><img src="/images/posts/双亲委派模型.png" width="400px">
-- CommonClassLoader：Tomcat最基本的类加载器，加载路径中的Class对Tomcat本身和每个WebApp可见
-- CatalinaClassLoader：Tomcat的容器私有类加载器，加载路径中的Class对WebApp不可见
-- SharedClassLoader：Tomcat的共享类加载器，加载路径中的Class可以被每个WebApp可见，但是对Tomcat不可见
-- WebAppClassLoader：各个WebApp的私有类加载器，加载路径中的Class仅对当前WebApp可见
+<h4><span id="tomcat-zhong-lei-jia-zai-qi-de-jia-gou">Tomcat中类加载器的架构</span><a href="#tomcat-zhong-lei-jia-zai-qi-de-jia-gou" class="header-anchor">#</a></h4><img src="/images/posts/Tomcat双亲委派模型.png" width="400px">
 
+<ul>
+<li>CommonClassLoader：Tomcat最基本的类加载器，加载路径中的Class对Tomcat本身和每个WebApp可见</li>
+<li>CatalinaClassLoader：Tomcat的容器私有类加载器，加载路径中的Class对WebApp不可见</li>
+<li>SharedClassLoader：Tomcat的共享类加载器，加载路径中的Class可以被每个WebApp可见，但是对Tomcat不可见</li>
+<li>WebAppClassLoader：各个WebApp的私有类加载器，加载路径中的Class仅对当前WebApp可见</li>
+</ul>
 <blockquote>
 <p>CommonClassLoader能加载的类都可以被<code>Catalina ClassLoader</code>和<code>SharedClassLoader</code>使用，从而实现了公有类库的共用，而<code>CatalinaClassLoader</code>和<code>Shared ClassLoader</code>自己能加载的类则与对方相互隔离。<br>WebAppClassLoader可以使用<code>SharedClassLoader</code>加载到的类，但各个<code>WebAppClassLoader</code>实例之间相互隔离。</p>
 </blockquote>
