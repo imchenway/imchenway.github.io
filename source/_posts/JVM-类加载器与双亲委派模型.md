@@ -157,7 +157,7 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
      3. 为了使Tomcat不受web应用的影响，服务器的类库应该与应用程序的类库互相独立
      4. 使Tomcat支持热部署
 
-### Tomcat中类加载器的架构是怎么样的？
+## Tomcat中类加载器的架构是怎么样的？
 
 <img src="/images/posts/Tomcat双亲委派模型.png" width="400px" />
 
