@@ -10,8 +10,7 @@ tags: ['#JVM']
     
 # 引言
 > 在上文[JVM-类加载机制](https://imchenway.com/2021/07/01/JVM-类加载机制)中，描述了在`java`命令执行后，JVM类加载的整个流程。
-> ![javaCli](/images/posts/javaCli.png)
-> - 可以看到ClassLoader在`java`命令执行后起到了承上启下的重要作用
+> - 在上文中可以看到ClassLoader在`java`命令执行后起到了承上启下的重要作用
 > - 那么JVM中的ClassCloader是如何运行的呢？本文将带你揭开它神秘的面纱
 
 # JVM类加载器
@@ -64,6 +63,17 @@ public class ClassLoaderTest {
 class com.imchenway.classload.ClassLoaderTest
 false
 ```
+
+### 类加载器是如何去加载类的？
+#### 双亲委派模型
+- 从Java虚拟机的角度来说，只存在两种不同的类加载器，一种是启动类加载器，使用C++实现，是虚拟机自身的一部分；另一种就是所有其他的类加载器，都是由Java实现的，全部都继承自抽象类`java.lang.ClassLoader`。
+- 从Java开发人员的角度来说，类加载器主要分为：
+  - 启动类加载器（BootStrap ClassLoader）：负责将存放于`<JAVA_HOME>\lib`目录中的，或者被`XbootClasspath`参数指定路径的类库加载到虚拟机内存中。
+  - 扩展类加载器（Extension ClassLoader）：负责将存放于`<JAVA_HOME>\lib\ext`目录中的，或者被`java.ext.dirs`系统变量所指定的类库。
+  - 应用程序类加载器（Application ClassLoader）：负责将用户类路径（classPath）上所指定的类库
+  - 除了以上三种类加载器外，我们还可以自定义类加载器。（TODO 如何使用自定义类加载器实现类加载？）
+
+
 
 
 # 本文总结
