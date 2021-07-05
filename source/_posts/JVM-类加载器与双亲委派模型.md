@@ -74,7 +74,7 @@ false
   - 除了以上三种类加载器外，我们还可以自定义类加载器。（TODO 如何使用自定义类加载器实现类加载？）
 
 ### 双亲委派模型工作过程
-<img src="/images/posts/双亲委派模型.png" width="200px" />
+<img src="/images/posts/双亲委派模型.png" width="400px" />
 
 
 # 本文总结
