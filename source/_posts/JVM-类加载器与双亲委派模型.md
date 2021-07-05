@@ -20,7 +20,51 @@ tags: ['#JVM']
 
 ### 类与类加载器的关系
 类加载器只用于类的加载动作，但是在我们的Java程序中起到的作用却不至于类的加载。在我们比较两个类是否相等时（`equals()`、`isInstance()`、关键字`instanceof`），即使两个类来源于同一个Class文件，被同一个虚拟机加载，当它们的类加载不同时，那么这两个类也会不相等。
-<iframe src="https://tool.lu/coderunner/embed/bdT.html" width="650" height="550" frameborder="0" mozallowfullscreen webkitallowfullscreen allowfullscreen></iframe>
+```java
+package com.imchenway.classload;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+/**
+ * 类加载器与类的关系
+ *
+ * @author David Chan
+ * @date 2021-07-02
+ */
+public class ClassLoaderTest {
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        ClassLoader classLoader = new ClassLoader(){
+            @Override
+            public Class<?> loadClass(String name) throws ClassNotFoundException {
+                String fileName = name.substring(name.lastIndexOf(".") + 1) + ".class";
+                InputStream is = getClass().getResourceAsStream(fileName);
+                if (is == null) {
+                    return super.loadClass(name);
+                }
+                try {
+                    byte[] b = new byte[is.available()];
+                    is.read(b);
+                    return defineClass(name, b, 0, b.length);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return super.loadClass(name);
+            }
+        };
+
+        Object obj = classLoader.loadClass("com.imchenway.classload.ClassLoaderTest").newInstance();
+        System.out.println(obj.getClass());
+        System.out.println(obj instanceof com.imchenway.classload.ClassLoaderTest);
+    }
+}
+```
+输出：
+```
+class com.imchenway.classload.ClassLoaderTest
+false
+```
+
 
 # 本文总结
 
