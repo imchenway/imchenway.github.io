@@ -65,19 +65,24 @@ JVM类加载的过程
 <li>JVM(Java Virtual Machine),JVM可以理解为是一个运行在操作系统之上的虚拟电脑，当我们通过<code>javac</code>将<code>*.java</code>编译成JVM可识别<code>*.class</code>字节码文件后，再执行<code>java</code>，此时JVM会将<code>*.class</code>字节码文件解释成当前操作系统平台可识别的机器码去执行。这样的话就实现了”Write once, run anywhere.”。</li>
 </ul>
 </li>
-<li>整体流程如下所示<img src="/images/posts/javaCli.png" width="600px">
-</li>
+<li>整体流程如下所示</li>
 </ul>
+<img src="/images/posts/javaCli.png" width="600px">
 </blockquote>
 <h1><span id="jvm-lei-jia-zai-de-guo-cheng">JVM类加载的过程</span><a href="#jvm-lei-jia-zai-de-guo-cheng" class="header-anchor">#</a></h1><img src="/images/posts/javaCli.png" width="400px">
-### 加载阶段：
-1. 通过类的全限定名来读取class字节码文件的二进制流
-2. 将字节流中的静态数据结构转化为方法区的运行时数据结构
-3. 在内存中生成代表这个类的`java.lang.Class`对象，作为方法区中这个类中的各种数据结构的访问入口
-  - 注意：
-    - 这只是类加载的其中一个阶段，不要和类加载混淆
-    - 加载阶段和链接阶段中的部分动作是交叉进行的，加载阶段尚未完成，链接阶段可能已经开始
 
+<h3><span id="jia-zai-jie-duan">加载阶段：</span><a href="#jia-zai-jie-duan" class="header-anchor">#</a></h3><ol>
+<li>通过类的全限定名来读取class字节码文件的二进制流</li>
+<li>将字节流中的静态数据结构转化为方法区的运行时数据结构</li>
+<li>在内存中生成代表这个类的<code>java.lang.Class</code>对象，作为方法区中这个类中的各种数据结构的访问入口<ul>
+<li>注意：<ul>
+<li>这只是类加载的其中一个阶段，不要和类加载混淆</li>
+<li>加载阶段和链接阶段中的部分动作是交叉进行的，加载阶段尚未完成，链接阶段可能已经开始</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
 <h3><span id="lian-jie-jie-duan-linking">链接阶段（linking）</span><a href="#lian-jie-jie-duan-linking" class="header-anchor">#</a></h3><ol>
 <li>验证<ol>
 <li>文件格式验证：确保class文件的字节流中包含的信息符合虚拟机规范，并且不会危害虚拟机自身的安全</li>
