@@ -75,6 +75,7 @@ false
 
 ### 双亲委派模型工作过程
 ![](/images/posts/双亲委派模型.png)
+<a><img align="left" width="300px" src="/images/posts/双亲委派模型.png" /></a>
 
 
 # 本文总结
