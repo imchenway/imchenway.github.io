@@ -1,5 +1,5 @@
 ---
-title: JVM类加载器与双亲委派模型
+title: JVM类加载器与双亲委派模型（JDK8）
 date: 2021-07-02
 tags: ['#JVM']
 ---
@@ -55,6 +55,9 @@ public class ClassLoaderTest {
         Object obj = classLoader.loadClass("com.imchenway.classload.ClassLoaderTest").newInstance();
         System.out.println(obj.getClass());
         System.out.println(obj instanceof com.imchenway.classload.ClassLoaderTest);
+
+        System.out.println("ClassLoaderTest classLoader: " + ClassLoaderTest.class.getClassLoader().toString());
+        System.out.println("obj classLoader: " + obj.getClass().getClassLoader().toString());
     }
 }
 ```
@@ -62,7 +65,10 @@ public class ClassLoaderTest {
 ```
 class com.imchenway.classload.ClassLoaderTest
 false
+ClassLoaderTest classLoader: jdk.internal.loader.ClassLoaders$AppClassLoader@55054057
+obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 ```
+由此可以看到，`ClassLoaderTest`在启动时由`jdk.internal.loader.ClassLoaders$AppClassLoader@55054057`所加载，而`obj`由`com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5`所加载，所以`System.out.println(obj instanceof com.imchenway.classload.ClassLoaderTest);`这一行输出的结果为`false`，因为类的唯一性由是否是同一个类加载器和是否同一个字节码文件同时决定的。
 
 ## 类加载器是如何去加载类的？
 ### 双亲委派模型
@@ -74,9 +80,20 @@ false
   - 除了以上三种类加载器外，我们还可以自定义类加载器。（TODO 如何使用自定义类加载器实现类加载？）
 
 ### 双亲委派模型工作过程
-<img src="/public/images/posts/双亲委派模型.png" width="400px" />
+<img src="/images/posts/双亲委派模型.png" width="400px" />
 
+当一个类加载器收到了类加载的请求时，首先是交给自己的父类加载器去加载，最终都会到达顶层的引导类加载器，当父类加载器反馈无法完成这个加载请求时，子加载器尝试自己去加载。
+
+### 为什么需要双亲委派？
+在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，试想如果我们在自定义类加载器中定义了`java.lang.Object`这个类并放在classpath中的话，那么程序中将出现两个Object根类，类之间的比较将变得毫无意义。
+
+当然，实际上自定义包名`java`开头的类将无法加载成功
+<img src="/public/images/posts/preDefineClass.png" width="400px">
+
+
+### 破坏双亲委派模型
 
 # 本文总结
+它的好处可以用一句话总结，即防止内存中出现多份同样的字节码。
 
 # 相关问题
