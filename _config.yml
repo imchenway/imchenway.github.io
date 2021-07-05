@@ -136,7 +136,7 @@ plugins:
     clientID: 7026ab2c4cdadba4d342
     clientSecret: 8e00dadc2db335285be4c861e53ee1bf9f8cc713
     distractionFreeMode: false
-    proxy: https://netnr-proxy.cloudno.de/https://github.com/login/oauth/access_token
+    proxy: https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token
 
 #RSS
 feed:
