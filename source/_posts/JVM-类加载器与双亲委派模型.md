@@ -88,7 +88,7 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，试想如果我们在自定义类加载器中定义了`java.lang.Object`这个类并放在classpath中的话，那么程序中将出现两个Object根类，类之间的比较将变得毫无意义。
 
 当然，实际上自定义包名`java`开头的类将无法加载成功
-<img src="/images/posts/preDefineClass.png" width="400px">
+<img src="/images/posts/preDefineClass.png" width="500px">
 
 
 ### 破坏双亲委派模型
