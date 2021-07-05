@@ -85,13 +85,84 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 当一个类加载器收到了类加载的请求时，首先是交给自己的父类加载器去加载，最终都会到达顶层的引导类加载器，当父类加载器反馈无法完成这个加载请求时，子加载器尝试自己去加载。
 
 ### 为什么需要双亲委派？
-在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，试想如果我们在自定义类加载器中定义了`java.lang.Object`这个类并放在classpath中的话，那么程序中将出现两个Object根类，类之间的比较将变得毫无意义。
+1. 可以避免类的重复加载，当父加载器已经加载过某一个类时，子加载器就不会再重新加载这个类。
+2. 保证应用程序的安全性，防止核心API被篡改。
+> 在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，设想如果应⽤程序类加载器想要 加载⼀个有破坏性的`java.lang.System`类，双亲委派模型会⼀层层向上委派，最终委派给启动类加载器，而启动类加载器中检查到缓存中已经有了这个类，并不会再加载这个有破坏性的System类。
 
 当然，实际上自定义包名`java`开头的类将无法加载成功
 <img src="/images/posts/preDefineClass.png" width="500px">
 
 
-### 破坏双亲委派模型
+## 破坏双亲委派模型
+### 双亲委派是如何实现的？
+```java
+    protected Class<?> loadClass(String name, boolean resolve)
+        throws ClassNotFoundException
+    {
+        synchronized (getClassLoadingLock(name)) {
+            // First, check if the class has already been loaded
+            Class<?> c = findLoadedClass(name);
+            if (c == null) {
+                long t0 = System.nanoTime();
+                try {
+                    if (parent != null) {
+                        c = parent.loadClass(name, false);
+                    } else {
+                        c = findBootstrapClassOrNull(name);
+                    }
+                } catch (ClassNotFoundException e) {
+                    // ClassNotFoundException thrown if class not found
+                    // from the non-null parent class loader
+                }
+
+                if (c == null) {
+                    // If still not found, then invoke findClass in order
+                    // to find the class.
+                    long t1 = System.nanoTime();
+                    c = findClass(name);
+
+                    // this is the defining class loader; record the stats
+                    sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+                    sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                    sun.misc.PerfCounter.getFindClasses().increment();
+                }
+            }
+            if (resolve) {
+                resolveClass(c);
+            }
+            return c;
+        }
+    }
+```
+1. `findLoadedClass(name);`判断该类是否已经加载，如果加载过，则使用缓存
+2. 如果加载器不为null，则继续调用父类加载器的`loadClass(String name, boolean resolve)`方法
+3. 如果加载器为null，说明当前为引导类加载器（bootstrapClassLoader），在`findBootstrapClassOrNull(name)`中调用本地方法（C++实现）
+
+### 为什么要破坏双亲委派模型？
+由于`类的唯一性由是否是同一个类加载器和是否同一个字节码文件同时决定的`这一特性，可以为应用程序提供类库的隔离性。
+
+### 有哪些破坏了双亲委派模型的例子？分别是为了什么目的？
+1. Tomcat：我们经常会在一个Tomcat中部署多个应用程序，多个应用程序之前可能用着不同版本的类库，也可能共享着一部分类库。这个时候自定类加载器就可以派上用场了
+   - 在Tomcat中主要用自定义类加载器解决以下几个问题：
+     1. 同一个Tomcat中，各个Web应用之前各自使用的Java类库要互相隔离
+     2. 同一个Tomcat中，各个Web应用之间可以共享有共享的Java类库
+     3. 为了使Tomcat不受web应用的影响，服务器的类库应该与应用程序的类库互相独立
+     4. 使Tomcat支持热部署
+
+#### Tomcat中类加载器的架构
+
+<img src="/images/posts/双亲委派模型.png" width="400px" />
+- CommonClassLoader：Tomcat最基本的类加载器，加载路径中的Class对Tomcat本身和每个WebApp可见
+- CatalinaClassLoader：Tomcat的容器私有类加载器，加载路径中的Class对WebApp不可见
+- SharedClassLoader：Tomcat的共享类加载器，加载路径中的Class可以被每个WebApp可见，但是对Tomcat不可见
+- WebAppClassLoader：各个WebApp的私有类加载器，加载路径中的Class仅对当前WebApp可见
+
+> CommonClassLoader能加载的类都可以被`Catalina ClassLoader`和`SharedClassLoader`使用，从而实现了公有类库的共用，而`CatalinaClassLoader`和`Shared ClassLoader`自己能加载的类则与对方相互隔离。
+> WebAppClassLoader可以使用`SharedClassLoader`加载到的类，但各个`WebAppClassLoader`实例之间相互隔离。
+
+
+### 如何破坏双亲委派模型？
+破坏双亲委托模型，只需要在`loadClass(String name, boolean resolve)` 方法中，不调用父类加载器去加载类就可以了。
 
 # 本文总结
 它的好处可以用一句话总结，即防止内存中出现多份同样的字节码。
