@@ -262,12 +262,12 @@ md5.min.js!function(n){"use strict";function t(n,t){var r=(65535&n)+(65535&t);re
 #gitalk settings
 plugins:
   gitalk:
-    enable: false
+    enable: true
     owner: imchenway
     repo: imchenway.github.io
     admin: imchenway
-    clientID: a29466c6e1aa2b1cb130
-    clientSecret: 12c4168a7d4cb01e96a1a9beb0c35d49d6c5f18b
+    clientID: your clientID
+    clientSecret: your clientSecret
     distractionFreeMode: false
 ```
 
