@@ -6,12 +6,12 @@
 引言
 CPU的组成以及工作原理
 JVM是如何与操作系统交互的？
+本文总结
 相关问题
 什么是CPU Cache、Cache Line、MESI？
 什么是用户态和内核态？
 
 
-参考资料
 
 
 
@@ -33,12 +33,12 @@ JVM是如何与操作系统交互的？
 <li><a href="#yin-yan">引言</a></li>
 <li><a href="#cpu-de-zu-cheng-yi-ji-gong-zuo-yuan-li">CPU的组成以及工作原理</a></li>
 <li><a href="#jvm-shi-ru-he-yu-cao-zuo-xi-tong-jiao-hu-de">JVM是如何与操作系统交互的？</a></li>
+<li><a href="#ben-wen-zong-jie">本文总结</a></li>
 <li><a href="#xiang-guan-wen-ti">相关问题</a><ul>
 <li><a href="#shi-me-shi-cpu-cache-cache-line-mesi">什么是CPU Cache、Cache Line、MESI？</a></li>
 <li><a href="#shi-me-shi-yong-hu-tai-he-nei-he-tai">什么是用户态和内核态？</a></li>
 </ul>
 </li>
-<li><a href="#can-kao-zi-liao">参考资料</a></li>
 </ul>
 <!-- tocstop -->
 
@@ -73,8 +73,9 @@ JVM是如何与操作系统交互的？
 </ul>
 </li>
 <li>在虚拟机启动之后，此时的虚拟机我们可以将其理解为一段可执行的指令集合，同时虚拟机作为操作系统的一个进程，操作系统为其分配类内存和CPU资源，其中保存着当前执行的指令，变量值等信息，这也可以称为进程的上下文。</li>
-<li>此时CPU在多个上下文（多个进程）切换执行指令，此时的上下文可能来自于系统调度，也可能来自于用户程序，也就会产生用户态和内核态之前的切换。<h1><span id="xiang-guan-wen-ti">相关问题</span><a href="#xiang-guan-wen-ti" class="header-anchor">#</a></h1><h2><span id="shi-me-shi-cpu-cache-cache-line-mesi">什么是CPU Cache、Cache Line、MESI？</span><a href="#shi-me-shi-cpu-cache-cache-line-mesi" class="header-anchor">#</a></h2><h2><span id="shi-me-shi-yong-hu-tai-he-nei-he-tai">什么是用户态和内核态？</span><a href="#shi-me-shi-yong-hu-tai-he-nei-he-tai" class="header-anchor">#</a></h2><h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1></li>
+<li>此时CPU在多个上下文（多个进程）切换执行指令，此时的上下文可能来自于系统调度，也可能来自于用户程序，也就会产生用户态和内核态之前的切换。</li>
 </ol>
+<h1><span id="ben-wen-zong-jie">本文总结</span><a href="#ben-wen-zong-jie" class="header-anchor">#</a></h1><h1><span id="xiang-guan-wen-ti">相关问题</span><a href="#xiang-guan-wen-ti" class="header-anchor">#</a></h1><h2><span id="shi-me-shi-cpu-cache-cache-line-mesi">什么是CPU Cache、Cache Line、MESI？</span><a href="#shi-me-shi-cpu-cache-cache-line-mesi" class="header-anchor">#</a></h2><h2><span id="shi-me-shi-yong-hu-tai-he-nei-he-tai">什么是用户态和内核态？</span><a href="#shi-me-shi-yong-hu-tai-he-nei-he-tai" class="header-anchor">#</a></h2><p>参考资料</p>
 <ul>
 <li><a href="https://software.intel.com/content/www/cn/zh/develop/articles/book-processor-architecture_cpu_function_and_composition.html" target="_blank" rel="noopener">CPU的功能和组成 - Intel® Developer Zone</a></li>
 </ul>
