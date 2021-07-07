@@ -11,7 +11,7 @@ tags: ['#JVM']
 # 引言
 > 在上文[JVM-类加载机制](https://imchenway.com/2021/07/01/JVM-类加载机制)中，描述了在`java`命令执行后，JVM类加载的整个流程。
 > - 在上文中可以看到ClassLoader在`java`命令执行后起到了承上启下的重要作用
-> - 那么JVM中的ClassCloader是如何运行的呢？本文将带你揭开它神秘的面纱
+> - 那么JVM中的ClassLoader是如何运行的呢？本文将带你揭开它神秘的面纱
 
 # JVM类加载器
 ## 什么是类加载器？

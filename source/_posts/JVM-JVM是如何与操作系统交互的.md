@@ -25,13 +25,30 @@ CPU由主要由控制器和运算器两部分组成。
 
 非常的枯燥无味，说人话就是：CPU会根据程序计数器所指示的位置，从主存中取出数据，寄存至数据寄存器，然后CPU从数据寄存器中取出指令，放入指令寄存器，并对指令译码。将指令分解成一系列的微操作，然后发出控制命令，执行这一系列微操作，从而完成一条指令的执行。
 
-看到这里还有耐心的小伙伴请戳：[CPU的功能和组成 - Intel® Developer Zone](https://software.intel.com/content/www/cn/zh/develop/articles/book-processor-architecture_cpu_function_and_composition.html)
-
 # JVM是如何与操作系统交互的？
+在前面的文章中我们说过，Java的跨平台的特性是基于JVM虚拟机能够将Java代码编译后的字节码（.class）文件转译为对应的机器所能识别的机器码。
+```java
+public class ByteCodeTest {
+    public static void main(String[] args) {
+        System.out.println("Hello world");
+    }
+}
+```
+通过`javac`编译后使用`javap -verbose`命令即可查看到该类的字节码
+以下是`System.out.println("Hello world")`的对应的字节码
+```
+0: getstatic     #7                  // Field java/lang/System.out:Ljava/io/PrintStream;
+3: ldc           #13                 // String Hello world
+5: invokevirtual #15                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+```
+虚拟机将以上字节码通过解释器解释成汇编指令，最终由硬件转译为CPU能识别的机器指令。
 
-
+1. 在`java`命令执行后，虚拟机启动，将class文件加载到虚拟机由于该类包含了main方法，[JVM类加载机制在之前的文章至于JVM内存模型](https://imchenway.com/2021/07/01/JVM-类加载机制/)中的初始化部分中讲过，包含main方法的类，会在虚拟机启动时过程中触发`初始化`的动作，那么该类中的信息就会被我们按照JVM内存模型的规则存入相对应的内存区域
+   - 我们暂且先把它理解为单纯的一块内存区域。JVM虚拟机暂时理解为运行在操作系统之上的一个虚拟电脑，操作系统为这个虚拟电脑分配CPU、内存等资源，而此时JVM虚拟机也可以称之为操作系统的一个进程。
+2. 在虚拟机启动之后，此时的虚拟机我们可以将其理解为一段可执行的指令集合，同时虚拟机作为操作系统的一个进程，操作系统为其分配类内存和CPU资源，其中保存着当前执行的指令，变量值等信息，这也可以称为进程的上下文。
+3. 此时CPU在多个上下文（多个进程）切换执行指令，此时的上下文可能来自于系统调度，也可能来自于用户程序，也就会产生用户态和内核态之前的切换。
 # 相关问题
 ## 什么是CPU Cache、Cache Line、MESI？
-
+## 什么是用户态和内核态？
 # 参考资料
 - [CPU的功能和组成 - Intel® Developer Zone](https://software.intel.com/content/www/cn/zh/develop/articles/book-processor-architecture_cpu_function_and_composition.html)
