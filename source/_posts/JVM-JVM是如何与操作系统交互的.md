@@ -47,8 +47,11 @@ public class ByteCodeTest {
    - 我们暂且先把它理解为单纯的一块内存区域。JVM虚拟机暂时理解为运行在操作系统之上的一个虚拟电脑，操作系统为这个虚拟电脑分配CPU、内存等资源，而此时JVM虚拟机也可以称之为操作系统的一个进程。
 2. 在虚拟机启动之后，此时的虚拟机我们可以将其理解为一段可执行的指令集合，同时虚拟机作为操作系统的一个进程，操作系统为其分配类内存和CPU资源，其中保存着当前执行的指令，变量值等信息，这也可以称为进程的上下文。
 3. 此时CPU在多个上下文（多个进程）切换执行指令，此时的上下文可能来自于系统调度，也可能来自于用户程序，也就会产生用户态和内核态之前的切换。
+
+# 本文总结
 # 相关问题
 ## 什么是CPU Cache、Cache Line、MESI？
 ## 什么是用户态和内核态？
-# 参考资料
+
+#### 参考资料
 - [CPU的功能和组成 - Intel® Developer Zone](https://software.intel.com/content/www/cn/zh/develop/articles/book-processor-architecture_cpu_function_and_composition.html)
