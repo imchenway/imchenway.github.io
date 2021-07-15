@@ -20,15 +20,15 @@ block content
     //-     a.fa.fa-weibo(href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&title=',e(d.title),'&appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));")
     //-   .twitter
     //-     a.fa.fa-twitter(href=url_for("http://twitter.com/home?status="+","+config.url+"/"+page.path+","+config.title+","+page.title+",;"))
-    - var prev = page.next ? page.next.path : false;
-    - var next = page.prev ? page.prev.path : false;
-    .pagination
-      ul.clearfix
-        if prev
-          li.pre.pagbuttons
-            a.btn(role="navigation",href=url_for(prev), title=page.prev.title)!= __('上一篇')
-        if next
-          li.next.pagbuttons
-            a.btn(role="navigation",href=url_for(next), title=page.next.title)!= __('下一篇')
-    if page.comments
-        include partial/comments
+    //- - var prev = page.next ? page.next.path : false;
+    //- - var next = page.prev ? page.prev.path : false;
+    //- .pagination
+    //-   ul.clearfix
+    //-     if prev
+    //-       li.pre.pagbuttons
+    //-         a.btn(role="navigation",href=url_for(prev), title=page.prev.title)!= __('上一篇')
+    //-     if next
+    //-       li.next.pagbuttons
+    //-         a.btn(role="navigation",href=url_for(next), title=page.next.title)!= __('下一篇')
+    //- if page.comments
+    //-     include partial/comments
