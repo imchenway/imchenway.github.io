@@ -79,51 +79,51 @@ git push -u origin master
 
 #### 4.1 配置SSH key
 
-###### 4.1.1. 测试SSH key
+##### 4.1.1. 测试SSH key
 - 命令行输入`cd ~/.ssh`
 - 如果没报错或者提示什么的说明就是以前生成过的，直接使用`cat ~/.ssh/id_rsa.pub`命令查看本机上的`SSH key`
 
-###### 4.1.2. 如果之前没有创建，则执行以下命令全局配置一下本地账户：
+##### 4.1.2. 如果之前没有创建，则执行以下命令全局配置一下本地账户：
 ```
 git config --global user.name "用户名"
 git config --global user.email "邮箱地址"
 ```
-###### 4.1.3. 然后开始生成密钥 SSH key
+##### 4.1.3. 然后开始生成密钥 SSH key
 ```
 ssh-keygen -t rsa -C '上面的邮箱'
 ```
 - 按照提示完成三次回车，即可生成`ssh key`。
 - 通过`cat ~/.ssh/id_rsa.pub`查看 `~/.ssh/id_rsa.pub` 文件内容，获取到你的`SSH key`
 
-###### 4.1.4. 首次使用还需要确认并添加主机到本机SSH可信列表
+##### 4.1.4. 首次使用还需要确认并添加主机到本机SSH可信列表
 - 若返回 Hi xxx! You've successfully authenticated, but GitHub does not provide  access. 内容，则证明添加成功。
 ```
 ssh -T git@github.com
 ```
 
-###### 4.1.5. Github 上添加刚刚生成的SSH key，按以下步骤添加：
+##### 4.1.5. Github 上添加刚刚生成的SSH key，按以下步骤添加：
 ![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8vgvddczmj31ac0f6qca.jpg)
 
 #### 4.2 Hexo部署到GitHub
 
-###### 4.2.1. 进入Hexo初始化的目录`imchenway.com`下,修改`_config.yml`中的deploy配置
+##### 4.2.1. 进入Hexo初始化的目录`imchenway.com`下,修改`_config.yml`中的deploy配置
 ```
 cd imchenway.com
 vi _config.yml
 ```
 ![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8vgzn6lidj30gu044q4a.jpg)
 
-###### 4.2.2. 安装部署插件
+##### 4.2.2. 安装部署插件
 ```
 npm install hexo-deployer-git --save
 ```
 
-###### 4.2.3. 执行部署命令,g = generate,d = deploy
+##### 4.2.3. 执行部署命令,g = generate,d = deploy
 ```
 hexo g -d
 ```
 
-###### 4.2.4. 访问<https://imchenway.github.io/>查看效果
+##### 4.2.4. 访问<https://imchenway.github.io/>查看效果
 
 # 5. 发表博文
 #### 5.1. 创建新的博文
