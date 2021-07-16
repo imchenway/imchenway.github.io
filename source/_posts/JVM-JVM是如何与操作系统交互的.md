@@ -53,8 +53,8 @@ public class ByteCodeTest {
 2. CPU通过JVM，获取到需要执行的汇编指令，CPU获取到汇编指令后通过硬件解码为机器所能识别的机器码，然后执行其机器码。
 
 # 相关问题
-## 什么是CPU Cache、Cache Line、MESI？
-## 什么是用户态和内核态？
+### 什么是CPU Cache、Cache Line、MESI？
+### 什么是用户态和内核态？
 
 #### 参考资料
 - [CPU的功能和组成 - Intel® Developer Zone](https://software.intel.com/content/www/cn/zh/develop/articles/book-processor-architecture_cpu_function_and_composition.html)

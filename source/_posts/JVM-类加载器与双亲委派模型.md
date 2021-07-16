@@ -143,13 +143,13 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 - 类加载的过程中，使用双亲委派机制来避免类的重复加载，同时也保障了核心类库API不被篡改。
 
 # 相关问题
-## 如何破坏双亲委派模型？
+### 如何破坏双亲委派模型？
 破坏双亲委托模型，只需要在`loadClass(String name, boolean resolve)` 方法中，不调用父类加载器去加载类就可以了。
 
-## 为什么要破坏双亲委派模型？
+### 为什么要破坏双亲委派模型？
 由于`类的唯一性由是否是同一个类加载器和是否同一个字节码文件同时决定的`这一特性，可以为应用程序提供类库的隔离性。
 
-## 有哪些破坏了双亲委派模型的例子？分别是为了什么目的？
+### 有哪些破坏了双亲委派模型的例子？分别是为了什么目的？
 1. Tomcat：我们经常会在一个Tomcat中部署多个应用程序，多个应用程序之前可能用着不同版本的类库，也可能共享着一部分类库。这个时候自定类加载器就可以派上用场了
    - 在Tomcat中主要用自定义类加载器解决以下几个问题：
      1. 同一个Tomcat中，各个Web应用之前各自使用的Java类库要互相隔离
@@ -157,7 +157,7 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
      3. 为了使Tomcat不受web应用的影响，服务器的类库应该与应用程序的类库互相独立
      4. 使Tomcat支持热部署
 
-## Tomcat中类加载器的架构是怎么样的？
+### Tomcat中类加载器的架构是怎么样的？
 
 <img src="/images/posts/Tomcat双亲委派模型.png" width="400px" />
 
