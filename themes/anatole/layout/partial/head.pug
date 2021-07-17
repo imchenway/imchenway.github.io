@@ -36,7 +36,19 @@ script.
     })();
 
 //- Global site tag (gtag.js) - Google Analytics
-script(src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K")
-script window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-PJKTXDR70K');
+script.
+    (function() {
+        var google = document.createElement("googleScript");
+        google.type = 'text/javascript';google.async = true;
+        google.src = "https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K";
+        var s = document.getElementsByTagName("googleScript")[0]; 
+        s.parentNode.insertBefore(google, s);
+    })();
+
+script.
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-PJKTXDR70K');
 
 <script data-ad-client="ca-pub-1946575658110055" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
