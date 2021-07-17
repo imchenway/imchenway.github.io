@@ -58,22 +58,21 @@ gtag('config', 'G-PJKTXDR70K');
 
 <h1><span id="cpu-gong-zuo-yuan-li">CPU工作原理</span><a href="#cpu-gong-zuo-yuan-li" class="header-anchor">#</a></h1><p>CPU由主要由控制器和运算器两部分组成。</p>
 <ul>
-<li><p>其中控制器中程序计数器（PC）、指令寄存器（IR）、指令译码器（ID）、时序发生器、操作控制器组成，他们的主要功能为：</p>
-<ol>
+<li>其中控制器中程序计数器（PC）、指令寄存器（IR）、指令译码器（ID）、时序发生器、操作控制器组成，他们的主要功能为：<ol>
 <li>从主存中取出一条指令，并指出吓一跳指令在主存中的位置；</li>
 <li>对指令进行译码，并产生相应的操作控制信号；</li>
 <li>指挥并控制CPU、主存和输入/输出设备之前的数据流动；</li>
 </ol>
 </li>
-<li><p>运算器由算数逻辑单元（ALU）、累加寄存器（AC）、数据寄存器（DR）和程序状态寄存器（PSW）组成，主要功能为：</p>
-<ol>
+<li>运算器由算数逻辑单元（ALU）、累加寄存器（AC）、数据寄存器（DR）和程序状态寄存器（PSW）组成，主要功能为：<ol>
 <li>执行所有的算术运算；</li>
 <li>执行所有的逻辑运算，并进行逻辑测试；</li>
 </ol>
 </li>
-<li><p>非常的枯燥无味，说人话就是：CPU会根据程序计数器所指示的位置，从主存中取出数据，寄存至数据寄存器，然后CPU从数据寄存器中取出指令，放入指令寄存器，并对指令译码。将指令分解成一系列的微操作，然后发出控制命令，执行这一系列微操作，从而完成一条指令的执行。</p>
-</li>
 </ul>
+<blockquote>
+<p>非常的枯燥无味，说人话就是：CPU会根据程序计数器所指示的位置，从主存中取出数据，寄存至数据寄存器，然后CPU从数据寄存器中取出指令，放入指令寄存器，并对指令译码。将指令分解成一系列的微操作，然后发出控制命令，执行这一系列微操作，从而完成一条指令的执行。</p>
+</blockquote>
 <h1><span id="jvm-shi-ru-he-yu-cao-zuo-xi-tong-jiao-hu-de">JVM是如何与操作系统交互的？</span><a href="#jvm-shi-ru-he-yu-cao-zuo-xi-tong-jiao-hu-de" class="header-anchor">#</a></h1><p>在前面的文章中我们说过，Java的跨平台的特性是基于JVM虚拟机能够将Java代码编译后的字节码（.class）文件转译为对应的机器所能识别的机器码。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ByteCodeTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Hello world"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>通过<code>javac</code>编译后使用<code>javap -verbose</code>命令即可查看到该类的字节码<br>以下是<code>System.out.println(&quot;Hello world&quot;)</code>的对应的字节码</p>
