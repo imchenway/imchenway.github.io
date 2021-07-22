@@ -63,11 +63,17 @@ gtag('config', 'G-PJKTXDR70K');
 <p>在上一篇文章<a href="https://imchenway.com/2021/07/06/JVM-JVM是如何与操作系统交互的/" target="_blank" rel="noopener">JVM是如何与操作系统交互的</a>中，我们介绍了CPU是如何与JVM去交互完成一个main方法的执行的。<br>那么在上篇文章中所提到的JVM虚拟机中的那一块内存区域是什么样的呢？<br>CPU是从JVM中的什么位置获取到了什么样的指令呢？</p>
 <p>带着以上问题，我们来了解一下什么是JVM内存模型</p>
 </blockquote>
-<h1><span id="jvm-nei-cun-mo-xing">JVM内存模型</span><a href="#jvm-nei-cun-mo-xing" class="header-anchor">#</a></h1><h2><span id="shi-me-shi-jvm-nei-cun-mo-xing">什么是JVM内存模型？</span><a href="#shi-me-shi-jvm-nei-cun-mo-xing" class="header-anchor">#</a></h2><img src="/images/posts/JVM内存模型.png" width="500px">
-由上图可以看到所有线程共享的区域为堆和方法区两部分，而程序计数器、栈和本地方法栈则为每个线程私有的内存区域。
+<h1><span id="jvm-nei-cun-mo-xing">JVM内存模型</span><a href="#jvm-nei-cun-mo-xing" class="header-anchor">#</a></h1><h2><span id="shi-me-shi-jvm-nei-cun-mo-xing">什么是JVM内存模型？</span><a href="#shi-me-shi-jvm-nei-cun-mo-xing" class="header-anchor">#</a></h2><img src="/images/posts/JVM/JVM内存模型.png" width="500px">
 
+<p>由上图可以看到所有线程共享的区域为堆和方法区两部分，而程序计数器、栈和本地方法栈则为每个线程私有的内存区域。</p>
 <h3><span id="dui">堆</span><a href="#dui" class="header-anchor">#</a></h3><h3><span id="fang-fa-qu">方法区</span><a href="#fang-fa-qu" class="header-anchor">#</a></h3><h3><span id="cheng-xu-ji-shu-qi">程序计数器</span><a href="#cheng-xu-ji-shu-qi" class="header-anchor">#</a></h3><p>程序计数器是一块线程私有的内存空间，因为多线程是通过线程轮流切换、分配处理器的执行时间来实现的，所以在任何一个具体的时刻，处理器的一个内核都只会执行一条线程中的指令，为了让线程切换后能恢复到正确的执行位置，所以每条线程都会由一个独立的程序计数器，各个线程之间的计数器独立存储，互不影响。当线程在执行Java方法时，记录着正在执行的虚拟机字节码的指令地址；执行Native方法时，该计数器为Undefined。该区域不会抛出OOM异常。</p>
-<h3><span id="xu-ni-ji-zhan">虚拟机栈</span><a href="#xu-ni-ji-zhan" class="header-anchor">#</a></h3><p>和程序计数器一样，栈也是线程私有的一块内存空间，也可以叫做Java方法执行的线程内存模型，每个方法被执行时，都会同步创建一个栈帧，用于存储局部变量表、操作数栈、方法出口等信息。每个方法从被调用到执行完毕就对应着一个栈帧在虚拟机栈中的入栈和出栈的过程。<br>该内存区域异常情况：当线程请求的栈深度大于虚拟机所允许的栈深度时，抛出StackOverflowError异常；如果Java虚拟机允许动态扩展，当栈扩展时无法申请到足够的内存时，抛出OOM异常。</p>
+<h3><span id="xu-ni-ji-zhan">虚拟机栈</span><a href="#xu-ni-ji-zhan" class="header-anchor">#</a></h3><img src="/images/posts/JVM/JVM栈空间.png" width="500px">
+
+<p>和程序计数器一样，栈也是线程私有的一块内存空间，也可以叫做Java方法执行的线程内存模型，每个方法被执行时，都会同步创建一个栈帧，用于存储局部变量表、操作数栈、方法出口等信息。每个方法从被调用到执行完毕就对应着一个栈帧在虚拟机栈中的入栈和出栈的过程。</p>
+<blockquote>
+<p>一个线程中的方法调用链可能会很长，以Java程序的角度来看，同一时刻、同一条线程里面，在 调用堆栈的所有方法都同时处于执行状态。而对于执行引擎来讲，在活动线程中，只有位于栈顶的方法才是在运行的，只有位于栈顶的栈帧才是生效的，其被称为“当前栈帧”（Current Stack Frame），与 这个栈帧所关联的方法被称为“当前方法”（Current Method）。执行引擎所运行的所有字节码指令都只针对当前栈帧进行操作。</p>
+</blockquote>
+<p>该内存区域异常情况：当线程请求的栈深度大于虚拟机所允许的栈深度时，抛出StackOverflowError异常；如果Java虚拟机允许动态扩展，当栈扩展时无法申请到足够的内存时，抛出OOM异常。</p>
 <h3><span id="ben-di-fang-fa-zhan">本地方法栈</span><a href="#ben-di-fang-fa-zhan" class="header-anchor">#</a></h3><h1><span id="ben-wen-zong-jie">本文总结</span><a href="#ben-wen-zong-jie" class="header-anchor">#</a></h1><p>当<code>class</code>文件被加载进虚拟机后，类信息会存放在方法区，在实际运行的时候会执行方法区中的代码，在<code>JVM</code>中所有的线程共享堆内存和方法区，而每个线程有自己独立的Java方法栈，本地方法栈（面向native方法），PC寄存器（存放线程执行位置），当调用一个方法的时候，Java虚拟机会在当前线程对应的方法栈中压入一个栈帧，用来存放Java字节码操作数以及局部变量，这个方法执行完会弹出栈帧，一个线程会连续执行多个方法，对应不同的栈帧的压入和弹出，压入栈帧后就是JVM解释执行的过程了。</p>
 <hr>
 <p><a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" target="_blank"><img alt="知识共享许可协议" style="border-width:0" src="https://tva1.sinaimg.cn/large/008i3skNly1gs8bdrls55j302g00vgld.jpg"></a><br><br>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
