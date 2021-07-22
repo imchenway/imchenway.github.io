@@ -14,7 +14,7 @@ tags: ['#JVM','#操作系统']
 > 那么CPU在操作系统中起到了什么样的作用呢？
 
 # CPU的组成
-<img src="/images/posts/CPU组成图.jpeg" width="500px" />
+<img src="/images/posts/JVM/CPU组成图.jpeg" width="500px" />
 
 # CPU工作原理
 CPU由主要由控制器和运算器两部分组成。

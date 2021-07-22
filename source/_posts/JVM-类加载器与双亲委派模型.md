@@ -80,7 +80,7 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
   - 除了以上三种类加载器外，我们还可以自定义类加载器。（TODO 如何使用自定义类加载器实现类加载？）
 
 ### 双亲委派模型工作过程
-<img src="/images/posts/双亲委派模型.png" width="400px" />
+<img src="/images/posts/JVM/双亲委派模型.png" width="400px" />
 
 当一个类加载器收到了类加载的请求时，首先是交给自己的父类加载器去加载，最终都会到达顶层的引导类加载器，当父类加载器反馈无法完成这个加载请求时，子加载器尝试自己去加载。
 
@@ -90,7 +90,7 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 > 在类与类加载器的关系中我们证明了一个类的唯一性由加载这个类的类加载器和类本身所决定，如果没有双亲委派机制存在的话，设想如果应⽤程序类加载器想要 加载⼀个有破坏性的`java.lang.System`类，双亲委派模型会⼀层层向上委派，最终委派给启动类加载器，而启动类加载器中检查到缓存中已经有了这个类，并不会再加载这个有破坏性的System类。
 
 当然，实际上自定义包名`java`开头的类将无法加载成功
-<img src="/images/posts/preDefineClass.png" width="500px">
+<img src="/images/posts/JVM/preDefineClass.png" width="500px">
 
 
 ### 双亲委派是如何实现的？
@@ -159,7 +159,7 @@ obj classLoader: com.imchenway.classload.ClassLoaderTest$1@6ff3c5b5
 
 ### Tomcat中类加载器的架构是怎么样的？
 
-<img src="/images/posts/Tomcat双亲委派模型.png" width="400px" />
+<img src="/images/posts/JVM/Tomcat双亲委派模型.png" width="400px" />
 
 - CommonClassLoader：Tomcat最基本的类加载器，加载路径中的Class对Tomcat本身和每个WebApp可见
 - CatalinaClassLoader：Tomcat的容器私有类加载器，加载路径中的Class对WebApp不可见
