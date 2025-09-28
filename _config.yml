@@ -143,3 +143,9 @@ feed:
   type: atom
   path: atom.xml
   limit: 20
+
+# Mermaid diagrams
+mermaid:
+  enable: true
+  # 可选: default / forest / neutral / dark / base
+  theme: neutral
