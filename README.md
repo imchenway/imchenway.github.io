@@ -113,19 +113,17 @@ vi _config.yml
 npm install hexo-deployer-git --save
 ```
 
-##### 4.2.3. 执行部署命令,g = generate,d = deploy
+##### 4.2.3. 推送源码触发 Actions 自动部署
+执行以下命令，将本地修改同步到 `hexo` 分支，由 GitHub Actions 自动构建并发布到 `master`：
 ```
-hexo g -d
+git add .
+git commit -m "chore: sync local changes"
+git push origin hexo
 ```
 
-> **使用 GitHub PAT 自动部署**
->
-> - 在 GitHub 仓库的 *Settings → Secrets and variables → Actions* 中新增 `HEXO_DEPLOY_TOKEN`，值为拥有 `repo` 权限的 PAT（官方教程：[Creating a PAT](https://docs.github.com/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)）。
-> - 本地或 CI 环境部署前，导出环境变量：`export HEXO_DEPLOY_TOKEN=你的PAT`。
-> - 执行 `hexo g -d` 时，脚本会自动把令牌注入到 `https://github.com/...` 仓库地址，避免手动输入账号密码。
-> - 部署完成后记得 `unset HEXO_DEPLOY_TOKEN`，或在 CI 中依赖 GitHub Actions 的 Secret。
+> Actions workflow 会在推送到 `hexo` 分支后自动运行，生成静态资源并同步到 Pages 部署分支。若需要手动触发，可在 GitHub Actions 页面使用 `Run workflow`。
 
-##### 4.2.4. 访问<https://imchenway.github.io/>查看效果
+##### 4.2.4. 访问 <https://imchenway.github.io/> 查看效果
 
 # 5. 发表博文
 #### 5.1. 创建新的博文
@@ -139,10 +137,12 @@ hexo g
 hexo s
 ```
 
-#### 5.3. 重新部署到GitHub,访问<https://imchenway.github.io/>查看效果
+#### 5.3. 重新部署到 GitHub
+构建后直接推送源码分支即可：
 ```
-hexo clean
-hexo g -d
+git add .
+git commit -m "chore: sync local changes"
+git push origin hexo
 ```
 
 # 6. 更换主题

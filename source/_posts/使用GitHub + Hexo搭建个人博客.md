@@ -118,9 +118,11 @@ vi _config.yml
 npm install hexo-deployer-git --save
 ```
 
-##### 4.2.3. 执行部署命令,g = generate,d = deploy
+##### 4.2.3. 推送源码触发 Actions 自动部署
 ```
-hexo g -d
+git add .
+git commit -m "chore: sync local changes"
+git push origin hexo
 ```
 
 ##### 4.2.4. 访问<https://imchenway.github.io/>查看效果
