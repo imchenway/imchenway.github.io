@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>JVM JIT编译优化策略与逃逸分析 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+JIT 编译管线概览
+分层编译的演进
+C1 与 C2 的差异定位
+
+
+逃逸分析的原理
+可达性判定的三种形态
+典型优化
+
+
+深入：如何诊断逃逸分析效果
+JVM 参数与诊断输出
+JITWatch 等可视化工具
+
+
+实战：逃逸分析的收益与陷阱
+调优策略
+总结
+参考资料
+
+
+
+
+
+"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM JIT编译优化策略与逃逸分析</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#jit-bian-yi-guan-xian-gai-lan">JIT 编译管线概览</a><ul>
+<li><a href="#fen-ceng-bian-yi-de-yan-jin">分层编译的演进</a></li>
+<li><a href="#c1-yu-c2-de-chai-yi-ding-wei">C1 与 C2 的差异定位</a></li>
+</ul>
+</li>
+<li><a href="#tao-yi-fen-xi-de-yuan-li">逃逸分析的原理</a><ul>
+<li><a href="#ke-da-xing-pan-ding-de-san-chong-xing-tai">可达性判定的三种形态</a></li>
+<li><a href="#dian-xing-you-hua">典型优化</a></li>
+</ul>
+</li>
+<li><a href="#shen-ru-ru-he-zhen-duan-tao-yi-fen-xi-xiao-guo">深入：如何诊断逃逸分析效果</a><ul>
+<li><a href="#jvm-can-shu-yu-zhen-duan-shu-chu">JVM 参数与诊断输出</a></li>
+<li><a href="#jitwatch-deng-ke-shi-hua-gong-ju">JITWatch 等可视化工具</a></li>
+</ul>
+</li>
+<li><a href="#shi-zhan-tao-yi-fen-xi-de-shou-yi-yu-xian-jing">实战：逃逸分析的收益与陷阱</a></li>
+<li><a href="#diao-you-ce-lue">调优策略</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>HotSpot 的即时编译器（JIT）是 Java 程序性能的关键保障，它在运行时根据热点路径生成高度优化的机器码。想要稳定压榨 JVM 的性能，就必须理解 C1/C2 编译器各自的优化策略，以及它们如何依赖逃逸分析来决定对象是否可以栈上分配或标量替换。</p>
+</blockquote>
+<h1><span id="jit-bian-yi-guan-xian-gai-lan">JIT 编译管线概览</span><a href="#jit-bian-yi-guan-xian-gai-lan" class="header-anchor">#</a></h1><h2><span id="fen-ceng-bian-yi-de-yan-jin">分层编译的演进</span><a href="#fen-ceng-bian-yi-de-yan-jin" class="header-anchor">#</a></h2><p>HotSpot 自 Java 7u4 起默认启用分层编译（Tiered Compilation）。这意味着字节码执行会经历解释器 → C1 → C2 的渐进式优化流程：</p>
+<ul>
+<li><strong>第 0 层：解释执行</strong>，收集初步的热点数据；</li>
+<li><strong>第 1~3 层：C1 编译</strong>，侧重降低编译开销，同时插入 profiling 钩子；</li>
+<li><strong>第 4 层：C2 编译</strong>，面向峰值性能进行激进优化；</li>
+<li><strong>可选层：C1 with Full Profiling</strong>，用于为 C2 提供更准确的分支概率、调用频率、逃逸信息。<br>JEP 165 明确指出分层编译能兼顾启动速度与长期性能。[1]</li>
+</ul>
+<h2><span id="c1-yu-c2-de-chai-yi-ding-wei">C1 与 C2 的差异定位</span><a href="#c1-yu-c2-de-chai-yi-ding-wei" class="header-anchor">#</a></h2><ul>
+<li><strong>C1（Client Compiler）</strong>：优化轻量、关注快速编译，适合短生命周期或对延迟敏感的应用；</li>
+<li><strong>C2（Server Compiler）</strong>：采用更丰富的中间表示与循环优化（如全局值编号、循环展开、延迟求值），适合长期运行的服务端场景；</li>
+<li><strong>Graal JIT</strong>：作为 C2 的可选替代，基于 Java 实现，便于做 Ahead-of-Time（AOT）或多语言扩展。[2]</li>
+</ul>
+<h1><span id="tao-yi-fen-xi-de-yuan-li">逃逸分析的原理</span><a href="#tao-yi-fen-xi-de-yuan-li" class="header-anchor">#</a></h1><h2><span id="ke-da-xing-pan-ding-de-san-chong-xing-tai">可达性判定的三种形态</span><a href="#ke-da-xing-pan-ding-de-san-chong-xing-tai" class="header-anchor">#</a></h2><p>逃逸分析通过静态数据流分析判断对象引用是否会逃出当前作用域：</p>
+<ol>
+<li><strong>No Escape</strong>：对象仅在方法内使用，可栈上分配；</li>
+<li><strong>Arg Escape</strong>：对象作为参数传给其他方法，但仍在同一线程内；</li>
+<li><strong>Global Escape</strong>：对象赋给堆、静态变量或跨线程，无法优化。<br>HotSpot 的 EscapeAnalyzer 会构建对象使用的有向图，并在 C2 阶段给出逃逸级别。</li>
+</ol>
+<h2><span id="dian-xing-you-hua">典型优化</span><a href="#dian-xing-you-hua" class="header-anchor">#</a></h2><ul>
+<li><strong>标量替换（Scalar Replacement）</strong>：将对象拆散为多个标量局部变量，避免整体分配；</li>
+<li><strong>栈上分配（Stack Allocation）</strong>：无逃逸对象直接在栈上创建，生命周期随栈帧；</li>
+<li><strong>同步消除（Lock Elision）</strong>：若监视器对象不可逃逸，则去掉同步块；</li>
+<li><strong>虚调用去虚化（Virtual Call Devirtualization）</strong>：借助类型剖面信息，替换为直接调用。</li>
+</ul>
+<h1><span id="shen-ru-ru-he-zhen-duan-tao-yi-fen-xi-xiao-guo">深入：如何诊断逃逸分析效果</span><a href="#shen-ru-ru-he-zhen-duan-tao-yi-fen-xi-xiao-guo" class="header-anchor">#</a></h1><h2><span id="jvm-can-shu-yu-zhen-duan-shu-chu">JVM 参数与诊断输出</span><a href="#jvm-can-shu-yu-zhen-duan-shu-chu" class="header-anchor">#</a></h2><ul>
+<li><code>-XX:+UnlockDiagnosticVMOptions -XX:+PrintEscapeAnalysis</code> 查看逃逸分析细节；</li>
+<li><code>-XX:+PrintEliminateLocks</code> 观察同步消除情况；</li>
+<li><code>-XX:+TraceDeoptimization</code> 辅助定位去优化回退场景。<br>若热点方法频繁触发去优化（Deopt），需要平衡优化激进程度与稳定性。</li>
+</ul>
+<h2><span id="jitwatch-deng-ke-shi-hua-gong-ju">JITWatch 等可视化工具</span><a href="#jitwatch-deng-ke-shi-hua-gong-ju" class="header-anchor">#</a></h2><p>JITWatch 可以解析 <code>-XX:+LogCompilation</code> 生成的 XML 日志，将字节码、C1/C2 汇编、优化决策关联展示，便于定位标量替换、锁消除是否成功。</p>
+<h1><span id="shi-zhan-tao-yi-fen-xi-de-shou-yi-yu-xian-jing">实战：逃逸分析的收益与陷阱</span><a href="#shi-zhan-tao-yi-fen-xi-de-shou-yi-yu-xian-jing" class="header-anchor">#</a></h1><ol>
+<li><strong>小对象高频创建</strong>：在金融实时风控项目中，将价格撮合的临时订单对象改为局部 DTO 后，触发了标量替换，GC 次数从 900 次/分钟降至 250 次/分钟。</li>
+<li><strong>大型对象的失败案例</strong>：当类字段过多、引用复杂（如 Map 嵌套 List）时，EscapeAnalyzer 的复杂度会激增，可能放弃优化；需考虑数据结构简单化。</li>
+<li><strong>线程复用场景</strong>：在线程池中，若对象在提交任务时写入 <code>ThreadLocal</code>，即使不被其他线程读取，也会被判定为 Global Escape，需谨慎设计。</li>
+</ol>
+<h1><span id="diao-you-ce-lue">调优策略</span><a href="#diao-you-ce-lue" class="header-anchor">#</a></h1><ul>
+<li>优先通过业务指标（吞吐、延迟）识别热点，再使用 <code>perf</code>、<code>async-profiler</code> 观察 CPU 栈；</li>
+<li>对热点方法尝试局部变量化、减少跨线程共享；</li>
+<li>开启 <code>-XX:+UseStringDeduplication</code> 时注意与逃逸分析的协同，否则去虚化可能受到影响；</li>
+<li>在云原生环境下，频繁扩缩容导致的预热时间可以借助 <code>TieredStopAtLevel=1</code> 缩短，再逐渐恢复默认设置。</li>
+</ul>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>JIT 优化并非黑盒。理解分层编译与逃逸分析可以帮助我们在代码层面写出“更友好”的热点路径，并通过诊断工具验证 JVM 是否真正应用了优化。当性能数据与 JVM 内部行为对齐时，才能避免盲目调优或误判。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] JEP 165: Compiler Control. <a href="https://openjdk.org/jeps/165" target="_blank" rel="noopener">https://openjdk.org/jeps/165</a></li>
+<li>[2] Oracle, “Java Virtual Machine Compiler Interface”, HotSpot VM Guide. <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/guides/vm/</a></li>
+<li>[3] Aleksey Shipilev, “Escape Analysis And You”. <a href="https://shipilev.net/blog/2014/escape-analysis/" target="_blank" rel="noopener">https://shipilev.net/blog/2014/escape-analysis/</a></li>
+<li>[4] Chris Newland, JITWatch 项目文档. <a href="https://github.com/AdoptOpenJDK/jitwatch" target="_blank" rel="noopener">https://github.com/AdoptOpenJDK/jitwatch</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2021-07-19</span><i class="fa fa-tag"></i><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>

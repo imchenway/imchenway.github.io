@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>MySQL复制延迟监控与治理方案 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+延迟成因
+监控手段
+治理策略
+高级特性
+总结
+参考资料
+
+
+
+
+
+引言#
+主从复制延迟会影响读写分离与故障切换的可用性。本文梳理 MySQL 复制延迟的成因、监控方法与治理策略。
+
+延迟成因#
+网络带宽不足、RTT 高；
+从库 IO/SQL 线程性能瓶颈；
+大事务、DDL "><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>MySQL复制延迟监控与治理方案</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#yan-chi-cheng-yin">延迟成因</a></li>
+<li><a href="#jian-kong-shou-duan">监控手段</a></li>
+<li><a href="#zhi-li-ce-lue">治理策略</a></li>
+<li><a href="#gao-ji-te-xing">高级特性</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>主从复制延迟会影响读写分离与故障切换的可用性。本文梳理 MySQL 复制延迟的成因、监控方法与治理策略。</p>
+</blockquote>
+<h1><span id="yan-chi-cheng-yin">延迟成因</span><a href="#yan-chi-cheng-yin" class="header-anchor">#</a></h1><ul>
+<li>网络带宽不足、RTT 高；</li>
+<li>从库 IO/SQL 线程性能瓶颈；</li>
+<li>大事务、DDL 阻塞；</li>
+<li>从库资源竞争（IO/CPU）。</li>
+</ul>
+<h1><span id="jian-kong-shou-duan">监控手段</span><a href="#jian-kong-shou-duan" class="header-anchor">#</a></h1><ul>
+<li><code>SHOW SLAVE STATUS</code>：<code>Seconds_Behind_Master</code>；</li>
+<li><code>performance_schema.replication_applier_status_by_worker</code>；</li>
+<li>MySQL 8.0 <code>replication_applier</code> 事件表；</li>
+<li>Prometheus Exporter <code>mysql_slave_status_seconds_behind_master</code>；</li>
+<li>自建延迟探针：在主库写时间戳，从库读取比较。</li>
+</ul>
+<h1><span id="zhi-li-ce-lue">治理策略</span><a href="#zhi-li-ce-lue" class="header-anchor">#</a></h1><ol>
+<li><strong>多线程复制</strong>：<code>slave_parallel_workers</code>、<code>parallel_type=LOGICAL_CLOCK</code>；</li>
+<li><strong>网络优化</strong>：专线、启用压缩；</li>
+<li><strong>拆分大事务</strong>：控制批量操作规模；</li>
+<li><strong>延迟监控告警</strong>：设置阈值+自动化处理；</li>
+<li><strong>读写路由</strong>：延迟过高时暂时停止从库读；</li>
+<li><strong>备库调优</strong>：SSD 磁盘、增加 Buffer Pool。</li>
+</ol>
+<h1><span id="gao-ji-te-xing">高级特性</span><a href="#gao-ji-te-xing" class="header-anchor">#</a></h1><ul>
+<li><code>INNODB_REDO_LOG_SPEED_LIMIT</code> 控制写入节奏；</li>
+<li><code>GROUP_REPLICATION</code> 解决复制一致性；</li>
+<li>延迟复制（Delayed Replica）提供灾备。</li>
+</ul>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>持续监控、合理调优和架构优化是解决复制延迟的关键。通过多线程复制、网络优化及大事务治理，可显著降低延迟风险。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] Oracle, <em>MySQL 8.0 Replication Manual</em>. <a href="https://dev.mysql.com/doc/refman/8.0/en/replication-features.html" target="_blank" rel="noopener">https://dev.mysql.com/doc/refman/8.0/en/replication-features.html</a></li>
+<li>[2] Percona Blog: Diagnosing Replication Delay.</li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-12-26</span><i class="fa fa-tag"></i><a class="tag" href="/tags/Database/" title="#Database">#Database </a></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>

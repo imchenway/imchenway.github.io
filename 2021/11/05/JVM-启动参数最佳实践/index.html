@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>JVM启动参数最佳实践 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+内存与 GC 参数
+JIT 与编译
+诊断与可观测
+容器环境
+组合示例
+总结
+参考资料
+
+
+
+
+
+引言#
+JVM 参数决定了堆大小、GC 策略、JIT 行为，是生产稳定性的基础。本文总结常用参数组合及在容器、微服务环境下的配置建议。
+
+内存与 GC 参数#
+-Xms/-Xmx"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM启动参数最佳实践</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#nei-cun-yu-gc-can-shu">内存与 GC 参数</a></li>
+<li><a href="#jit-yu-bian-yi">JIT 与编译</a></li>
+<li><a href="#zhen-duan-yu-ke-guan-ce">诊断与可观测</a></li>
+<li><a href="#rong-qi-huan-jing">容器环境</a></li>
+<li><a href="#zu-he-shi-li">组合示例</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>JVM 参数决定了堆大小、GC 策略、JIT 行为，是生产稳定性的基础。本文总结常用参数组合及在容器、微服务环境下的配置建议。</p>
+</blockquote>
+<h1><span id="nei-cun-yu-gc-can-shu">内存与 GC 参数</span><a href="#nei-cun-yu-gc-can-shu" class="header-anchor">#</a></h1><ul>
+<li><code>-Xms/-Xmx</code>：固定堆大小，减少扩容抖动；</li>
+<li><code>-XX:MaxRAMPercentage</code>、<code>-XX:InitialRAMPercentage</code>：适用于容器；</li>
+<li><code>-XX:+UseG1GC</code>/<code>-XX:+UseZGC</code>：选择 GC；</li>
+<li><code>-XX:MaxGCPauseMillis</code>：GC 延迟目标；</li>
+<li><code>-XX:+ParallelRefProcEnabled</code>：并行处理引用队列。</li>
+</ul>
+<h1><span id="jit-yu-bian-yi">JIT 与编译</span><a href="#jit-yu-bian-yi" class="header-anchor">#</a></h1><ul>
+<li><code>-XX:+TieredCompilation</code>、<code>-XX:TieredStopAtLevel=1</code>：调节预热；</li>
+<li><code>-XX:CICompilerCount</code>：控制编译线程数；</li>
+<li><code>-XX:+PrintCompilation</code>、<code>-XX:+UnlockDiagnosticVMOptions</code>：调试。</li>
+</ul>
+<h1><span id="zhen-duan-yu-ke-guan-ce">诊断与可观测</span><a href="#zhen-duan-yu-ke-guan-ce" class="header-anchor">#</a></h1><ul>
+<li><code>-XX:+UnlockCommercialFeatures -XX:+FlightRecorder</code>（JDK 11 前）；</li>
+<li><code>-XX:+HeapDumpOnOutOfMemoryError</code>；</li>
+<li><code>-XX:+ExitOnOutOfMemoryError</code>；</li>
+<li><code>-Xlog:gc*,safepoint:file=gc.log:time,uptimemillis</code>；</li>
+<li><code>-XX:StartFlightRecording=duration=5m,filename=app.jfr</code>。</li>
+</ul>
+<h1><span id="rong-qi-huan-jing">容器环境</span><a href="#rong-qi-huan-jing" class="header-anchor">#</a></h1><ul>
+<li>必须开启 <code>UseContainerSupport</code>（JDK 10+ 默认）；</li>
+<li>使用 <code>-XX:ActiveProcessorCount</code> 控制线程数；</li>
+<li>结合 <code>cgroup</code> 资源限制；</li>
+<li>对于 Kubernetes，建议在 Helm Chart 中集中管理参数；</li>
+<li>预热脚本：<code>java -Xshare:on -XX:TieredStopAtLevel=1</code>。</li>
+</ul>
+<h1><span id="zu-he-shi-li">组合示例</span><a href="#zu-he-shi-li" class="header-anchor">#</a></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">JAVA_OPTS&#x3D;&quot;-Xms4g -Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis&#x3D;200 \</span><br><span class="line"> -XX:+HeapDumpOnOutOfMemoryError -XX:+ExitOnOutOfMemoryError \</span><br><span class="line"> -XX:StartFlightRecording&#x3D;duration&#x3D;10m,filename&#x3D;&#x2F;logs&#x2F;app.jfr \</span><br><span class="line"> -Xlog:gc*,safepoint:file&#x3D;&#x2F;logs&#x2F;gc.log:tags,uptimemillis&quot;</span><br></pre></td></tr></table></figure>
+
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>JVM 参数配置要结合硬件、业务形态、容器限制综合考虑。通过模板化配置、自动化校验，可以让调优成为可复制的能力。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] Oracle, “Java Command-Line Reference”. <a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></li>
+<li>[2] OpenJDK JEP 343: Packaging Tool. <a href="https://openjdk.org/jeps/343" target="_blank" rel="noopener">https://openjdk.org/jeps/343</a></li>
+<li>[3] Red Hat, “Optimizing Java in Containers”. <a href="https://access.redhat.com" target="_blank" rel="noopener">https://access.redhat.com</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2021-11-06</span><i class="fa fa-tag"></i><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>

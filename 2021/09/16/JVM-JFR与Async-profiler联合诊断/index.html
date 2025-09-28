@@ -1,0 +1,103 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>JFR与Async-profiler联合诊断 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+JFR 的优势与限制
+内置事件模型
+低开销原理
+
+
+async-profiler 特性
+联合诊断流程
+最佳实践
+经验总结
+参考资料
+
+
+
+
+
+引言#
+Java Flight Recorder (JFR) 提供低开销的事件采样，而 async-profiler 专注于火焰图与"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JFR与Async-profiler联合诊断</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#jfr-de-you-shi-yu-xian-zhi">JFR 的优势与限制</a><ul>
+<li><a href="#nei-zhi-shi-jian-mo-xing">内置事件模型</a></li>
+<li><a href="#di-kai-xiao-yuan-li">低开销原理</a></li>
+</ul>
+</li>
+<li><a href="#async-profiler-te-xing">async-profiler 特性</a></li>
+<li><a href="#lian-he-zhen-duan-liu-cheng">联合诊断流程</a></li>
+<li><a href="#zui-jia-shi-jian">最佳实践</a></li>
+<li><a href="#jing-yan-zong-jie">经验总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>Java Flight Recorder (JFR) 提供低开销的事件采样，而 async-profiler 专注于火焰图与原生栈捕获。将两者结合，可以在生产环境获得可视化、低干扰的性能诊断能力。</p>
+</blockquote>
+<h1><span id="jfr-de-you-shi-yu-xian-zhi">JFR 的优势与限制</span><a href="#jfr-de-you-shi-yu-xian-zhi" class="header-anchor">#</a></h1><h2><span id="nei-zhi-shi-jian-mo-xing">内置事件模型</span><a href="#nei-zhi-shi-jian-mo-xing" class="header-anchor">#</a></h2><ul>
+<li>收集 JVM 事件（GC、JIT、线程、锁竞争）；</li>
+<li>支持自定义事件与阈值；</li>
+<li>和 Mission Control 配合分析。</li>
+</ul>
+<h2><span id="di-kai-xiao-yuan-li">低开销原理</span><a href="#di-kai-xiao-yuan-li" class="header-anchor">#</a></h2><p>JFR 在 JVM 内核实现，采用环形缓冲区、批量写入，默认开销 &lt;1%。但对原生栈、内核栈支持有限。</p>
+<h1><span id="async-profiler-te-xing">async-profiler 特性</span><a href="#async-profiler-te-xing" class="header-anchor">#</a></h1><ul>
+<li>通过 <code>perf_event_open</code>（Linux）或 <code>dtrace</code> 捕获原生栈；</li>
+<li>支持 CPU、Wall Clock、Lock、Memory 采样；</li>
+<li>生成 flame graph、火焰图、JFR 输出 (<code>--jfr</code>)；</li>
+<li>开销 &lt; 2%，适合在线使用。</li>
+</ul>
+<h1><span id="lian-he-zhen-duan-liu-cheng">联合诊断流程</span><a href="#lian-he-zhen-duan-liu-cheng" class="header-anchor">#</a></h1><ol>
+<li><strong>基础监控</strong>：开启 JFR 周期性录制 <code>jcmd &lt;pid&gt; JFR.start name=profile settings=profile delay=10s duration=120s filename=app.jfr</code>；</li>
+<li><strong>热点确认</strong>：在 JMC 中查看方法采样、锁阻塞、线程活动；</li>
+<li><strong>细化原生栈</strong>：对疑点运行 <code>async-profiler -e cpu -d 60 -f flame.html &lt;pid&gt;</code>；</li>
+<li><strong>对齐时间线</strong>：使用 <code>async-profiler --jfr</code> 输出 JFR 文件，与主 JFR 合并 <code>jfr assemble</code>；</li>
+<li><strong>案例</strong>：在实战中定位 Netty Native Transport 中的 <code>epoll</code> 阻塞，将 JFR 的线程阻塞事件与 async-profiler 的 native 栈对齐，快速定位 epoll wait 长时间未唤醒。</li>
+</ol>
+<h1><span id="zui-jia-shi-jian">最佳实践</span><a href="#zui-jia-shi-jian" class="header-anchor">#</a></h1><ul>
+<li>JFR 设置 <code>stackdepth=256</code> 提高栈采样深度；</li>
+<li>async-profiler 使用 <code>--begin --end</code> 控制采样窗口；</li>
+<li>对容器需挂载 <code>perf_event_paranoid=1</code>；</li>
+<li>使用 <code>JMC 8</code> 的 <code>JFR Analytics</code> 脚本自动分析；</li>
+<li>在 CI/CD 中集成“性能回归守门人”：构建后自动运行 5 分钟负载，收集 JFR + flame graph，比较指标。</li>
+</ul>
+<h1><span id="jing-yan-zong-jie">经验总结</span><a href="#jing-yan-zong-jie" class="header-anchor">#</a></h1><p>结合 JFR 的 JVM 内部指标与 async-profiler 的原生栈，能够覆盖从 Java 层到系统层的性能视角。通过统一时间线和自动化分析脚本，可以让性能诊断成为日常工程实践的一部分。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] Oracle, “Java Flight Recorder Runtime Guide”. <a href="https://docs.oracle.com/javase/flight-recorder/" target="_blank" rel="noopener">https://docs.oracle.com/javase/flight-recorder/</a></li>
+<li>[2] Async-profiler 官方文档. <a href="https://github.com/jvm-profiling-tools/async-profiler" target="_blank" rel="noopener">https://github.com/jvm-profiling-tools/async-profiler</a></li>
+<li>[3] JEP 328: Flight Recorder. <a href="https://openjdk.org/jeps/328" target="_blank" rel="noopener">https://openjdk.org/jeps/328</a></li>
+<li>[4] JDK Mission Control 官方指南. <a href="https://docs.oracle.com/javacomponents/jmc-8-0/jmc-user-guide" target="_blank" rel="noopener">https://docs.oracle.com/javacomponents/jmc-8-0/jmc-user-guide</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2021-09-17</span><i class="fa fa-tag"></i><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>

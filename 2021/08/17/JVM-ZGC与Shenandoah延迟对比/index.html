@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>ZGC与Shenandoah延迟对比 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+GC 设计理念对比
+ZGC：Region 化 + 染色指针
+Shenandoah：Brooks Pointer + 并发压缩
+
+
+停顿特性与吞吐对比
+选择策略
+调优建议
+生产实战案例
+总结
+参考资料
+
+
+
+
+
+引言#
+ZGC 与 Shenandoah 均以极低的暂停时间为目"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>ZGC与Shenandoah延迟对比</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#gc-she-ji-li-nian-dui-bi">GC 设计理念对比</a><ul>
+<li><a href="#zgc-region-hua-ran-se-zhi-zhen">ZGC：Region 化 + 染色指针</a></li>
+<li><a href="#shenandoah-brooks-pointer-bing-fa-ya-suo">Shenandoah：Brooks Pointer + 并发压缩</a></li>
+</ul>
+</li>
+<li><a href="#ting-dun-te-xing-yu-tun-tu-dui-bi">停顿特性与吞吐对比</a></li>
+<li><a href="#xuan-ze-ce-lue">选择策略</a></li>
+<li><a href="#diao-you-jian-yi">调优建议</a></li>
+<li><a href="#sheng-chan-shi-zhan-an-li">生产实战案例</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>ZGC 与 Shenandoah 均以极低的暂停时间为目标，但它们在指针压缩、并发阶段设计和内存布局上存在差异。理解两者的权衡，有助于我们在低延迟场景（如在线交易、广告投放）中做出正确的 GC 选择。</p>
+</blockquote>
+<h1><span id="gc-she-ji-li-nian-dui-bi">GC 设计理念对比</span><a href="#gc-she-ji-li-nian-dui-bi" class="header-anchor">#</a></h1><h2><span id="zgc-region-hua-ran-se-zhi-zhen">ZGC：Region 化 + 染色指针</span><a href="#zgc-region-hua-ran-se-zhi-zhen" class="header-anchor">#</a></h2><ul>
+<li>将堆划分为固定大小的 Region（2MB~16GB），支持动态缩放；</li>
+<li>通过带三位标记位的指针实现读屏障，允许并发转发；</li>
+<li>所有 GC 阶段（标记、重定位、重映射）几乎全并发，暂停时间与堆大小无关；</li>
+<li>需要 64 位平台，要求 <code>UseCompressedOops</code> 部分受限。[1]</li>
+</ul>
+<h2><span id="shenandoah-brooks-pointer-bing-fa-ya-suo">Shenandoah：Brooks Pointer + 并发压缩</span><a href="#shenandoah-brooks-pointer-bing-fa-ya-suo" class="header-anchor">#</a></h2><ul>
+<li>采用 Brooks Pointer（转发表）实现并发移动；</li>
+<li>依赖读/写屏障减少停顿；</li>
+<li>支持多线程并发标记与压缩，默认使用 SATB + Brooks；</li>
+<li>区域化堆，可与 G1 共存于同一代码库；</li>
+<li>在 JDK 17 起成为正式特性。[2]</li>
+</ul>
+<h1><span id="ting-dun-te-xing-yu-tun-tu-dui-bi">停顿特性与吞吐对比</span><a href="#ting-dun-te-xing-yu-tun-tu-dui-bi" class="header-anchor">#</a></h1><table>
+<thead>
+<tr>
+<th>指标</th>
+<th>ZGC</th>
+<th>Shenandoah</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目标暂停</td>
+<td>&lt; 1ms</td>
+<td>&lt; 10ms</td>
+</tr>
+<tr>
+<td>GC 周期结构</td>
+<td>Mark → Relocate → Remap（全并发）</td>
+<td>Mark → Evacuation → Update refs</td>
+</tr>
+<tr>
+<td>指针机制</td>
+<td>染色指针（Colored Pointers）</td>
+<td>Brooks Pointer</td>
+</tr>
+<tr>
+<td>支持平台</td>
+<td>x86_64, ARM64, S390</td>
+<td>x86_64, AArch64</td>
+</tr>
+<tr>
+<td>压缩开销</td>
+<td>需要额外指针元数据</td>
+<td>Brooks 指针增加对象头</td>
+</tr>
+</tbody></table>
+<p>ZGC 对暂停时间控制更激进，但吞吐会受大量读屏障影响；Shenandoah 在吞吐上表现接近 G1，适合低延迟与吞吐平衡的场景。</p>
+<h1><span id="xuan-ze-ce-lue">选择策略</span><a href="#xuan-ze-ce-lue" class="header-anchor">#</a></h1><ol>
+<li><strong>超低延迟</strong>：处理几十毫秒内必须响应的交易系统，ZGC 的 &lt;1ms 暂停更稳；</li>
+<li><strong>大堆场景</strong>：ZGC 支持最大 16TB 堆，Shenandoah 默认 4TB；</li>
+<li><strong>成本考量</strong>：Shenandoah 在 OpenJDK 社区维护，迁移成本较低；</li>
+<li><strong>观测能力</strong>：两者均可通过 <code>jcmd GC.heap_info</code>、<code>-Xlog:gc*</code> 监控，但 ZGC 的日志结构更清晰。</li>
+</ol>
+<h1><span id="diao-you-jian-yi">调优建议</span><a href="#diao-you-jian-yi" class="header-anchor">#</a></h1><ul>
+<li>ZGC：设置 <code>-XX:ZCollectionInterval=2</code> 控制周期；合理配置 <code>-XX:ZUncommitDelay</code>; 关注 <code>ZStatisticsCounter</code> 指标；</li>
+<li>Shenandoah：结合 <code>-XX:ShenandoahGCHeuristics=aggressive</code> 应对吞吐；使用 <code>-XX:+ShenandoahUnloadClasses</code> 释放类加载器；</li>
+<li>统一开启 <code>-XX:+UnlockDiagnosticVMOptions -XX:+LogEvents</code> 获取事件流；</li>
+<li>与容器资源限制结合，确保 <code>MaxRAMPercentage</code> 与 <code>ShenandoahMinFreeThreshold</code> 等参数匹配。</li>
+</ul>
+<h1><span id="sheng-chan-shi-zhan-an-li">生产实战案例</span><a href="#sheng-chan-shi-zhan-an-li" class="header-anchor">#</a></h1><ul>
+<li>在在线广告竞价系统中，从 G1 迁移到 ZGC 后，99.9 分位暂停时间从 35ms 降至 2.5ms，但 CPU 利用率提高 8%。需要配合 <code>perf</code> 观察屏障带来的额外开销。</li>
+<li>某互联网支付公司在 JDK 17 使用 Shenandoah，发现长时间的并发标记阶段会与应用线程争抢 CPU，通过 <code>taskset</code> 绑定 GC 线程至独立核心后改善。</li>
+</ul>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>ZGC、Shenandoah 虽然目标相同，但实现路径不同。选型时应结合延迟指标、硬件平台与生态支持情况，评估对吞吐的影响，再配合监控优化策略持续验证。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] JEP 333: ZGC. <a href="https://openjdk.org/jeps/333" target="_blank" rel="noopener">https://openjdk.org/jeps/333</a></li>
+<li>[2] JEP 379: Shenandoah. <a href="https://openjdk.org/jeps/379" target="_blank" rel="noopener">https://openjdk.org/jeps/379</a></li>
+<li>[3] Oracle, “Z Garbage Collector”. <a href="https://docs.oracle.com/en/java/javase/17/gctuning/z-garbage-collector.html" target="_blank" rel="noopener">https://docs.oracle.com/en/java/javase/17/gctuning/z-garbage-collector.html</a></li>
+<li>[4] Red Hat, “Shenandoah GC Handbook”. <a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/" target="_blank" rel="noopener">https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2021-08-18</span><i class="fa fa-tag"></i><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>

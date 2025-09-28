@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>JVM偏向锁与轻量级锁演进史 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+HotSpot 锁状态转换
+偏向锁的激活条件
+JDK 15 的变更
+轻量级锁与自旋策略
+实践案例
+优化建议
+总结
+参考资料
+
+
+
+
+
+引言#
+HotSpot 的锁实现经历了偏向锁、轻量级锁、重量级锁等阶段，以减少无竞争同步的开销。了解锁的演进和 JDK 15 之后的调整，有"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM偏向锁与轻量级锁演进史</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#hotspot-suo-zhuang-tai-zhuan-huan">HotSpot 锁状态转换</a></li>
+<li><a href="#pian-xiang-suo-de-ji-huo-tiao-jian">偏向锁的激活条件</a></li>
+<li><a href="#jdk-15-de-bian-geng">JDK 15 的变更</a></li>
+<li><a href="#qing-liang-ji-suo-yu-zi-xuan-ce-lue">轻量级锁与自旋策略</a></li>
+<li><a href="#shi-jian-an-li">实践案例</a></li>
+<li><a href="#you-hua-jian-yi">优化建议</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>HotSpot 的锁实现经历了偏向锁、轻量级锁、重量级锁等阶段，以减少无竞争同步的开销。了解锁的演进和 JDK 15 之后的调整，有助于我们在并发代码中做正确的锁选择。</p>
+</blockquote>
+<h1><span id="hotspot-suo-zhuang-tai-zhuan-huan">HotSpot 锁状态转换</span><a href="#hotspot-suo-zhuang-tai-zhuan-huan" class="header-anchor">#</a></h1><ol>
+<li><strong>无锁</strong>：对象头 mark word 记录 hash、年龄；</li>
+<li><strong>偏向锁</strong>：初次获取锁时将线程 ID 写入 mark word，以后同线程进入不需 CAS；</li>
+<li><strong>轻量级锁</strong>：通过 CAS 尝试获取锁，使用自旋等待；</li>
+<li><strong>重量级锁</strong>：多线程竞争失败后，进入 OS 互斥锁，线程阻塞。</li>
+</ol>
+<h1><span id="pian-xiang-suo-de-ji-huo-tiao-jian">偏向锁的激活条件</span><a href="#pian-xiang-suo-de-ji-huo-tiao-jian" class="header-anchor">#</a></h1><ul>
+<li>默认开启（JDK 6 起）；</li>
+<li>可通过 <code>-XX:+UseBiasedLocking</code> 控制；</li>
+<li>延迟激活：<code>-XX:BiasedLockingStartupDelay</code>；</li>
+<li>仅适用于无竞争、单线程访问的锁。</li>
+</ul>
+<h1><span id="jdk-15-de-bian-geng">JDK 15 的变更</span><a href="#jdk-15-de-bian-geng" class="header-anchor">#</a></h1><p>JEP 374 移除了偏向锁，JDK 17 彻底删除该特性。[1]</p>
+<ul>
+<li>原因：JIT、C2 复杂度高；偏向锁撤销成本大；</li>
+<li>替代：直接使用轻量级锁 + 自旋 + 自适应调度。</li>
+</ul>
+<h1><span id="qing-liang-ji-suo-yu-zi-xuan-ce-lue">轻量级锁与自旋策略</span><a href="#qing-liang-ji-suo-yu-zi-xuan-ce-lue" class="header-anchor">#</a></h1><ul>
+<li><code>-XX:+UseSpinWait</code> 在用户态自旋等待；</li>
+<li><code>-XX:PreBlockSpin</code> 控制自旋次数；</li>
+<li>自适应自旋：根据上次锁持有时间动态调整；</li>
+<li>与 CPU 核心数、线程排队情况相关。</li>
+</ul>
+<h1><span id="shi-jian-an-li">实践案例</span><a href="#shi-jian-an-li" class="header-anchor">#</a></h1><ul>
+<li>高并发订单系统中，热点锁在 JDK 17 后性能平稳提升 5%，主要来自偏向锁撤销开销消失；</li>
+<li>在大量短临界区场景，高自旋可能导致 CPU 空转，应结合 <code>perf</code> 观察；</li>
+<li>AQS（AbstractQueuedSynchronizer）仍基于重量级锁，需要结合业务选择。</li>
+</ul>
+<h1><span id="you-hua-jian-yi">优化建议</span><a href="#you-hua-jian-yi" class="header-anchor">#</a></h1><ul>
+<li>使用无锁或低争用设计（<code>LongAdder</code>、<code>StampedLock</code>）；</li>
+<li>在 JDK 15+ 不再关注偏向锁参数，专注于竞争热点；</li>
+<li>监控 <code>safepoint</code> 与锁竞争，<code>jcmd Thread.print</code> 查看；</li>
+<li>在微服务中使用 <code>synchronized</code> 已不再过时，尤其配合 JIT 优化。</li>
+</ul>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>偏向锁曾在单线程场景发挥作用，但随 JDK 发展，轻量级锁成为默认策略。理解锁状态转换与自旋策略，才能写出高效、稳定的同步代码。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] JEP 374: Disable Biased Locking. <a href="https://openjdk.org/jeps/374" target="_blank" rel="noopener">https://openjdk.org/jeps/374</a></li>
+<li>[2] Oracle, “Java Object Synchronization”. <a href="https://docs.oracle.com/javase/" target="_blank" rel="noopener">https://docs.oracle.com/javase/</a></li>
+<li>[3] Aleksey Shipilev, “Java Locks and synchronizers” 演讲.</li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2021-10-17</span><i class="fa fa-tag"></i><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>
