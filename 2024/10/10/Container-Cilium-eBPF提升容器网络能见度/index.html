@@ -1,0 +1,99 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Cilium/eBPF 提升容器网络能见度 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+Cilium 架构
+数据路径
+可观测能力
+安全功能
+实战经验
+总结
+参考资料
+
+
+
+
+
+引言#
+eBPF 通过内核可编程带来高可见性与性能。Cilium 将 eBPF 应用于 Kubernetes 网络、可观测与安全。本文介绍 Cilium 架构、Hubble 观测与实际案"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Cilium/eBPF 提升容器网络能见度</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#cilium-jia-gou">Cilium 架构</a></li>
+<li><a href="#shu-ju-lu-jing">数据路径</a></li>
+<li><a href="#ke-guan-ce-neng-li">可观测能力</a></li>
+<li><a href="#an-quan-gong-neng">安全功能</a></li>
+<li><a href="#shi-zhan-jing-yan">实战经验</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>eBPF 通过内核可编程带来高可见性与性能。Cilium 将 eBPF 应用于 Kubernetes 网络、可观测与安全。本文介绍 Cilium 架构、Hubble 观测与实际案例。</p>
+</blockquote>
+<h1><span id="cilium-jia-gou">Cilium 架构</span><a href="#cilium-jia-gou" class="header-anchor">#</a></h1><ul>
+<li>eBPF 替代 iptables，实现高性能数据路径；</li>
+<li>Cilium Agent 管理 eBPF 程序；</li>
+<li>Hubble 提供网络观测与 Service Map；</li>
+<li>支持 L3-L7 策略、身份感知。</li>
+</ul>
+<h1><span id="shu-ju-lu-jing">数据路径</span><a href="#shu-ju-lu-jing" class="header-anchor">#</a></h1><pre class="mermaid">graph LR
+  PodA --> eBPF
+  eBPF --> PodB
+  eBPF --> lb[Load Balancer]
+  lb --> External</pre>
+
+<h1><span id="ke-guan-ce-neng-li">可观测能力</span><a href="#ke-guan-ce-neng-li" class="header-anchor">#</a></h1><ul>
+<li>Hubble UI 展示服务拓扑；</li>
+<li>CLI <code>hubble observe</code> 过滤流量；</li>
+<li>导出指标至 Prometheus；</li>
+<li>支持 L7 请求日志、延迟分析。</li>
+</ul>
+<h1><span id="an-quan-gong-neng">安全功能</span><a href="#an-quan-gong-neng" class="header-anchor">#</a></h1><ul>
+<li>基于身份（Identity）定义策略；</li>
+<li>DNS Policy、HTTP Policy；</li>
+<li>与 SPIFFE、Istio 集成；</li>
+<li>使用 Tetragon 实现进程级审计。</li>
+</ul>
+<h1><span id="shi-zhan-jing-yan">实战经验</span><a href="#shi-zhan-jing-yan" class="header-anchor">#</a></h1><ul>
+<li>替换 Calico 提升网络性能；</li>
+<li>利用 Hubble 快速定位请求延迟与丢包；</li>
+<li>eBPF 程序调试：<code>cilium monitor</code>, <code>bpftool</code>; </li>
+<li>升级时注意内核版本兼容。</li>
+</ul>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>Cilium 利用 eBPF 提供高性能网络与可观测性。结合 Hubble 与策略控制，可显著提升容器网络治理能力。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] Cilium Documentation. <a href="https://docs.cilium.io" target="_blank" rel="noopener">https://docs.cilium.io</a></li>
+<li>[2] Hubble Observability. <a href="https://docs.cilium.io/en/latest/gettingstarted/hubble/" target="_blank" rel="noopener">https://docs.cilium.io/en/latest/gettingstarted/hubble/</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2024-10-11</span><i class="fa fa-tag"></i><a class="tag" href="/tags/Container/" title="#Container">#Container </a></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>
