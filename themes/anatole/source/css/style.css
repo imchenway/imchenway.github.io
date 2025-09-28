@@ -2,12 +2,13 @@
 html {
   background-color: #fff;
   -webkit-font-smoothing: antialiased;
+  font-size: 16px;
 }
 
 body {
   color: rgba(0, 0, 0, 0.5);
   font-family: 'PingHei', 'PingFang SC', Helvetica Neue, 'Work Sans', 'Hiragino Sans GB', 'Microsoft YaHei', SimSun, sans-serif;
-  font-size: 15px;
+  font-size: 1rem;
   width: 100%;
   margin: 0 auto 30px auto;
   background-color: #fff;
@@ -16,7 +17,19 @@ body {
 p {
   line-height: 1.9em;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 1rem;
+}
+
+@media screen and (max-width: 1200px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
 }
 
 a {
@@ -128,7 +141,7 @@ a:hover, a:active {
   list-style: none;
   padding: 18px 30px;
   float: left;
-  font-size: 12px;
+  font-size: 0.9rem;
 }
 .page-top .nav li {
   position: relative;
@@ -187,7 +200,7 @@ a:hover, a:active {
   padding-top: 240px;
 }
 .sidebar .logo-title .description {
-  font-size: 14px;
+  font-size: 1rem;
   color: #565654;
 }
 .sidebar .logo-title .logo {
@@ -210,7 +223,7 @@ a:hover, a:active {
 .sidebar .social-links {
   list-style: none;
   padding: 0;
-  font-size: 14px;
+  font-size: 1rem;
   text-align: center;
 }
 .sidebar .social-links i {
@@ -234,14 +247,14 @@ a:hover, a:active {
 }
 .post .post-title h1 {
   /* text-transform: uppercase; */
-  font-size: 30px;
+  font-size: 1.875rem;
   letter-spacing: 5px;
   line-height: 1;
 }
 .post .post-title h2 {
   /* text-transform: uppercase; */
   letter-spacing: 1px;
-  font-size: 28px;
+  font-size: 1.75rem;
   line-height: 1;
   font-weight: 600;
   color: #5f5f5f;
@@ -252,7 +265,7 @@ a:hover, a:active {
   line-height: 1;
   font-weight: 600;
   color: #464646;
-  font-size: 22px;
+  font-size: 1.375rem;
   margin: 0;
 }
 .post .post-title a {
@@ -273,12 +286,12 @@ a:hover, a:active {
 }
 .post .post-content h3 {
   color: #5F5F5F;
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 600;
 }
 .post .post-content h4 {
   color: #5F5F5F;
-  font-size: 16px;
+  font-size: 1.1rem;
 }
 .post .post-footer {
   padding: 0 0 30px 0;
@@ -291,7 +304,7 @@ a:hover, a:active {
 }
 .post .post-footer .meta .info {
   float: left;
-  font-size: 12px;
+  font-size: 0.85rem;
 }
 .post .post-footer .meta .info .date {
   margin-right: 10px;
@@ -309,7 +322,7 @@ a:hover, a:active {
 }
 .post .post-footer .tags {
   padding-bottom: 15px;
-  font-size: 13px;
+  font-size: 0.9rem;
 }
 .post .post-footer .tags ul {
   list-style-type: none;
@@ -386,7 +399,7 @@ a:hover, a:active {
 .footer {
   clear: both;
   text-align: center;
-  font-size: 10px;
+  font-size: 0.75rem;
   margin: 0 auto;
   bottom: 0;
   position: absolute;
@@ -407,7 +420,7 @@ a:hover, a:active {
 }
 
 .list-with-title {
-  font-size: 14px;
+  font-size: 1rem;
   margin: 30px;
   padding: 0;
 }
@@ -416,7 +429,7 @@ a:hover, a:active {
   padding: 0;
 }
 .list-with-title .listing-title {
-  font-size: 24px;
+  font-size: 1.5rem;
   color: #666666;
   font-weight: 600;
   line-height: 2.2em;
@@ -454,7 +467,7 @@ a:hover, a:active {
 .evernote a {
   color: #fff;
   padding: 11px;
-  font-size: 12px;
+  font-size: 0.85rem;
 }
 .evernote a:hover {
   color: #ED6243;
@@ -496,7 +509,7 @@ a:hover, a:active {
   margin: 30px;
 }
 .about h3 {
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 
 /* links*/
@@ -504,7 +517,7 @@ a:hover, a:active {
   margin: 30px;
 }
 .links h3 {
-  font-size: 22px;
+  font-size: 1.375rem;
 }
 .links a {
   cursor: pointer;
@@ -520,7 +533,7 @@ a:hover, a:active {
 }
 
 .read_more {
-  font-size: 14px;
+  font-size: 1rem;
 }
 
 .back-button {
@@ -547,7 +560,7 @@ a.btn {
   outline: 0;
   color: rgba(0, 0, 0, 0.44);
   background: transparent;
-  font-size: 14px;
+  font-size: 1rem;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
@@ -564,7 +577,7 @@ a.btn {
   outline: 0px;
   color: #464545;
   background: transparent;
-  font-size: 14px;
+  font-size: 1rem;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
@@ -613,7 +626,7 @@ a.btn {
   outline: 0;
   color: rgba(0, 0, 0, 0.44);
   background: transparent;
-  font-size: 14px;
+  font-size: 1rem;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
@@ -630,7 +643,7 @@ a.btn {
   outline: 0;
   color: #fff;
   background: #3CBD10;
-  font-size: 14px;
+  font-size: 1rem;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
@@ -667,7 +680,7 @@ a.btn {
     width: 100px;
   }
   .sidebar .logo-title .title h3 {
-    font-size: 20px;
+    font-size: 1.25rem;
   }
 
   .page-top {

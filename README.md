@@ -118,6 +118,13 @@ npm install hexo-deployer-git --save
 hexo g -d
 ```
 
+> **使用 GitHub PAT 自动部署**
+>
+> - 在 GitHub 仓库的 *Settings → Secrets and variables → Actions* 中新增 `HEXO_DEPLOY_TOKEN`，值为拥有 `repo` 权限的 PAT（官方教程：[Creating a PAT](https://docs.github.com/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)）。
+> - 本地或 CI 环境部署前，导出环境变量：`export HEXO_DEPLOY_TOKEN=你的PAT`。
+> - 执行 `hexo g -d` 时，脚本会自动把令牌注入到 `https://github.com/...` 仓库地址，避免手动输入账号密码。
+> - 部署完成后记得 `unset HEXO_DEPLOY_TOKEN`，或在 CI 中依赖 GitHub Actions 的 Secret。
+
 ##### 4.2.4. 访问<https://imchenway.github.io/>查看效果
 
 # 5. 发表博文
