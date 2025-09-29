@@ -1,6 +1,6 @@
 ---
 date: 2025-09-28
-tags: ['#Tools', '#AI', '#vibe']
+tags: ['#Tools', '#AI', '#VIBE']
 ---
 
 ### 本文目录
