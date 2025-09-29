@@ -1,5 +1,5 @@
 ---
-title: "vibeBot 实战操作指南"
+title: "跨终端 Vibe Coding 方案：用 Telegram Bot 随走随写"
 date: 2025-09-28
 tags: ['#Tools', '#AI', '#VIBE']
 ---
