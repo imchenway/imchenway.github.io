@@ -320,30 +320,6 @@ a:hover, a:active {
 .post .post-footer .meta i {
   margin-right: 6px;
 }
-.post .post-footer .tags {
-  padding-bottom: 15px;
-  font-size: 0.9rem;
-}
-.post .post-footer .tags ul {
-  list-style-type: none;
-  display: inline;
-  margin: 0;
-  padding: 0;
-}
-.post .post-footer .tags ul li {
-  list-style-type: none;
-  margin: 0;
-  padding-right: 5px;
-  display: inline;
-}
-.post .post-footer .tags a {
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.44);
-  font-weight: 400;
-}
-.post .post-footer .tags a:hover {
-  text-decoration: none;
-}
 
 .pagination {
   margin: 30px;

@@ -1,3 +1,7 @@
+# 显示控制，通过布尔值开关标签与 GitHub 图标
+show_tags: false
+show_github: false
+
 keywords: DavidChan,imchenway
 author: DavidChan,imchenway@gmail.com
 description: I hear and I forget. <br>I see and I remember. <br>I write and I understand.

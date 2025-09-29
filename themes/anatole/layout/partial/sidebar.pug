@@ -9,7 +9,7 @@
           p!= theme.description
 
   ul.social-links
-    if theme.github
+    if theme.show_github !== false && theme.github
       li
         a(href=theme.github)
           i.fa.fa-github
@@ -36,14 +36,18 @@
 
     h3(title="")
     
-    if site.tags
+    - var sidebarHasCategories = site.categories && site.categories.length
+    - var sidebarHasTags = site.tags && site.tags.length
+    if theme.show_tags !== false && (sidebarHasCategories || sidebarHasTags)
       li
         i.fa.fa-tag
-        - site.categories.sort('posts').each(function(item) {
-            a.tag(href=config.root + item.path, title= item.name)= item.name + " "
-        - });
-        - site.tags.sort('posts').each(function(item) {
-            a.tag(href=config.root + item.path, title= item.name)= item.name + " "
-        - });
+        if sidebarHasCategories
+          - site.categories.sort('posts').each(function(category) {
+              a.tag(href=config.root + category.path, title= category.name)= category.name + " "
+          - });
+        if sidebarHasTags
+          - site.tags.sort('posts').each(function(tag) {
+              a.tag(href=config.root + tag.path, title= tag.name)= tag.name + " "
+          - });
 
   include footer
