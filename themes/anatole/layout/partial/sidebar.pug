@@ -8,8 +8,10 @@
         .description
           p!= theme.description
 
+  - var githubToggle = theme.show_github
+  - var enableGithub = !(githubToggle === false || githubToggle === 'false' || githubToggle === 0 || githubToggle === '0')
   ul.social-links
-    if theme.show_github !== false && theme.github
+    if enableGithub && theme.github
       li
         a(href=theme.github)
           i.fa.fa-github
@@ -36,9 +38,11 @@
 
     h3(title="")
     
+    - var themeShowTags = theme.show_tags
+    - var enableTags = !(themeShowTags === false || themeShowTags === 'false' || themeShowTags === 0 || themeShowTags === '0')
     - var sidebarHasCategories = site.categories && site.categories.length
     - var sidebarHasTags = site.tags && site.tags.length
-    if theme.show_tags !== false && (sidebarHasCategories || sidebarHasTags)
+    if enableTags && (sidebarHasCategories || sidebarHasTags)
       li
         i.fa.fa-tag
         if sidebarHasCategories

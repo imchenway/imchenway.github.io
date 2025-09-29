@@ -19,19 +19,21 @@ mixin make_post(item, is_detail)
 				if theme.duoshuo || theme.disqus
 					i.fa.fa-comment-o
 					a(href= url_for(item.path + "#comments"))= __('Comments')
-				if theme.show_tags !== false
-				- var hasCategories = item.categories && item.categories.length
-				- var hasTags = item.tags && item.tags.length
-				if hasCategories || hasTags
-					i.fa.fa-tag
-					if hasCategories
-						- item.categories.sort('posts').each(function(category) {
-							a.tag(href=config.root + category.path, title= category.name)= category.name + " "
-						- });
-					if hasTags
-						- item.tags.sort('posts').each(function(tag) {
-							a.tag(href=config.root + tag.path, title= tag.name)= tag.name + " "
-						- });
+				- var themeShowTags = theme.show_tags
+				- var enableTags = !(themeShowTags === false || themeShowTags === 'false' || themeShowTags === 0 || themeShowTags === '0')
+				if enableTags
+					- var hasCategories = item.categories && item.categories.length
+					- var hasTags = item.tags && item.tags.length
+					if hasCategories || hasTags
+						i.fa.fa-tag
+						if hasCategories
+							- item.categories.sort('posts').each(function(category) {
+									a.tag(href=config.root + category.path, title= category.name)= category.name + " "
+							- });
+						if hasTags
+							- item.tags.sort('posts').each(function(tag) {
+									a.tag(href=config.root + tag.path, title= tag.name)= tag.name + " "
+							- });
 
 
 mixin make_pager()
