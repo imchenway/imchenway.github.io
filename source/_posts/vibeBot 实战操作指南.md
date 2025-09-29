@@ -1,4 +1,5 @@
 ---
+title: "vibeBot 实战操作指南"
 date: 2025-09-28
 tags: ['#Tools', '#AI', '#VIBE']
 ---
