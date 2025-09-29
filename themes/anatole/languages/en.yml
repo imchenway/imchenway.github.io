@@ -1,0 +1,27 @@
+categories: Categories
+search: Search
+tags: Tags
+tagcloud: Tag Cloud
+tweets: Tweets
+prev: Previous
+next: Next
+comment: Comment
+Comments: Comments
+Home: Home
+Archive: Archive
+Guestbook: Guestbook
+language_switch: Language
+languages:
+  zh-CN: Chinese (Simplified)
+  en: English
+archive_a: Archive
+archive_b: "Archive: %s"
+page: Page %d
+recent_posts: Recent Posts
+newer: Newer
+older: Older
+share: Share
+powered_by: Powered by
+rss_feed: RSS Feed
+category: Category
+tag: Tag
