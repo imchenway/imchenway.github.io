@@ -29,7 +29,7 @@ GC 日志是定位内存问题的核心数据来源。从 JDK 9 的 Unified Logg
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-PJKTXDR70K');
-</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM垃圾收集日志全景分析</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/imchenway"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a target="_blank" rel="noopener" href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/categories/博客搭建/" title="博客搭建">博客搭建 </a><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a><a class="tag" href="/tags/Hexo/" title="#Hexo">#Hexo </a><a class="tag" href="/tags/GitHubPages/" title="#GitHubPages">#GitHubPages </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><div class="lang-switch"><span class="lang-label">语言</span><a class="current" href="/">简体中文</a><a href="/en/">英文（English）</a><a href="/default/">languages.default</a></div><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JVM垃圾收集日志全景分析</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
 
 <!-- toc -->
 
@@ -59,10 +59,10 @@ gtag('config', 'G-PJKTXDR70K');
 <h1><span id="guan-jian-zi-duan-jie-du">关键字段解读</span><a href="#guan-jian-zi-duan-jie-du" class="header-anchor">#</a></h1><ul>
 <li><strong>Pause Young</strong>、<strong>Pause Remark</strong>、<strong>Pause Cleanup</strong>：G1 的阶段；</li>
 <li><strong>Concurrent Mark</strong>、<strong>Concurrent Cycle</strong>：并发阶段；</li>
-<li><strong>Eden/Survivor/Old</strong> 区域容量变化；</li>
+<li><strong>Eden&#x2F;Survivor&#x2F;Old</strong> 区域容量变化；</li>
 <li><strong>Humongous allocations</strong>：大对象分配；</li>
 <li><strong>Metaspace</strong>：类元数据使用；</li>
-<li><strong>User/Sys/Real</strong>：时间分布。</li>
+<li><strong>User&#x2F;Sys&#x2F;Real</strong>：时间分布。</li>
 </ul>
 <h1><span id="fen-xi-gong-ju">分析工具</span><a href="#fen-xi-gong-ju" class="header-anchor">#</a></h1><ul>
 <li>GCViewer：支持 CMS、G1、Parallel；</li>
@@ -77,20 +77,20 @@ gtag('config', 'G-PJKTXDR70K');
 <li><strong>容器溢出</strong>：通过日志发现 Full GC 后堆回落到 0.9X，说明堆设置过小，调整 <code>MaxRAMPercentage</code>。</li>
 </ol>
 <h1><span id="zi-dong-hua-yu-gao-jing">自动化与告警</span><a href="#zi-dong-hua-yu-gao-jing" class="header-anchor">#</a></h1><ul>
-<li>使用 Logstash/Fluentd 解析 GC 日志指标；</li>
+<li>使用 Logstash&#x2F;Fluentd 解析 GC 日志指标；</li>
 <li>配置 Prometheus exporter 将 pause time、GC 频率暴露；</li>
 <li>设定告警：Full GC 次数、Pause P99 超阈值；</li>
 <li>在发布流程中运行固定负载，比较 GC 指标基线。</li>
 </ul>
 <h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>GC 日志是透明化 Java 内存行为的窗口。通过统一日志配置、分析工具与自动化告警，我们可以快速定位问题并持续优化内存表现。</p>
 <h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
-<li>[1] JEP 271: Unified Logging. <a href="https://openjdk.org/jeps/271" target="_blank" rel="noopener">https://openjdk.org/jeps/271</a></li>
-<li>[2] G1 GC Tuning Guide. <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/g1_gc_tuning.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/g1_gc_tuning.html</a></li>
-<li>[3] GCeasy 文档. <a href="https://gceasy.io" target="_blank" rel="noopener">https://gceasy.io</a></li>
+<li>[1] JEP 271: Unified Logging. <a target="_blank" rel="noopener" href="https://openjdk.org/jeps/271">https://openjdk.org/jeps/271</a></li>
+<li>[2] G1 GC Tuning Guide. <a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/g1_gc_tuning.html">https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/g1_gc_tuning.html</a></li>
+<li>[3] GCeasy 文档. <a target="_blank" rel="noopener" href="https://gceasy.io/">https://gceasy.io</a></li>
 <li>[4] Netflix, “Garbage Collection Monitoring at Scale” 经验分享.</li>
 </ul>
 <hr>
-<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
 
 <div id="gitalk-container"></div>
 <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>

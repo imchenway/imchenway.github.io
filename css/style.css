@@ -702,7 +702,29 @@ a.btn {
     display: none;
   }
 
-  .share {
-    display: grid;
-  }
+.share {
+  display: grid;
+}
+}
+
+.information .lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.information .lang-switch .lang-label {
+  margin-right: 4px;
+  color: #999;
+}
+
+.information .lang-switch a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.information .lang-switch a.current {
+  font-weight: 600;
+  text-decoration: underline;
 }

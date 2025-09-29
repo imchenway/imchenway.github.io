@@ -17,7 +17,7 @@ gRPC 互通要点
 
 
 引言#
-Dubbo3 引入的 Triple 协议基于 HTTP/2 与 Protobuf，旨在与 gRPC 互通。本文分析 Triple 的设计、互通细节与生产部署经验，并使"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+Dubbo3 引入的 Triple 协议基于 HTTP&amp;#x2F;2 与 Protobuf，旨在与 gRPC 互通。本文分析 Triple 的设计、互通细节与生产部署"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");
     hm.type = 'text/javascript';hm.async = true;
@@ -29,7 +29,7 @@ Dubbo3 引入的 Triple 协议基于 HTTP/2 与 Protobuf，旨在与 gRPC 互通
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-PJKTXDR70K');
-</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Dubbo3 Triple协议与gRPC互通实践</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/imchenway"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a target="_blank" rel="noopener" href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/categories/博客搭建/" title="博客搭建">博客搭建 </a><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a><a class="tag" href="/tags/Hexo/" title="#Hexo">#Hexo </a><a class="tag" href="/tags/GitHubPages/" title="#GitHubPages">#GitHubPages </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><div class="lang-switch"><span class="lang-label">语言</span><a class="current" href="/">简体中文</a><a href="/en/">英文（English）</a><a href="/default/">languages.default</a></div><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Dubbo3 Triple协议与gRPC互通实践</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
 
 <!-- toc -->
 
@@ -48,10 +48,10 @@ gtag('config', 'G-PJKTXDR70K');
 </div>
 
 <h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
-<p>Dubbo3 引入的 Triple 协议基于 HTTP/2 与 Protobuf，旨在与 gRPC 互通。本文分析 Triple 的设计、互通细节与生产部署经验，并使用 Mermaid 绘制互通架构。</p>
+<p>Dubbo3 引入的 Triple 协议基于 HTTP&#x2F;2 与 Protobuf，旨在与 gRPC 互通。本文分析 Triple 的设计、互通细节与生产部署经验，并使用 Mermaid 绘制互通架构。</p>
 </blockquote>
 <h1><span id="triple-xie-yi-gai-shu">Triple 协议概述</span><a href="#triple-xie-yi-gai-shu" class="header-anchor">#</a></h1><ul>
-<li>使用 HTTP/2 双向流，与 gRPC 框架兼容；</li>
+<li>使用 HTTP&#x2F;2 双向流，与 gRPC 框架兼容；</li>
 <li>Protobuf 作为 IDL，可复用 proto 文件；</li>
 <li>支持服务端推送、双向流式调用；</li>
 <li>与旧 Dubbo 协议（Dubbo2）共存，支持渐进迁移。</li>
@@ -59,7 +59,10 @@ gtag('config', 'G-PJKTXDR70K');
 <h1><span id="grpc-hu-tong-yao-dian">gRPC 互通要点</span><a href="#grpc-hu-tong-yao-dian" class="header-anchor">#</a></h1><ol>
 <li><strong>IDL 统一</strong>：共享 <code>.proto</code> 文件；</li>
 <li><strong>Service 定义</strong>：Dubbo3 使用 <code>@DubboService</code> 与 <code>@DubboReference</code>；</li>
-<li><strong>协议配置</strong>：<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">dubbo:</span></span><br><span class="line">  <span class="attr">protocol:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">tri</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">50051</span></span><br><span class="line">  <span class="attr">registry:</span></span><br><span class="line">    <span class="attr">address:</span> <span class="string">nacos://127.0.0.1:8848</span></span><br></pre></td></tr></table></figure></li>
+<li><strong>协议配置</strong>：</li>
+</ol>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">dubbo:</span></span><br><span class="line">  <span class="attr">protocol:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">tri</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">50051</span></span><br><span class="line">  <span class="attr">registry:</span></span><br><span class="line">    <span class="attr">address:</span> <span class="string">nacos://127.0.0.1:8848</span></span><br></pre></td></tr></table></figure>
+<ol start="4">
 <li><strong>gRPC 客户端</strong>：使用 <code>io.grpc.ManagedChannelBuilder</code> 指向 Dubbo 服务；</li>
 <li><strong>压缩与元数据</strong>：Triple 支持 gRPC Metadata。</li>
 </ol>
@@ -72,24 +75,24 @@ gtag('config', 'G-PJKTXDR70K');
 
 <h1><span id="xing-neng-kao-liang">性能考量</span><a href="#xing-neng-kao-liang" class="header-anchor">#</a></h1><ul>
 <li>Triple 避免了 Dubbo2 的自定义二进制协议，降低了跨语言成本；</li>
-<li>HTTP/2 多路复用提升吞吐，但需关注 Header 压缩开销；</li>
-<li>使用 Netty 作为底层 transport，优化 TLS/ALPN 配置；</li>
+<li>HTTP&#x2F;2 多路复用提升吞吐，但需关注 Header 压缩开销；</li>
+<li>使用 Netty 作为底层 transport，优化 TLS&#x2F;ALPN 配置；</li>
 <li>gRPC 客户端需设置 <code>keepalive</code> 防止连接断开。</li>
 </ul>
 <h1><span id="sheng-chan-jing-yan">生产经验</span><a href="#sheng-chan-jing-yan" class="header-anchor">#</a></h1><ul>
 <li>在多语言部署中（Go、Java），Triple + gRPC 互通成功；</li>
 <li>需统一超时、重试策略，避免 Dubbo 与 gRPC 行为差异；</li>
 <li>使用 Dubbo Admin 与 gRPC Health Check 监控服务状态；</li>
-<li>对慢调用启用 Zipkin/OTel Trace 收集。</li>
+<li>对慢调用启用 Zipkin&#x2F;OTel Trace 收集。</li>
 </ul>
 <h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>Dubbo3 Triple 协议提供了与 gRPC 的自然互通路径。通过统一 IDL、协议配置与监控体系，可以平滑实现跨语言 RPC。</p>
 <h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
-<li>[1] Apache Dubbo Triple 文档. <a href="https://dubbo.apache.org/zh/docs3-v2/java-sdk/advanced-features-and-usage/serialization/triple/" target="_blank" rel="noopener">https://dubbo.apache.org/zh/docs3-v2/java-sdk/advanced-features-and-usage/serialization/triple/</a></li>
-<li>[2] gRPC 官方文档. <a href="https://grpc.io/docs/" target="_blank" rel="noopener">https://grpc.io/docs/</a></li>
+<li>[1] Apache Dubbo Triple 文档. <a target="_blank" rel="noopener" href="https://dubbo.apache.org/zh/docs3-v2/java-sdk/advanced-features-and-usage/serialization/triple/">https://dubbo.apache.org/zh/docs3-v2/java-sdk/advanced-features-and-usage/serialization/triple/</a></li>
+<li>[2] gRPC 官方文档. <a target="_blank" rel="noopener" href="https://grpc.io/docs/">https://grpc.io/docs/</a></li>
 <li>[3] Dubbo 3.0 用户指南.</li>
 </ul>
 <hr>
-<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
 
 <div id="gitalk-container"></div>
 <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>

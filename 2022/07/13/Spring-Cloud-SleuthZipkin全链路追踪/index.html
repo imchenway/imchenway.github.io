@@ -29,7 +29,7 @@ Observability 升级
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-PJKTXDR70K');
-</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Spring Cloud Sleuth与Zipkin全链路追踪</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/imchenway"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a target="_blank" rel="noopener" href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/categories/博客搭建/" title="博客搭建">博客搭建 </a><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a><a class="tag" href="/tags/Hexo/" title="#Hexo">#Hexo </a><a class="tag" href="/tags/GitHubPages/" title="#GitHubPages">#GitHubPages </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><div class="lang-switch"><span class="lang-label">语言</span><a class="current" href="/">简体中文</a><a href="/en/">英文（English）</a><a href="/default/">languages.default</a></div><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Spring Cloud Sleuth与Zipkin全链路追踪</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
 
 <!-- toc -->
 
@@ -51,14 +51,14 @@ gtag('config', 'G-PJKTXDR70K');
 <p>在微服务体系中，全链路追踪是定位性能瓶颈的关键。Spring Cloud Sleuth 与 Zipkin 提供开箱即用的 Trace 收集与展示能力。本文介绍追踪原理、生产化部署与优化策略。</p>
 </blockquote>
 <h1><span id="sleuth-gong-zuo-yuan-li">Sleuth 工作原理</span><a href="#sleuth-gong-zuo-yuan-li" class="header-anchor">#</a></h1><ul>
-<li>在入口处创建 Trace/Span，使用 B3/W3C Header 传播；</li>
+<li>在入口处创建 Trace&#x2F;Span，使用 B3&#x2F;W3C Header 传播；</li>
 <li>支持 RestTemplate、WebClient、Feign、RabbitMQ、Kafka；</li>
 <li>对异步任务、线程池进行上下文传播；</li>
 <li>与 Micrometer Tracing 集成。</li>
 </ul>
 <h1><span id="zipkin-bu-shu">Zipkin 部署</span><a href="#zipkin-bu-shu" class="header-anchor">#</a></h1><ul>
 <li>存储后端：MySQL、Elasticsearch、Cassandra；</li>
-<li>Collector：接收 HTTP/GRPC；</li>
+<li>Collector：接收 HTTP&#x2F;GRPC；</li>
 <li>Query Service + UI 展示；</li>
 <li>可部署在 Kubernetes，并设置数据保留策略。</li>
 </ul>
@@ -76,17 +76,17 @@ gtag('config', 'G-PJKTXDR70K');
 </ul>
 <h1><span id="observability-sheng-ji">Observability 升级</span><a href="#observability-sheng-ji" class="header-anchor">#</a></h1><ul>
 <li>升级到 Micrometer Tracing + OTEL Collector，兼容 Zipkin；</li>
-<li>引入 Service Map，结合 Grafana Tempo/Jaeger；</li>
+<li>引入 Service Map，结合 Grafana Tempo&#x2F;Jaeger；</li>
 <li>添加业务标签（租户、订单号）提高定位效率。</li>
 </ul>
 <h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>Sleuth + Zipkin 提供了标准化的追踪方案。通过合理采样、可视化平台和上下文传播，能快速发现分布式系统中的瓶颈。</p>
 <h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
-<li>[1] Spring Cloud Sleuth Reference. <a href="https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/" target="_blank" rel="noopener">https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/</a></li>
-<li>[2] Zipkin Documentation. <a href="https://zipkin.io/pages/quickstart" target="_blank" rel="noopener">https://zipkin.io/pages/quickstart</a></li>
-<li>[3] Micrometer Tracing Guide. <a href="https://micrometer.io/docs/tracing" target="_blank" rel="noopener">https://micrometer.io/docs/tracing</a></li>
+<li>[1] Spring Cloud Sleuth Reference. <a target="_blank" rel="noopener" href="https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/">https://docs.spring.io/spring-cloud-sleuth/docs/current/reference/html/</a></li>
+<li>[2] Zipkin Documentation. <a target="_blank" rel="noopener" href="https://zipkin.io/pages/quickstart">https://zipkin.io/pages/quickstart</a></li>
+<li>[3] Micrometer Tracing Guide. <a target="_blank" rel="noopener" href="https://micrometer.io/docs/tracing">https://micrometer.io/docs/tracing</a></li>
 </ul>
 <hr>
-<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
 
 <div id="gitalk-container"></div>
 <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>

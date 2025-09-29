@@ -4,7 +4,7 @@
 
 
 引言
-HTTP/3 概述
+HTTP&amp;#x2F;3 概述
 Feign 现状
 代理方案
 未来展望
@@ -17,7 +17,7 @@ Feign 现状
 
 
 引言#
-HTTP/3 基于 QUIC，为高延迟场景提供更优的性能。虽然 Java 生态尚在演进，但我们可以提前评估 OpenFeign 与 HTTP/3 的互操作路径，考虑代"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+HTTP&amp;#x2F;3 基于 QUIC，为高延迟场景提供更优的性能。虽然 Java 生态尚在演进，但我们可以提前评估 OpenFeign 与 HTTP&amp;#x"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");
     hm.type = 'text/javascript';hm.async = true;
@@ -29,13 +29,13 @@ HTTP/3 基于 QUIC，为高延迟场景提供更优的性能。虽然 Java 生�
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-PJKTXDR70K');
-</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="https://github.com/imchenway" target="_blank" rel="noopener"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg" target="_blank" rel="noopener"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">Home</a></li><li><a href="/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">Guestbook</a></li></div><div class="information"><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>OpenFeign与HTTP/3互操作前瞻</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/imchenway"><i class="fa fa-github"></i></a></li><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a target="_blank" rel="noopener" href="https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3><li><i class="fa fa-tag"></i><a class="tag" href="/categories/博客搭建/" title="博客搭建">博客搭建 </a><a class="tag" href="/tags/LeetCode/" title="#LeetCode">#LeetCode </a><a class="tag" href="/tags/ServiceMesh/" title="#ServiceMesh">#ServiceMesh </a><a class="tag" href="/tags/Container/" title="#Container">#Container </a><a class="tag" href="/tags/Database/" title="#Database">#Database </a><a class="tag" href="/tags/RPC/" title="#RPC">#RPC </a><a class="tag" href="/tags/Tools/" title="#Tools">#Tools </a><a class="tag" href="/tags/JVM/" title="#JVM">#JVM </a><a class="tag" href="/tags/操作系统/" title="#操作系统">#操作系统 </a><a class="tag" href="/tags/MQ/" title="#MQ">#MQ </a><a class="tag" href="/tags/Spring/" title="#Spring">#Spring </a><a class="tag" href="/tags/TPM/" title="#TPM">#TPM </a><a class="tag" href="/tags/AI/" title="#AI">#AI </a><a class="tag" href="/tags/vibe/" title="#vibe">#vibe </a><a class="tag" href="/tags/Hexo/" title="#Hexo">#Hexo </a><a class="tag" href="/tags/GitHubPages/" title="#GitHubPages">#GitHubPages </a></li></ul><div class="footer"><div class="p"> <span>© 2017 - 2041 </span><i class="fa fa-star"></i><span> imchenway</span></div></div></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><div class="lang-switch"><span class="lang-label">语言</span><a class="current" href="/">简体中文</a><a href="/en/">英文（English）</a><a href="/default/">languages.default</a></div><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>OpenFeign与HTTP/3互操作前瞻</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
 
 <!-- toc -->
 
 <ul>
 <li><a href="#yin-yan">引言</a></li>
-<li><a href="#http-3-gai-shu">HTTP/3 概述</a></li>
+<li><a href="#http-3-gai-shu">HTTP&#x2F;3 概述</a></li>
 <li><a href="#feign-xian-zhuang">Feign 现状</a></li>
 <li><a href="#dai-li-fang-an">代理方案</a></li>
 <li><a href="#wei-lai-zhan-wang">未来展望</a></li>
@@ -48,26 +48,26 @@ gtag('config', 'G-PJKTXDR70K');
 </div>
 
 <h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
-<p>HTTP/3 基于 QUIC，为高延迟场景提供更优的性能。虽然 Java 生态尚在演进，但我们可以提前评估 OpenFeign 与 HTTP/3 的互操作路径，考虑代理层引入 QUIC 支持。</p>
+<p>HTTP&#x2F;3 基于 QUIC，为高延迟场景提供更优的性能。虽然 Java 生态尚在演进，但我们可以提前评估 OpenFeign 与 HTTP&#x2F;3 的互操作路径，考虑代理层引入 QUIC 支持。</p>
 </blockquote>
-<h1><span id="http-3-gai-shu">HTTP/3 概述</span><a href="#http-3-gai-shu" class="header-anchor">#</a></h1><ul>
+<h1><span id="http-x2f-3-gai-shu">HTTP&#x2F;3 概述</span><a href="#http-x2f-3-gai-shu" class="header-anchor">#</a></h1><ul>
 <li>基于 UDP + QUIC，提供 0-RTT、头部压缩、流控制；</li>
 <li>加密默认开启；</li>
 <li>需要客户端、服务端、代理支持。</li>
 </ul>
 <h1><span id="feign-xian-zhuang">Feign 现状</span><a href="#feign-xian-zhuang" class="header-anchor">#</a></h1><ul>
 <li>默认使用 Apache HttpClient 或 OkHttp；</li>
-<li>OkHttp 4.x 支持 HTTP/2，HTTP/3 仍在实验；</li>
+<li>OkHttp 4.x 支持 HTTP&#x2F;2，HTTP&#x2F;3 仍在实验；</li>
 <li>可通过自定义 Client 接入其他库（如 Cloudflare QUIC 支持）。</li>
 </ul>
 <h1><span id="dai-li-fang-an">代理方案</span><a href="#dai-li-fang-an" class="header-anchor">#</a></h1><ul>
-<li>在服务端 / 边缘使用 Envoy、NGINX QUIC 提供 HTTP/3；</li>
-<li>Feign 调用代理层的 HTTP/2/1.1 接口，由代理转为 HTTP/3；</li>
-<li>或者使用 gRPC + Triple 协议（HTTP/2），结合 HTTP/3 网关。</li>
+<li>在服务端 &#x2F; 边缘使用 Envoy、NGINX QUIC 提供 HTTP&#x2F;3；</li>
+<li>Feign 调用代理层的 HTTP&#x2F;2&#x2F;1.1 接口，由代理转为 HTTP&#x2F;3；</li>
+<li>或者使用 gRPC + Triple 协议（HTTP&#x2F;2），结合 HTTP&#x2F;3 网关。</li>
 </ul>
 <h1><span id="wei-lai-zhan-wang">未来展望</span><a href="#wei-lai-zhan-wang" class="header-anchor">#</a></h1><ul>
-<li>Jetty/Netty 正在开发 QUIC 支持；</li>
-<li>Spring Cloud Gateway + Netty QUIC 可能实现端到端 HTTP/3；</li>
+<li>Jetty&#x2F;Netty 正在开发 QUIC 支持；</li>
+<li>Spring Cloud Gateway + Netty QUIC 可能实现端到端 HTTP&#x2F;3；</li>
 <li>Feign 可能通过 OkHttp 实现原生支持。</li>
 </ul>
 <h1><span id="jian-kong-yu-ce-shi-jian-yi">监控与测试建议</span><a href="#jian-kong-yu-ce-shi-jian-yi" class="header-anchor">#</a></h1><ul>
@@ -76,14 +76,14 @@ gtag('config', 'G-PJKTXDR70K');
 <li>在 QUIC 代理上记录指标；</li>
 <li>对 Feign 侧仍需监控重试、熔断行为。</li>
 </ul>
-<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>HTTP/3 对 RPC 的影响主要在传输层。短期内可以通过代理平滑过渡，长期则需要关注 Java 客户端的 QUIC 支持演进。</p>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>HTTP&#x2F;3 对 RPC 的影响主要在传输层。短期内可以通过代理平滑过渡，长期则需要关注 Java 客户端的 QUIC 支持演进。</p>
 <h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
-<li>[1] IETF HTTP/3 RFC 9114.</li>
-<li>[2] OkHttp HTTP/3 Roadmap. <a href="https://square.github.io/okhttp/http3/" target="_blank" rel="noopener">https://square.github.io/okhttp/http3/</a></li>
-<li>[3] Envoy QUIC Support. <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http3" target="_blank" rel="noopener">https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http3</a></li>
+<li>[1] IETF HTTP&#x2F;3 RFC 9114.</li>
+<li>[2] OkHttp HTTP&#x2F;3 Roadmap. <a target="_blank" rel="noopener" href="https://square.github.io/okhttp/http3/">https://square.github.io/okhttp/http3/</a></li>
+<li>[3] Envoy QUIC Support. <a target="_blank" rel="noopener" href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http3">https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http3</a></li>
 </ul>
 <hr>
-<p>本作品系原创，采用<a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh" target="_blank">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
 
 <div id="gitalk-container"></div>
 <script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
