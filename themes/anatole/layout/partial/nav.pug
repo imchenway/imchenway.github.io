@@ -1,6 +1,6 @@
 .page-top.animated.fadeInDown
   - const rawLanguages = config.language ? [].concat(config.language) : [];
-  - const languages = rawLanguages.filter(Boolean);
+  - const languages = rawLanguages.filter(lang => lang && lang !== 'default');
   - const defaultLang = languages.length ? languages[0] : (page.lang || page.language || '');
   - const currentLang = page.lang || page.language || defaultLang;
   - const buildLangUrl = (lang, segment) => {

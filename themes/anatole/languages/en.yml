@@ -12,8 +12,8 @@ Archive: Archive
 Guestbook: Guestbook
 language_switch: Language
 languages:
-  zh-CN: Chinese (Simplified)
-  en: English
+  zh-CN: 中
+  en: EN
 archive_a: Archive
 archive_b: "Archive: %s"
 page: Page %d
