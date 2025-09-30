@@ -84,6 +84,9 @@ gtag('config', 'G-PJKTXDR70K');
   var trigger = document.querySelector('.wechat-trigger');
   var modal = document.getElementById('wechat-modal');
   if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
   var closeBtn = modal.querySelector('.wechat-modal__close');
   var show = function () {
     modal.style.display = 'flex';
