@@ -9,12 +9,10 @@ block content
 		- 	var langSegment = page.path ? page.path.split('/')[0] : '';
 		- 	var segmentLang = (langSegment && langs.indexOf(langSegment) !== -1) ? langSegment : null;
 		- 	var targetLang = page.lang || page.language || segmentLang || defaultLang;
-		- 	if (!targetLang) {
+		- 	if (!targetLang || !defaultLang) {
 		- 		return;
 		- 	}
-		- 	if (defaultLang && targetLang === defaultLang) {
-		- 		filteredPosts = postsCollection.filter(function(item){ return !item.lang || item.lang === defaultLang; });
-		- 	} else {
+		- 	if (targetLang !== defaultLang) {
 		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === targetLang; });
 		- 	}
 		- })();

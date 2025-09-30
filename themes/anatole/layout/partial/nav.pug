@@ -34,9 +34,7 @@
     if languages.length === 2
       - const fallbackLang = languages.find(lang => lang !== currentLang);
       if fallbackLang
-        .lang-switch
-          span.lang-label= __('language_switch')
-          a(href=buildLangUrl(fallbackLang, '/'))= __('languages.' + fallbackLang)
+        a.lang-toggle(href=buildLangUrl(fallbackLang, '/'))= __('languages.' + fallbackLang)
     .back_btn
       li
         if is_post()
