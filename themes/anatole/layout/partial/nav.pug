@@ -31,12 +31,12 @@
       else
         a(href=buildLangUrl(currentLang, 'guestbook'))= __('Guestbook')
   .information
-    if languages.length > 1
-      .lang-switch
-        span.lang-label= __('language_switch')
-        each lang in languages
-          - const isActiveLang = lang === currentLang;
-          a(class=isActiveLang ? 'current' : '', href=buildLangUrl(lang, '/'))= __('languages.' + lang)
+    if languages.length === 2
+      - const fallbackLang = languages.find(lang => lang !== currentLang);
+      if fallbackLang
+        .lang-switch
+          span.lang-label= __('language_switch')
+          a(href=buildLangUrl(fallbackLang, '/'))= __('languages.' + fallbackLang)
     .back_btn
       li
         if is_post()

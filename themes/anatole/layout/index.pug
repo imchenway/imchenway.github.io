@@ -4,14 +4,18 @@ block content
 		- var postsCollection = page.posts || site.posts;
 		- var filteredPosts = postsCollection;
 		- (function(){
-		- 	var defaultLang = Array.isArray(config.language) ? config.language[0] : config.language;
+		- 	var langs = config.language ? [].concat(config.language).filter(Boolean) : [];
+		- 	var defaultLang = langs.length ? langs[0] : null;
 		- 	var langSegment = page.path ? page.path.split('/')[0] : '';
-		- 	if (page.lang) {
-		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === page.lang; });
-		- 	} else if (langSegment && config.language && Array.isArray(config.language) && config.language.indexOf(langSegment) !== -1) {
-		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === langSegment; });
-		- 	} else if (defaultLang) {
+		- 	var segmentLang = (langSegment && langs.indexOf(langSegment) !== -1) ? langSegment : null;
+		- 	var targetLang = page.lang || page.language || segmentLang || defaultLang;
+		- 	if (!targetLang) {
+		- 		return;
+		- 	}
+		- 	if (defaultLang && targetLang === defaultLang) {
 		- 		filteredPosts = postsCollection.filter(function(item){ return !item.lang || item.lang === defaultLang; });
+		- 	} else {
+		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === targetLang; });
 		- 	}
 		- })();
 		- filteredPosts.each(function (item) {
