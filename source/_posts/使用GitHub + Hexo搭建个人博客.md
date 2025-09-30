@@ -1,291 +1,269 @@
 ---
+title: 使用 GitHub + Hexo 搭建个人博客（图文深度教程 / Bilingual Guide）
 date: 2019-10-24
-tags: ['#Tools']
+updated: 2025-09-29
+tags:
+  - '#Tools'
+  - '#Hexo'
+  - '#GitHubPages'
+categories:
+  - 博客搭建
+summary: 从零搭建 Hexo 博客并部署到 GitHub Pages，涵盖环境准备、自动化发布、主题优化、安全加固与常见故障排查的中英双语详解。
+cover: https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80
 ---
 
 ### 本文目录
 <!-- toc -->
 
-# 1. 准备环境
-- `node.js`
-- `git`
-- `npm`
+# 中文版
 
-# 2. 安装Hexo
+## 1. 背景与目标
+- 目标：在 1 小时内完成 Hexo 博客的本地搭建、GitHub Pages 托管与自动化发布，形成可持续迭代的个人知识库。
+- 适用人群：初学者、想要快速上线个人站点的工程师、产品或技术写作者。
+- 输出成果：一套包含源码分支与静态页面分支的 GitHub 仓库、本地可编辑的 Hexo 工作目录、自动化部署流水线与备份方案。
 
-#### 2.1. 执行以下命令安装Hexo
+> Hexo 官方文档说明它以 Node.js 为基础，将 Markdown 转换成静态网页，适合开发者定制化扩展 [[Hexo Docs](https://hexo.io/docs/)]。GitHub Pages 提供静态托管服务，可直接发布 Hexo 构建产物 [[GitHub Pages Docs](https://docs.github.com/pages/getting-started-with-github-pages)].
+
+### 站点上线流程速览
+```mermaid
+flowchart TD
+    A[规划需求与环境检查] --> B[Hexo 初始化与主题配置]
+    B --> C[撰写 Markdown 内容]
+    C --> D[本地预览 hexo server]
+    D --> E[Git 提交到源码分支 hexo]
+    E --> F[GitHub Actions 构建静态文件]
+    F --> G[发布到 GitHub Pages 主分支]
+    G --> H[持续运维与备份]
 ```
+
+![Hexo + GitHub Pages 部署拓扑（图片来源：Unsplash @chuttersnap）](https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1600&q=80)
+
+## 2. 环境准备清单
+| 工具 | 推荐版本 | 验证命令 | 备注 |
+| --- | --- | --- | --- |
+| Node.js | ≥ 18 LTS | `node -v` | Hexo 4.x 官方建议使用 LTS 版本，保证包管理器与插件兼容。 |
+| npm | ≥ 9 | `npm -v` | 与 Node.js LTS 配套发布。 |
+| Git | ≥ 2.34 | `git --version` | 支持 GitHub OAuth 与安全协议。 |
+| GitHub 账号 | 最新 | 浏览器登录 | 需要启用双因素验证与 SSH key。 |
+
+```bash
+# macOS 使用 Homebrew 安装/升级示例
+brew install node git
+node -v
+npm -v
+```
+
+> 参考：Node.js 官方下载页 [[Node.js Downloads](https://nodejs.org/en/download/)]；Git 安装指南 [[Git Docs](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)].
+
+## 3. 初始化 Hexo 项目
+### 3.1 创建目录与安装 CLI
+```bash
 npm install -g hexo-cli
-```
-
-#### 2.2. 初始化
-```
 hexo init imchenway.com
 cd imchenway.com
 npm install
 ```
+- `hexo init` 会生成基础目录结构，包括 `_config.yml`、`source/_posts`、`themes` 等。
+- 默认主题为 landscape，可在后续替换为 anatole 或其他主题。
 
-#### 2.3. 初始化后的目录为
+### 3.2 项目结构速览
+```text
+imchenway.com
+├── _config.yml          # 站点级配置
+├── package.json         # 依赖与脚本
+├── scaffolds/           # 新文章模板
+├── source/
+│   ├── _posts/          # Markdown 文章
+│   └── images/          # 建议自建，存放插图
+└── themes/              # 主题目录
 ```
-.
-├── _config.yml # 网站的配置信息，您可以在此配置大部分的参数。 
-├── package.json
-├── scaffolds # 模版文件夹
-├── source  # 资源文件夹，除 _posts 文件，其他以下划线_开头的文件或者文件夹不会被编译打包到public文件夹
-|   ├── _drafts # 草稿文件
-|   └── _posts # 文章Markdowm文件 
-└── themes  # 主题文件夹
-```
-
-#### 2.4. 执行以下命令查看效果,s 是`server`的缩写，浏览器输入[http://localhost:4000](http://localhost:4000)就可以预览效果了。
-```
-hexo s
-```
-
-# 3. 创建GitHub Pages
-
-#### 3.1. 创建[repository](https://github.com/new)
-![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8vgepn3x9j30tw0mjdme.jpg)
-
-#### 3.2. Clone the repository
-```
-git clone https://github.com/imchenway/imchenway.github.io.git
+建议立即创建统一的图片目录：
+```bash
+mkdir -p source/images/posts/github-hexo-setup
 ```
 
-#### 3.3. Hello World
-```
-cd username.github.io
+## 4. GitHub Pages 仓库与分支策略
+### 4.1 创建仓库
+1. 新建仓库 `imchenway.github.io`（Public）。
+2. 勾选 README 与 `.gitignore` 可选项以便初始提交。
 
-echo "Hello World" > index.html
-```
+### 4.2 Git 远程配置
+```bash
+git init
+curl -o .gitignore https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
+cat >> .gitignore <<'END'
+public/
+.deploy_git/
+END
 
-#### 3.4. Push it
+git remote add origin git@github.com:imchenway/imchenway.github.io.git
 ```
-git add --all
+> GitHub 建议使用 SSH key 认证，可参考官方指南 [[GitHub SSH Docs](https://docs.github.com/authentication/connecting-to-github-with-ssh)].
 
-git commit -m "Initial commit"
+### 4.3 分支设计
+- `hexo`：存放 Hexo 源码与内容（默认工作分支）。
+- `master` 或 `gh-pages`：存放静态站点，供 GitHub Pages 发布。
+- 备份分支（可选）：用于 `hexo-git-backup` 插件备份主题与配置。
 
-git push -u origin master
+## 5. 内容创作与本地预览流程
+```bash
+hexo new "第一篇文章"
+hexo server # 访问 http://localhost:4000
 ```
+- 建议在 `scaffolds/post.md` 中增加 `categories`、`summary` 等字段，确保文章结构统一。
+- 写作时使用 Markdown + Mermaid，配合 `hexo-filter-mermaid-diagrams` 插件生成流程图或序列图。
 
-#### 3.5. Settings配置
-- source中选中自己的master分支
-![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8vgjj4p8fj30rq0423zz.jpg)
-![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8vgks8f4yj30pq0gsdlp.jpg)
+### 内容校验清单
+- `npm run build`：确保 Markdown 无语法错误、引用路径正确。
+- `npm run server`：手动检查页面布局、TOC 与代码高亮。
 
-#### 3.6. 此时访问<https://imchenway.github.io/>即可看到效果
-
-# 4. 将Hexo部署到Github
-
-#### 4.1 配置SSH key
-
-##### 4.1.1. 测试SSH key
-- 命令行输入`cd ~/.ssh`
-- 如果没报错或者提示什么的说明就是以前生成过的，直接使用`cat ~/.ssh/id_rsa.pub`命令查看本机上的`SSH key`
-
-##### 4.1.2. 如果之前没有创建，则执行以下命令全局配置一下本地账户：
-```
-git config --global user.name "用户名"
-git config --global user.email "邮箱地址"
-```
-##### 4.1.3. 然后开始生成密钥 SSH key
-```
-ssh-keygen -t rsa -C '上面的邮箱'
-```
-- 按照提示完成三次回车，即可生成`ssh key`。
-- 通过`cat ~/.ssh/id_rsa.pub`查看 `~/.ssh/id_rsa.pub` 文件内容，获取到你的`SSH key`
-
-##### 4.1.4. 首次使用还需要确认并添加主机到本机SSH可信列表
-- 若返回 Hi xxx! You've successfully authenticated, but GitHub does not provide  access. 内容，则证明添加成功。
-```
-ssh -T git@github.com
-```
-
-##### 4.1.5. Github 上添加刚刚生成的SSH key，按以下步骤添加：
-![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8vgvddczmj31ac0f6qca.jpg)
-
-#### 4.2 Hexo部署到GitHub
-
-##### 4.2.1. 进入Hexo初始化的目录`imchenway.com`下,修改`_config.yml`中的deploy配置
-```
-cd imchenway.com
-vi _config.yml
-```
-![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8vgzn6lidj30gu044q4a.jpg)
-
-##### 4.2.2. 安装部署插件
-```
-npm install hexo-deployer-git --save
-```
-
-##### 4.2.3. 执行部署命令,g = generate,d = deploy
-```
-hexo g -d
-```
-
-##### 4.2.4. 访问<https://imchenway.github.io/>查看效果
-
-# 5. 发表博文
-#### 5.1. 创建新的博文
-```
-hexo new '博文标题'
-```
-
-#### 5.2. 本地测试
-```
-hexo g
-hexo s
-```
-
-#### 5.3. 重新部署到GitHub,访问<https://imchenway.github.io/>查看效果
-```
-hexo clean
-hexo g -d
-```
-
-# 6. 更换主题
-#### 6.1. 终端执行
-```
-cd imchenway.com
-cd themes
-git clone https://github.com/Ben02/hexo-theme-Anatole.git anatole
-cd anatole
-git pull
-npm install --save hexo-render-pug hexo-generator-archive hexo-generator-tag hexo-generator-index hexo-generator-category
-```
-
-
-#### 6.2.修改`_config.yml`
-```
-# anatole
-archive_generator:
-    per_page: 0  
-    yearly: false
-    monthly: false
-    daily: false
-```
-![](https://tva1.sinaimg.cn/large/006y8mN6gy1g8virr42naj30pm0bkq7f.jpg)
-
-#### 6.3. 重新部署到GitHub,访问<https://imchenway.github.io/>查看效果
-```
-hexo clean
-hexo g -d
-```
-
-# 7. hexo备份
-
-#### 7.1 安装备份插件
-- 终端执行
-```
-npm install hexo-git-backup --save
-```
-- 修改根目录`_config.yml`，添加如下内容
-```
-# theme：你要备份的主题名称
-# message：自定义提交信息
-# repository：仓库名，仓库地址添加一个分支名
-backup:
-  type: git
-  theme: anatole
-  message: Back up my imchenway.com blog
-  repository:
-    github: https://github.com/imchenway/imchenway.github.io.git,hexo
-```
-- 在原GitHub.io项目下创建分支`hexo`
-- 终端执行
-```
-hexo backup
-git push
-```
-
-#### 7.2 恢复博客
-```
-git clone https://github.com/imchenway/imchenway.github.io.git
-npm install hexo-cli
-npm install
-npm install hexo-deployer-git --save
-```
-
-# 8. 开启TOC支持
-- 安装插件
-```
-npm install hexo-toc --save
-```
-- 修改`_config.yml`
-```
-toc:
-  maxdepth: 3
-  class: toc
-  slugify: transliteration
-  decodeEntities: false
-  anchor:
-    position: after
-    symbol: '#'
-    style: header-anchor
-```
-- 文章中加入
-```
-<!-- toc -->
-```
-
-# 9. 文章标题区分大小写
-- 将主题文件夹`/source/css/`目录中的`.scss`文件里面的`text-transform: uppercase;`全去掉
-
-# 10. 集成Gitalk
-- 打开`hexo/themes/anatole/layout/partial/comments.pug`文件, 在文件末尾加入以下代码:
-```pug
-if theme.gitalk
-    if theme.gitalk.enable == true
-        link(rel="stylesheet", href='https://unpkg.com/gitalk/dist/gitalk.css')
-        div(id='gitalk-container')
-        script(src="/js/md5.min.js")
-        script(src='https://unpkg.com/gitalk/dist/gitalk.min.js')
-        script.
-            var gitalk = new Gitalk({
-                clientID: '#{theme.gitalk.clientID}',
-                clientSecret: '#{theme.gitalk.clientSecret}',
-                id: md5(location.pathname),
-                repo: '#{theme.gitalk.repo}',
-                owner: '#{theme.gitalk.owner}',
-             admin: '#{theme.gitalk.admin}'
-            })
-            gitalk.render('gitalk-container');
-```
-- 在 `/hexo/themes/anatole/source/js` 目录中新建文件 `md5.min.js` , 在其中加入如下内容:
-```js
-md5.min.js!function(n){"use strict";function t(n,t){var r=(65535&n)+(65535&t);return(n>>16)+(t>>16)+(r>>16)<<16|65535&r}function r(n,t){return n<<t|n>>>32-t}function e(n,e,o,u,c,f){return t(r(t(t(e,n),t(u,f)),c),o)}function o(n,t,r,o,u,c,f){return e(t&r|~t&o,n,t,u,c,f)}function u(n,t,r,o,u,c,f){return e(t&o|r&~o,n,t,u,c,f)}function c(n,t,r,o,u,c,f){return e(t^r^o,n,t,u,c,f)}function f(n,t,r,o,u,c,f){return e(r^(t|~o),n,t,u,c,f)}function i(n,r){n[r>>5]|=128<<r%32,n[14+(r+64>>>9<<4)]=r;var e,i,a,d,h,l=1732584193,g=-271733879,v=-1732584194,m=271733878;for(e=0;e<n.length;e+=16)i=l,a=g,d=v,h=m,g=f(g=f(g=f(g=f(g=c(g=c(g=c(g=c(g=u(g=u(g=u(g=u(g=o(g=o(g=o(g=o(g,v=o(v,m=o(m,l=o(l,g,v,m,n[e],7,-680876936),g,v,n[e+1],12,-389564586),l,g,n[e+2],17,606105819),m,l,n[e+3],22,-1044525330),v=o(v,m=o(m,l=o(l,g,v,m,n[e+4],7,-176418897),g,v,n[e+5],12,1200080426),l,g,n[e+6],17,-1473231341),m,l,n[e+7],22,-45705983),v=o(v,m=o(m,l=o(l,g,v,m,n[e+8],7,1770035416),g,v,n[e+9],12,-1958414417),l,g,n[e+10],17,-42063),m,l,n[e+11],22,-1990404162),v=o(v,m=o(m,l=o(l,g,v,m,n[e+12],7,1804603682),g,v,n[e+13],12,-40341101),l,g,n[e+14],17,-1502002290),m,l,n[e+15],22,1236535329),v=u(v,m=u(m,l=u(l,g,v,m,n[e+1],5,-165796510),g,v,n[e+6],9,-1069501632),l,g,n[e+11],14,643717713),m,l,n[e],20,-373897302),v=u(v,m=u(m,l=u(l,g,v,m,n[e+5],5,-701558691),g,v,n[e+10],9,38016083),l,g,n[e+15],14,-660478335),m,l,n[e+4],20,-405537848),v=u(v,m=u(m,l=u(l,g,v,m,n[e+9],5,568446438),g,v,n[e+14],9,-1019803690),l,g,n[e+3],14,-187363961),m,l,n[e+8],20,1163531501),v=u(v,m=u(m,l=u(l,g,v,m,n[e+13],5,-1444681467),g,v,n[e+2],9,-51403784),l,g,n[e+7],14,1735328473),m,l,n[e+12],20,-1926607734),v=c(v,m=c(m,l=c(l,g,v,m,n[e+5],4,-378558),g,v,n[e+8],11,-2022574463),l,g,n[e+11],16,1839030562),m,l,n[e+14],23,-35309556),v=c(v,m=c(m,l=c(l,g,v,m,n[e+1],4,-1530992060),g,v,n[e+4],11,1272893353),l,g,n[e+7],16,-155497632),m,l,n[e+10],23,-1094730640),v=c(v,m=c(m,l=c(l,g,v,m,n[e+13],4,681279174),g,v,n[e],11,-358537222),l,g,n[e+3],16,-722521979),m,l,n[e+6],23,76029189),v=c(v,m=c(m,l=c(l,g,v,m,n[e+9],4,-640364487),g,v,n[e+12],11,-421815835),l,g,n[e+15],16,530742520),m,l,n[e+2],23,-995338651),v=f(v,m=f(m,l=f(l,g,v,m,n[e],6,-198630844),g,v,n[e+7],10,1126891415),l,g,n[e+14],15,-1416354905),m,l,n[e+5],21,-57434055),v=f(v,m=f(m,l=f(l,g,v,m,n[e+12],6,1700485571),g,v,n[e+3],10,-1894986606),l,g,n[e+10],15,-1051523),m,l,n[e+1],21,-2054922799),v=f(v,m=f(m,l=f(l,g,v,m,n[e+8],6,1873313359),g,v,n[e+15],10,-30611744),l,g,n[e+6],15,-1560198380),m,l,n[e+13],21,1309151649),v=f(v,m=f(m,l=f(l,g,v,m,n[e+4],6,-145523070),g,v,n[e+11],10,-1120210379),l,g,n[e+2],15,718787259),m,l,n[e+9],21,-343485551),l=t(l,i),g=t(g,a),v=t(v,d),m=t(m,h);return[l,g,v,m]}function a(n){var t,r="",e=32*n.length;for(t=0;t<e;t+=8)r+=String.fromCharCode(n[t>>5]>>>t%32&255);return r}function d(n){var t,r=[];for(r[(n.length>>2)-1]=void 0,t=0;t<r.length;t+=1)r[t]=0;var e=8*n.length;for(t=0;t<e;t+=8)r[t>>5]|=(255&n.charCodeAt(t/8))<<t%32;return r}function h(n){return a(i(d(n),8*n.length))}function l(n,t){var r,e,o=d(n),u=[],c=[];for(u[15]=c[15]=void 0,o.length>16&&(o=i(o,8*n.length)),r=0;r<16;r+=1)u[r]=909522486^o[r],c[r]=1549556828^o[r];return e=i(u.concat(d(t)),512+8*t.length),a(i(c.concat(e),640))}function g(n){var t,r,e="";for(r=0;r<n.length;r+=1)t=n.charCodeAt(r),e+="0123456789abcdef".charAt(t>>>4&15)+"0123456789abcdef".charAt(15&t);return e}function v(n){return unescape(encodeURIComponent(n))}function m(n){return h(v(n))}function p(n){return g(m(n))}function s(n,t){return l(v(n),v(t))}function C(n,t){return g(s(n,t))}function A(n,t,r){return t?r?s(t,n):C(t,n):r?m(n):p(n)}"function"==typeof define&&define.amd?define(function(){return A}):"object"==typeof module&&module.exports?module.exports=A:n.md5=A}(this);
-//# sourceMappingURL=md5.min.js.map
-```
-
-- 在 `hexo/_config.yml`中增加以下内容:
+## 6. 自动化部署（GitHub Actions）
+在仓库根目录创建 `.github/workflows/deploy.yml`：
 ```yaml
-#gitalk settings
-plugins:
-  gitalk:
-    enable: true
-    owner: imchenway
-    repo: imchenway.github.io
-    admin: imchenway
-    clientID: your clientID
-    clientSecret: your clientSecret
-    distractionFreeMode: false
+name: Hexo Deploy
+on:
+  push:
+    branches: [hexo]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: npx hexo generate
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: master
+```
+> 官方行动指引：GitHub Actions + GitHub Pages [[GitHub Pages Action Guide](https://docs.github.com/actions/deployment/deploying-to-your-cloud-provider/deploying-to-github-pages)].
+
+## 7. 安全与运维
+- **SSH Key 管理**：定期轮换密钥，撤销旧设备；启用 GitHub 2FA。
+- **密钥保护**：不要在 `_config.yml` 中硬编码敏感信息，若使用自定义域名证书请存储在仓库 Secret。
+- **监控与备份**：`hexo backup` 定期推送到备份分支；利用 GitHub Insights 观察访问趋势。
+- **性能优化**：可结合 Cloudflare 为 GitHub Pages 提供 CDN，加快全球访问。
+
+## 8. 实战案例：30 分钟上线知识博客
+1. 10 分钟：完成 Node、Git 环境校验与 Hexo 初始化。
+2. 5 分钟：撰写首篇文章并添加封面图与 Mermaid 图。
+3. 5 分钟：配置 GitHub 仓库、生成 SSH key。
+4. 10 分钟：推送到 `hexo` 分支，触发 Actions 自动发布。
+结果：`https://imchenway.github.io/` 成功上线，并在 Actions 日志中确认构建成功。
+
+## 9. 常见问题排查
+| 症状 | 可能原因 | 处理建议 |
+| --- | --- | --- |
+| `npm install` 失败 | 网络阻塞或权限不足 | 切换镜像源，例如 `npm config set registry https://registry.npmmirror.com`。 |
+| GitHub Pages 返回 404 | 发布分支未选中或 CNAME 缺失 | 仓库 Settings → Pages 指定正确分支，并确认 `source/CNAME` 存在。 |
+| Actions 构建超时 | 缓存残留或插件冲突 | 在工作流中增加 `hexo clean`，升级插件版本。 |
+| 图片不显示 | 路径大小写不一致 | 使用 `/images/posts/...` 绝对路径，保持全小写。 |
+
+## 10. 进一步扩展
+- 接入 Algolia 搜索与 `hexo-generator-sitemap`，提升 SEO。
+- 编写 Node.js 脚本批量生成文章模板、校验 front-matter。
+- 结合 GitHub Issues/Discussions 建立读者反馈与内容策划流程。
+
+## 11. 参考资料
+- Hexo 官方文档：https://hexo.io/docs/
+- GitHub Pages 官方指南：https://docs.github.com/pages/
+- Node.js LTS 发布计划：https://github.com/nodejs/release#release-schedule
+- Git 工具书：《Pro Git》第 2 版：https://git-scm.com/book/en/v2
+- GitHub Actions Marketplace：https://github.com/marketplace?type=actions
+- Unsplash 图片授权：https://unsplash.com/license
+
+# English Version
+
+## 1. Background & Objectives
+- Goal: bootstrap a Hexo blog, host it on GitHub Pages, and automate deployment within an hour.
+- Audience: developers, product managers, and technical writers who prefer Markdown-driven workflows.
+- Deliverables: a Git repository with separate source/static branches, a local Hexo workspace, CI/CD automation, and backup strategy.
+
+> Hexo converts Markdown content into static assets via Node.js [[Hexo Docs](https://hexo.io/docs/)]. GitHub Pages offers free static hosting tightly integrated with Git [[GitHub Pages Docs](https://docs.github.com/pages/)].
+
+### Deployment Pipeline Overview
+```mermaid
+flowchart LR
+    Plan[Plan & Environment Check] --> Init[Hexo Init]
+    Init --> Write[Markdown Writing]
+    Write --> Preview[Local Preview]
+    Preview --> Commit[Commit to hexo Branch]
+    Commit --> Actions[GitHub Actions Build]
+    Actions --> Publish[Publish to Pages Branch]
+    Publish --> Observe[Operate & Monitor]
 ```
 
-# 10. 集成百度统计
-- 1. [注册百度统计](https://tongji.baidu.com/web/10000111788/welcome/login)
-- 2. 添加你的博客地址
-- 3. 在`hexo\themes\anatole\layout\partial` 目录下打开`head.pug`, 在末尾加上以下内容:
-```pug
-script.
-    var _hmt = _hmt || [];
-    (function() {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
-        var s = document.getElementsByTagName("script")[0]; 
-        s.parentNode.insertBefore(hm, s);
-    })();
-```
-- 4. 等待20分钟后点击代码检查，显示代码安装正确即可
-![](https://tva1.sinaimg.cn/large/006tNbRwly1g9ju6jbbdpj30uu0bkdh3.jpg)
+![Hexo + GitHub Pages pipeline (Credit: Unsplash @chuttersnap)](https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1600&q=80)
 
-# 11. 集成Google Adsense
+## 2. Prerequisites
+| Tool | Recommended | Verification | Notes |
+| --- | --- | --- | --- |
+| Node.js | 18 LTS or newer | `node -v` | Matches Hexo 4.x requirements. |
+| npm | ≥ 9 | `npm -v` | Ships with Node.js releases. |
+| Git | ≥ 2.34 | `git --version` | Supports strong crypto defaults and SSH U2F. |
+| GitHub Account | Enabled | Browser login | Turn on 2FA and register SSH key. |
+
+## 3. Initialize Hexo Workspace
+```bash
+npm install -g hexo-cli
+hexo init imchenway.com
+cd imchenway.com
+npm install
+mkdir -p source/images/posts/github-hexo-setup
+```
+- Review `_config.yml` for site-wide settings and `themes/` for theme assets.
+- Pin dependency versions in `package.json` to keep builds reproducible.
+
+## 4. GitHub Pages Setup
+1. Create repository `imchenway.github.io`.
+2. Clone locally and keep the `hexo` branch as your working branch.
+3. Extend `.gitignore` to exclude `public/` and `.deploy_git/` folders.
+4. Generate an SSH key (`ssh-keygen -t ed25519 -C "email"`) and add it to GitHub [[SSH Docs](https://docs.github.com/authentication/connecting-to-github-with-ssh)].
+
+## 5. Writing & Previewing
+- Use `hexo new post "Title"` to scaffold posts with consistent front-matter.
+- Run `hexo server` for live preview at `http://localhost:4000`.
+- Store media assets under `source/images/posts/<slug>/` and embed them with absolute paths.
+
+## 6. Continuous Deployment
+Create `.github/workflows/deploy.yml` using `actions/setup-node` and `peaceiris/actions-gh-pages`. Trigger on pushes to `hexo`, publish the `public/` directory to `master` (or `gh-pages`). Double-check repository Settings → Pages for the correct branch selection.
+
+## 7. Security & Operations
+- Rotate SSH keys periodically and revoke lost devices.
+- Store custom domain certificates or tokens in GitHub Secrets.
+- Enable branch protection and required status checks on the `hexo` branch.
+- Schedule `hexo clean && npm run build` in CI to detect broken links and invalid assets early.
+
+## 8. Case Study: 30-Minute Rollout
+- 10 min: validate environment and initialize Hexo.
+- 5 min: write the first bilingual post with hero image.
+- 5 min: configure repository, push to `hexo`.
+- 10 min: monitor GitHub Actions, verify `https://imchenway.github.io/` is reachable.
+
+## 9. Troubleshooting
+| Symptom | Root Cause | Remedy |
+| --- | --- | --- |
+| `hexo generate` stuck | Outdated cache or incompatible plugins | Run `hexo clean`, upgrade packages, inspect plugin changelog. |
+| Pages build warning | Missing CNAME or theme assets | Re-run workflow, ensure `source/CNAME` exists, review theme docs. |
+| Images missing | Case-sensitive paths on Linux runners | Use lowercase directories and absolute URLs. |
+| Workflow quota exceeded | Repeated dependency downloads | Enable `actions/cache` for `~/.npm` and prune unused plugins. |
+
+## 10. Further Enhancements
+- Integrate Algolia DocSearch or Pagefind for instant search.
+- Add Lighthouse audits via GitHub Actions for performance regression alerts.
+- Implement content staging with preview deployments or custom branches.
+
+## 11. References
+- Hexo Official Docs: https://hexo.io/docs/
+- GitHub Pages Getting Started: https://docs.github.com/pages/
+- peaceiris/actions-gh-pages README: https://github.com/peaceiris/actions-gh-pages
+- Node.js Release Schedule: https://github.com/nodejs/release
+- GitHub Actions Workflow syntax: https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions
+- Unsplash License: https://unsplash.com/license

@@ -1,3 +1,7 @@
+# 显示控制，通过布尔值开关标签与 GitHub 图标
+show_tags: false
+show_github: false
+
 keywords: DavidChan,imchenway
 author: DavidChan,imchenway@gmail.com
 description: I hear and I forget. <br>I see and I remember. <br>I write and I understand.
@@ -13,7 +17,7 @@ rss: /atom.xml
 weibo:
 instagram:
 facebook:
-wechat: https://tva1.sinaimg.cn/large/008i3skNly1gs66t63obvj30ml0m7dhm.jpg
+wechat: https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg
 
 # 评论
 duoshuo:

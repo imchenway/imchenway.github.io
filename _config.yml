@@ -8,7 +8,9 @@ subtitle: ''
 description: 'I hear and I forget. <br>I see and I remember. <br>I write and I understand.'
 keywords:
 author: DavidChan
-language: cn
+language:
+  - zh-CN
+  - en
 timezone: 'Asia/Shanghai'
 
 # URL
@@ -100,14 +102,6 @@ deploy:
   repo: 
     github: https://github.com/imchenway/imchenway.github.io.git,master
 
-## BackUp
-backup:
-  type: git
-  theme: anatole
-  message: Back up my imchenway.com blog
-  repository:
-    github: https://github.com/imchenway/imchenway.github.io.git,hexo
-
 # anatole
 archive_generator:
   per_page: 0  
@@ -143,3 +137,9 @@ feed:
   type: atom
   path: atom.xml
   limit: 20
+
+# Mermaid diagrams
+mermaid:
+  enable: true
+  # 可选: default / forest / neutral / dark / base
+  theme: neutral

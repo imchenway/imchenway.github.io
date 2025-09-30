@@ -1,15 +1,25 @@
 .page-top.animated.fadeInDown
+  - const rawLanguages = config.language ? [].concat(config.language) : [];
+  - const languages = rawLanguages.filter(Boolean);
+  - const defaultLang = languages.length ? languages[0] : (page.lang || page.language || '');
+  - const currentLang = page.lang || page.language || defaultLang;
+  - const buildLangUrl = (lang, segment) => {
+  -   const trimmed = (segment || '/').replace(/^\//, '');
+  -   const prefix = (!lang || lang === defaultLang) ? '' : `/${lang}`;
+  -   const fullPath = trimmed ? `${prefix}/${trimmed}` : `${prefix}/`;
+  -   return url_for(fullPath);
+  - };
   .nav
     li
       if is_home()
-        a.current(href="/")= __('Home')					
+        a.current(href=buildLangUrl(currentLang, '/'))= __('Home')
       else
-        a(href="/")= __('Home')	
+        a(href=buildLangUrl(currentLang, '/'))= __('Home')
     li
       if is_archive()
-        a.current(href="/archives")= __('Archive')
+        a.current(href=buildLangUrl(currentLang, 'archives'))= __('Archive')
       else
-        a(href="/archives")= __('Archive')
+        a(href=buildLangUrl(currentLang, 'archives'))= __('Archive')
     //li
     //  if is_current('about')
     //    a.current(href="/about")= __('About')
@@ -17,10 +27,16 @@
     //    a(href="/about")= __('About')
     li
       if is_current('Guestbook')
-        a.current(href="/guestbook")= __('Guestbook')
+        a.current(href=buildLangUrl(currentLang, 'guestbook'))= __('Guestbook')
       else
-        a(href="/guestbook")= __('Guestbook')
+        a(href=buildLangUrl(currentLang, 'guestbook'))= __('Guestbook')
   .information
+    if languages.length > 1
+      .lang-switch
+        span.lang-label= __('language_switch')
+        each lang in languages
+          - const isActiveLang = lang === currentLang;
+          a(class=isActiveLang ? 'current' : '', href=buildLangUrl(lang, '/'))= __('languages.' + lang)
     .back_btn
       li
         if is_post()
