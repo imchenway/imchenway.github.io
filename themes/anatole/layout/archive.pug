@@ -1,0 +1,33 @@
+extends partial/layout
+
+block content
+  .autopagerize_page_element: .content
+    - var rawList = page.posts || site.posts || [];
+    - var postsArray = rawList.toArray ? rawList.toArray() : rawList;
+    - var isEnglish = page.lang === 'en' || (page.path && page.path.indexOf('en/') === 0);
+    - var filtered = postsArray.filter(function(item){
+    -   if (isEnglish) {
+    -     return item.lang === 'en';
+    -   }
+    -   return !item.lang || item.lang === 'zh-CN' || item.lang === 'zh';
+    - });
+    - if (filtered.length)
+      - filtered.sort(function(a, b){ return b.date - a.date; });
+      - var grouped = {};
+      - filtered.forEach(function(item){
+      -   var key = date(item.date, 'YYYY');
+      -   (grouped[key] = grouped[key] || []).push(item);
+      - });
+      - var years = Object.keys(grouped).sort(function(a, b){ return b - a; });
+      each year in years
+        .listing-title= year
+        ul.listing
+          each item in grouped[year]
+            li.listing-item
+              .listing-post
+                a(href= url_for(item.path), title=item.title)= item.title
+                .post-time
+                  span.date= date(item.date, 'MM-DD')
+    - else
+      .archive
+        p= __('No posts found')
