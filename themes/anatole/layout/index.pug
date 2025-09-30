@@ -1,7 +1,20 @@
 extends partial/layout
 block content
 	.autopagerize_page_element: .content
-		- page.posts.each(function (item) {
+		- var postsCollection = page.posts || site.posts;
+		- var filteredPosts = postsCollection;
+		- (function(){
+		- 	var defaultLang = Array.isArray(config.language) ? config.language[0] : config.language;
+		- 	var langSegment = page.path ? page.path.split('/')[0] : '';
+		- 	if (page.lang) {
+		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === page.lang; });
+		- 	} else if (langSegment && config.language && Array.isArray(config.language) && config.language.indexOf(langSegment) !== -1) {
+		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === langSegment; });
+		- 	} else if (defaultLang) {
+		- 		filteredPosts = postsCollection.filter(function(item){ return !item.lang || item.lang === defaultLang; });
+		- 	}
+		- })();
+		- filteredPosts.each(function (item) {
 			include mixins
 			+make_post(item, false)
 		- })
