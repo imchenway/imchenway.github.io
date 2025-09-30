@@ -31,15 +31,66 @@ WebAssembly（WASM）轻量、安全的特点使其成为容器的补充。本�
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-PJKTXDR70K');
-</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><div class="wechat-modal" id="wechat-modal"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 9999;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
   var trigger = document.querySelector('.wechat-trigger');
   var modal = document.getElementById('wechat-modal');
   if (!trigger || !modal) return;
   var closeBtn = modal.querySelector('.wechat-modal__close');
-  var hide = function () { modal.classList.remove('is-active'); };
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
   trigger.addEventListener('click', function (event) {
     event.preventDefault();
-    modal.classList.add('is-active');
+    show();
   });
   closeBtn && closeBtn.addEventListener('click', hide);
   modal.addEventListener('click', function (event) {
