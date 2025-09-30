@@ -45,7 +45,7 @@ gtag('config', 'G-PJKTXDR70K');
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.65);
-  z-index: 9999;
+  z-index: 2147483000;
 }
 .wechat-modal.is-active {
   display: flex;
@@ -58,6 +58,7 @@ gtag('config', 'G-PJKTXDR70K');
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   max-width: 90vw;
   max-height: 90vh;
+  z-index: 2147483001;
 }
 .wechat-modal__image {
   max-width: 70vw;
@@ -92,6 +93,7 @@ gtag('config', 'G-PJKTXDR70K');
     modal.classList.remove('is-active');
     modal.style.display = 'none';
   };
+  hide();
   trigger.addEventListener('click', function (event) {
     event.preventDefault();
     show();
