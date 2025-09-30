@@ -33,11 +33,11 @@
           i.fa.fa-weibo
     if theme.wechat
       li
-        a(href=theme.wechat)
+        a.wechat-trigger(href="javascript:void(0);")
           i.fa.fa-wechat
 
     h3(title="")
-    
+
     - var themeShowTags = theme.show_tags
     - var enableTags = !(themeShowTags === false || themeShowTags === 'false' || themeShowTags === 0 || themeShowTags === '0')
     - var sidebarHasCategories = site.categories && site.categories.length
@@ -54,4 +54,27 @@
               a.tag(href=config.root + tag.path, title= tag.name)= tag.name + " "
           - });
 
-  include footer
+      include footer
+
+  if theme.wechat
+    #wechat-modal.wechat-modal
+      .wechat-modal__content
+        span.wechat-modal__close &times;
+        img.wechat-modal__image(src=theme.wechat, alt='WeChat QR code')
+
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+        var trigger = document.querySelector('.wechat-trigger');
+        var modal = document.getElementById('wechat-modal');
+        if (!trigger || !modal) return;
+        var closeBtn = modal.querySelector('.wechat-modal__close');
+        var hide = function () { modal.classList.remove('is-active'); };
+        trigger.addEventListener('click', function (event) {
+          event.preventDefault();
+          modal.classList.add('is-active');
+        });
+        closeBtn && closeBtn.addEventListener('click', hide);
+        modal.addEventListener('click', function (event) {
+          if (event.target === modal) hide();
+        });
+      });
