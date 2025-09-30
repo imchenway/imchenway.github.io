@@ -1,6 +1,7 @@
 ---
 title: "Choosing Your Vibe Coding Agent: Google Jules vs OpenAI Codex vs Claude Code"
 date: 2025-09-30
+lang: en
 tags: ['#AI', '#Tools', '#VIBE']
 ---
 

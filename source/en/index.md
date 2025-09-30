@@ -2,6 +2,7 @@
 title: Welcome
 date: 2025-09-29 00:00:00
 lang: en
+layout: index
 ---
 
-English articles will be published here soon. Please use the language switch in the navigation bar to return to the Chinese section.
+Welcome! English posts are now available below. Use the language switch in the navigation bar if you want to return to the Chinese edition.
