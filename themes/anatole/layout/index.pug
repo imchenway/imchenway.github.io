@@ -12,7 +12,9 @@ block content
 		- 	if (!targetLang || !defaultLang) {
 		- 		return;
 		- 	}
-		- 	if (targetLang !== defaultLang) {
+		- 	if (targetLang === defaultLang) {
+		- 		filteredPosts = postsCollection.filter(function(item){ return !item.lang || item.lang === defaultLang; });
+		- 	} else {
 		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === targetLang; });
 		- 	}
 		- })();
