@@ -42,6 +42,8 @@
     - var enableTags = !(themeShowTags === false || themeShowTags === 'false' || themeShowTags === 0 || themeShowTags === '0')
     - var sidebarHasCategories = site.categories && site.categories.length
     - var sidebarHasTags = site.tags && site.tags.length
+    - var tagsLimit = 20
+    - var limitedTags = sidebarHasTags ? site.tags.sort('date').slice(0, tagsLimit) : []
     if enableTags && (sidebarHasCategories || sidebarHasTags)
       li
         i.fa.fa-tag
@@ -50,7 +52,7 @@
               a.tag(href=config.root + category.path, title= category.name)= category.name + " "
           - });
         if sidebarHasTags
-          - site.tags.sort('posts').each(function(tag) {
+          - limitedTags.forEach(function(tag) {
               a.tag(href=config.root + tag.path, title= tag.name)= tag.name + " "
           - });
 
