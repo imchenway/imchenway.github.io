@@ -1,5 +1,8 @@
 doctype
-html(lang="zh-CN")
+- var siteLanguages = Array.isArray(config.language) ? config.language : [config.language]
+- var primaryLang = siteLanguages && siteLanguages.length ? siteLanguages[0] : 'zh-CN'
+- var pageLang = page.lang || primaryLang
+html(lang= pageLang)
   head
     include head
 
@@ -10,6 +13,6 @@ html(lang="zh-CN")
 
       block content
 
-    script(src= url_for('js/jquery.js'))
-    script(src= url_for('js/jquery-migrate-1.2.1.min.js'))
-    script(src= url_for('js/jquery.appear.js'))
+    script(defer, src= url_for('js/jquery.js'))
+    script(defer, src= url_for('js/jquery-migrate-1.2.1.min.js'))
+    script(defer, src= url_for('js/jquery.appear.js'))

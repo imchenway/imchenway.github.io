@@ -15,7 +15,7 @@ timezone: 'Asia/Shanghai'
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://imchenway.com
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -138,8 +138,25 @@ feed:
   path: atom.xml
   limit: 20
 
+sitemap:
+  path: sitemap.xml
+
 # Mermaid diagrams
 mermaid:
   enable: true
   # 可选: default / forest / neutral / dark / base
   theme: neutral
+
+lazyload:
+  enable: true
+  onlypost: false
+  loadingImg: https://imchenway.com/images/logo.png
+
+all_minifier:
+  enable: true
+  css:
+    level: 2
+  js:
+    mangle: false
+  html:
+    removeComments: true

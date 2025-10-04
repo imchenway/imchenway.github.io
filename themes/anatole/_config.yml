@@ -1,5 +1,5 @@
 # 显示控制，通过布尔值开关标签与 GitHub 图标
-show_tags: false
+show_tags: true
 show_github: false
 
 keywords: DavidChan,imchenway

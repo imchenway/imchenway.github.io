@@ -1,11 +1,28 @@
 meta(charset="utf-8")
 meta(name="X-UA-Compatible", content="IE=edge")
+- var pageTitle = page.title || config.title
+- var descriptionSource = page.description || page.excerpt || page.content
+- var fallbackDescription = config.description ? strip_html(config.description) : 'A Blog Powered By Hexo'
+- var description = descriptionSource ? strip_html(descriptionSource).replace(/\s+/g, ' ').substring(0, 160) : fallbackDescription
+- var canonicalUrl = full_url_for(page.path || '')
+- var ogType = page.layout === 'post' ? 'article' : 'website'
+- var siteName = config.title
 meta(name="author", content= theme.author)
 title
     block site_title
-        = config.title
+        = pageTitle
 block description
-    meta(name="description", content= config.description ? config.description : 'A Blog Powered By Hexo')
+    meta(name="description", content= description)
+
+link(rel="canonical", href= canonicalUrl)
+meta(property="og:type", content= ogType)
+meta(property="og:title", content= pageTitle)
+meta(property="og:description", content= description)
+meta(property="og:url", content= canonicalUrl)
+meta(property="og:site_name", content= siteName)
+meta(name="twitter:card", content="summary")
+meta(name="twitter:title", content= pageTitle)
+meta(name="twitter:description", content= description)
 
 if page.keywords
     meta(name="keywords", content= page.keywords)
