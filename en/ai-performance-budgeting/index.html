@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Performance Budgets and Adaptive Optimization in the Age of AI · DavidChan's Blog</title><meta name="description" content="Table of Contents#
+
+
+
+
+1. Why Performance Budgets Need an AI Update
+2. Define Inference Envelopes and Composite Budgets
+3. Close the Loop with Unified"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/x-icon" href="https://tva1.sinaimg.cn/large/008eGmZEly1gnzyi23j0yj300w00w077.jpg"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/en/">Home</a></li><li><a href="/en/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/en/guestbook">Guestbook</a></li></div><div class="information"><a class="lang-toggle" href="/">中</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Performance Budgets and Adaptive Optimization in the Age of AI</a></h3></div><div class="post-content"><h3><span id="table-of-contents">Table of Contents</span><a href="#table-of-contents" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#1-why-performance-budgets-need-an-ai-update">1. Why Performance Budgets Need an AI Update</a></li>
+<li><a href="#2-define-inference-envelopes-and-composite-budgets">2. Define Inference Envelopes and Composite Budgets</a></li>
+<li><a href="#3-close-the-loop-with-unified-telemetry">3. Close the Loop with Unified Telemetry</a></li>
+<li><a href="#4-automate-guardrails-and-keep-rollbacks-safe">4. Automate Guardrails and Keep Rollbacks Safe</a></li>
+<li><a href="#conclusion-outlook">Conclusion &#x2F; Outlook</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="1-why-performance-budgets-need-an-ai-update">1. Why Performance Budgets Need an AI Update</span><a href="#1-why-performance-budgets-need-an-ai-update" class="header-anchor">#</a></h1><p>Production teams no longer optimise only for page load times or requests per second. Every AI-powered feature introduces a chain of inference calls, vector lookups, feature pipelines, and GPU scheduling decisions. Guidance from <a target="_blank" rel="noopener" href="https://developers.cloudflare.com/workers-ai/">Cloudflare Workers AI</a> highlights why each model deserves its own guardrails—token ceilings, concurrency caps, and fallbacks—so a single overloaded edge node will not cascade into downtime. The latest <a target="_blank" rel="noopener" href="https://cloud.google.com/blog/products/devops-sre/dora-2023-accelerate-state-of-devops-report-now-available">DORA research from Google Cloud</a> echoes the organisational lesson: elite teams rely on metric-driven automation to stay fast and resilient.</p>
+<h1><span id="2-define-inference-envelopes-and-composite-budgets">2. Define Inference Envelopes and Composite Budgets</span><a href="#2-define-inference-envelopes-and-composite-budgets" class="header-anchor">#</a></h1><p>Modern budgets should spell out “inference envelopes”. A retrieval-augmented generation (RAG) flow might target an end-to-end P95 latency of 1.5 seconds, a per-request ceiling of ¥0.02, and a cache hit rate above 70%. Such targets combine provider pricing tables with historical telemetry, translating abstract GPU consumption into knobs that product owners understand. Once a service exhausts its envelope, the platform can throttle traffic, downgrade to a smaller model, or require users to opt into a paid high-precision mode.</p>
+<p>Composability matters as soon as multiple models or tenants join the mix. A conversational assistant may orchestrate intent detection, knowledge retrieval, and long-form generation—each stage carries its own mini-budget and rolls up into a global guardrail. Solo builders can run the same playbook: estimate incremental token burn before exposing a feature, and surface a “performance mode” toggle when the burn threatens the baseline experience.</p>
+<h1><span id="3-close-the-loop-with-unified-telemetry">3. Close the Loop with Unified Telemetry</span><a href="#3-close-the-loop-with-unified-telemetry" class="header-anchor">#</a></h1><p>Budgets that cannot be observed will be ignored. Anchoring instrumentation on the <a target="_blank" rel="noopener" href="https://opentelemetry.io/docs/">OpenTelemetry specification</a> keeps metrics, traces, and logs consistent across services. Real-time streams catch guardrail breaches—P95 latency spikes, GPU utilisation nearing saturation, or cache misses exploding. Daily snapshots and usage histograms reveal slow drifts, while trace sampling stitches parameters and payloads together so engineers can replay the exact context of an expensive request.</p>
+<p>One SaaS vendor wired its LLM gateway to company SLOs: whenever the primary model exceeded the latency guardrail, traffic automatically shifted to a distilled sibling model and a counter tracked downgrade duration. The team funnelled routing events and inference stats through OpenTelemetry Collector dashboards, exposing the “spike → downgrade → recovery” loop. Lower-level signals from eBPF probes or cloud GPU telemetry helped them confirm whether the bottleneck lived in the model, storage layer, or network.</p>
+<h1><span id="4-automate-guardrails-and-keep-rollbacks-safe">4. Automate Guardrails and Keep Rollbacks Safe</span><a href="#4-automate-guardrails-and-keep-rollbacks-safe" class="header-anchor">#</a></h1><p>A budget earns its keep once it triggers action. Borrowing from the <a target="_blank" rel="noopener" href="https://www.finops.org/framework/">FinOps Framework</a>, each guardrail should ship with policy-as-code: when costs approach the ceiling, enable aggressive response caching or fall back to quantised models; if latency climbs, spin up extra inference replicas or reroute requests to a nearer region. Multi-tenant products can mix these actions with anomaly detection to flag abusive traffic and to keep premium customers within higher bounds.</p>
+<p>Automation still needs a parachute. Store thresholds and playbooks in Git, deliver them through GitOps, and archive every successful rollout so that a single command restores the last-known-good configuration. Feature-flag platforms add traceability by logging activation timestamps and correlating them with business metrics, proving whether an adaptive tweak generated measurable value.</p>
+<h1><span id="conclusion-x2f-outlook">Conclusion &#x2F; Outlook</span><a href="#conclusion-x2f-outlook" class="header-anchor">#</a></h1><p>Performance budgeting in the age of AI is a social contract across product, platform, and operations. By combining composable metrics, unified telemetry, and automated guardrails, teams can delight users without losing control of cost or reliability. The next milestone is to tie inference budgets directly to business KPIs, closing the loop from infrastructure tuning to customer impact so every optimisation tells a value story.</p>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2025-10-04</span></div></div></div></div></div></div></div></div><script src="/js/jquery.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script></body></html>
