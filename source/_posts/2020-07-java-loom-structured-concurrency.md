@@ -1,6 +1,7 @@
 ---
 title: Java 结构化并发（Structured Concurrency）实践
 date: 2020-07-05
+lang: zh-CN
 tags: ['#Java', '#Loom', '#Concurrency']
 categories:
   - Java

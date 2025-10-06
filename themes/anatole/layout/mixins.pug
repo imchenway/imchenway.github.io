@@ -26,14 +26,20 @@ mixin make_post(item, is_detail)
 					- var hasTags = item.tags && item.tags.length
 					if hasCategories || hasTags
 						i.fa.fa-tag
-						if hasCategories
-							- item.categories.sort('posts').each(function(category) {
-									a.tag(href=config.root + category.path, title= category.name)= category.name + " "
-							- });
-						if hasTags
-							- item.tags.sort('posts').each(function(tag) {
-									a.tag(href=config.root + tag.path, title= tag.name)= tag.name + " "
-							- });
+					if hasCategories
+						- item.categories.sort('posts').each(function(category) {
+							- var categoryPath = category.path;
+							- if (item.lang === 'en' && categoryPath.indexOf('en/') !== 0)
+								categoryPath = 'en/' + categoryPath;
+								a.tag(href=config.root + categoryPath, title= category.name)= category.name + " "
+						- });
+					if hasTags
+						- item.tags.sort('posts').each(function(tag) {
+							- var tagPath = tag.path;
+							- if (item.lang === 'en' && tagPath.indexOf('en/') !== 0)
+								tagPath = 'en/' + tagPath;
+								a.tag(href=config.root + tagPath, title= tag.name)= tag.name + " "
+						- });
 
 
 mixin make_pager()
@@ -50,10 +56,18 @@ mixin make_pager()
 
 mixin postList()
 	.archive
+		- var rawPosts = page.posts || [];
+		- var postsArray = rawPosts.toArray ? rawPosts.toArray() : rawPosts;
+		- var currentLang = page.lang || (page.path && page.path.indexOf('en/') === 0 ? 'en' : (config.language ? config.language[0] : null));
+		- var filteredPosts = postsArray.filter(function(item){
+		- 	if (currentLang === 'en') return item.lang === 'en';
+		- 	return !item.lang || item.lang === 'zh-CN' || item.lang === 'zh';
+		- });
+		- filteredPosts.sort(function(a, b){ return b.date - a.date; });
 		- var year = 0;
 		- var change = false;
 		- var firstYear = true;
-		- page.posts.each(function (item) {
+		- filteredPosts.forEach(function (item) {
 			- var itemYear = date(item.date, 'YYYY') - 0;
 			- change = year !== itemYear;
 			- year = change ? itemYear : year;

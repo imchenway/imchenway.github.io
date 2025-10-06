@@ -1,6 +1,7 @@
 ---
 title: 组织学习与复盘方法论落地
 date: 2025-08-17
+lang: zh-CN
 tags: ['#TPM']
 ---
 

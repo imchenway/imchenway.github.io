@@ -1,6 +1,7 @@
 ---
 title: Kotlin 与 Java 协同开发注意事项清单
 date: 2020-07-19
+lang: zh-CN
 tags: ['#Java', '#Kotlin', '#Interoperability']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: Spring Boot多模块大型项目结构
 date: 2022-08-03
+lang: zh-CN
 tags: ['#Spring']
 ---
 

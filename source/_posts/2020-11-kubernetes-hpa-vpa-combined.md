@@ -1,6 +1,7 @@
 ---
 title: Kubernetes HPA 与 VPA 联合弹性策略
 date: 2020-11-19
+lang: zh-CN
 tags: ['#Kubernetes', '#Autoscaling', '#DevOps']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: 根号分治（Sqrt Decomposition）在数组与图问题中的应用
 date: 2019-01-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure']
 categories:
   - Algorithms

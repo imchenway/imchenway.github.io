@@ -1,6 +1,7 @@
 ---
 title: Meet-in-the-Middle 算法设计与典型题目
 date: 2018-12-19
+lang: zh-CN
 tags: ['#Algorithm', '#Search']
 categories:
   - Algorithms

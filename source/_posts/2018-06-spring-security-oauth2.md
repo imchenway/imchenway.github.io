@@ -1,6 +1,7 @@
 ---
 title: Spring Security OAuth2 资源服务器实践
 date: 2018-06-26
+lang: zh-CN
 tags: ['#Spring', '#Security']
 categories:
   - Java

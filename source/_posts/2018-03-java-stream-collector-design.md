@@ -1,6 +1,7 @@
 ---
 title: 自定义 Java Stream Collector 的设计模式
 date: 2018-03-05
+lang: zh-CN
 tags: ['#Java', '#Stream']
 categories:
   - Java

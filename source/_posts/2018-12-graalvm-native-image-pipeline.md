@@ -1,6 +1,7 @@
 ---
 title: GraalVM Native Image 构建流水线实践
 date: 2018-12-05
+lang: zh-CN
 tags: ['#Java', '#GraalVM', '#Performance']
 categories:
   - Java

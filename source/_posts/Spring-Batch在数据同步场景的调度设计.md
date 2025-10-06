@@ -1,6 +1,7 @@
 ---
 title: Spring Batch在数据同步场景的调度设计
 date: 2022-04-25
+lang: zh-CN
 tags: ['#Spring']
 ---
 

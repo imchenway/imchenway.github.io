@@ -1,6 +1,7 @@
 ---
 title: JFR 持续监控流水线搭建指南
 date: 2020-09-05
+lang: zh-CN
 tags: ['#JVM', '#JFR', '#Monitoring']
 categories:
   - JVM

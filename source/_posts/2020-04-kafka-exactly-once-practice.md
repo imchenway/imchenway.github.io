@@ -1,6 +1,7 @@
 ---
 title: Kafka 精确一次（Exactly-Once）语义落地实战
 date: 2020-04-26
+lang: zh-CN
 tags: ['#Kafka', '#Streaming', '#Reliability']
 categories:
   - Java

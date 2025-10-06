@@ -1,6 +1,7 @@
 ---
 title: JVM内存模型
 date: 2021-07-07
+lang: zh-CN
 tags: ['#JVM']
 ---
 

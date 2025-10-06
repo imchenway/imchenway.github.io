@@ -1,6 +1,7 @@
 ---
 title: Java 集合框架性能与实践指南
 date: 2017-07-05
+lang: zh-CN
 tags: ['#Java']
 categories:
   - Java

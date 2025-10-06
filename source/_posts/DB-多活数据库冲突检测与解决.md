@@ -1,6 +1,7 @@
 ---
 title: 多活数据库冲突检测与解决
 date: 2024-06-03
+lang: zh-CN
 tags: ['#Database']
 ---
 

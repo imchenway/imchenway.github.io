@@ -1,6 +1,7 @@
 ---
 title: HotSpot JIT 编译管线：从解释到优化
 date: 2018-02-12
+lang: zh-CN
 tags: ['#JVM', '#JIT']
 categories:
   - JVM

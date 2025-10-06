@@ -1,6 +1,7 @@
 ---
 title: Apache Hudi 数据湖增量摄取实践
 date: 2021-02-12
+lang: zh-CN
 tags: ['#Hudi', '#DataLake', '#Streaming']
 categories:
   - Java

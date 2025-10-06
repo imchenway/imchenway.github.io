@@ -1,6 +1,7 @@
 ---
 title: JVM偏向锁与轻量级锁演进史
 date: 2021-10-17
+lang: zh-CN
 tags: ['#JVM']
 ---
 

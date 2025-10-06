@@ -1,6 +1,7 @@
 ---
 title: 后缀数组与 LCP 的高效构建
 date: 2019-11-19
+lang: zh-CN
 tags: ['#Algorithm', '#String']
 categories:
   - Algorithms

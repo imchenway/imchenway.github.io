@@ -1,6 +1,7 @@
 ---
 title: Service Mesh 流量影子测试实践
 date: 2020-06-26
+lang: zh-CN
 tags: ['#ServiceMesh', '#Testing', '#DevOps']
 categories:
   - Java

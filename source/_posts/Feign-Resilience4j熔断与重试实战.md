@@ -1,6 +1,7 @@
 ---
 title: Feign与Resilience4j熔断重试策略
 date: 2022-11-11
+lang: zh-CN
 tags: ['#RPC']
 ---
 

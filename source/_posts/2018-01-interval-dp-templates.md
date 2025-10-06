@@ -1,6 +1,7 @@
 ---
 title: 区间动态规划模板与案例实战
 date: 2018-01-19
+lang: zh-CN
 tags: ['#Algorithm', '#DynamicProgramming']
 categories:
   - Algorithms

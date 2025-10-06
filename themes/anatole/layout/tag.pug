@@ -1,10 +1,13 @@
 extends partial/layout
 
 block site_title
-  != page.tag + " · " + config.title
+  - var currentTag = page.tag || (page.lang === 'en' ? 'Tags' : '标签')
+  != currentTag + " · " + config.title
 
 block description
-  - var desc = '标签：' + page.tag + ' - ' + config.title;
+  - var tagLabel = page.lang === 'en' ? 'Tag: ' : '标签：';
+  - var currentTag = page.tag || (page.lang === 'en' ? 'Tags' : '标签')
+  - var desc = tagLabel + currentTag + ' - ' + config.title;
   meta(name="description", content=desc)
 
 block content

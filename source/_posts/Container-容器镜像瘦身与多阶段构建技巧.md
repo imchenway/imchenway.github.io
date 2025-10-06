@@ -1,6 +1,7 @@
 ---
 title: 容器镜像瘦身与多阶段构建技巧
 date: 2024-08-22
+lang: zh-CN
 tags: ['#Container']
 ---
 

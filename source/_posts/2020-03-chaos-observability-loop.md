@@ -1,6 +1,7 @@
 ---
 title: 混沌实验的数据闭环与指标看板
 date: 2020-03-26
+lang: zh-CN
 tags: ['#ChaosEngineering', '#Observability']
 categories:
   - Java

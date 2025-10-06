@@ -1,6 +1,7 @@
 ---
 title: Project Panama 外部内存 API 初探
 date: 2019-12-05
+lang: zh-CN
 tags: ['#Java', '#Panama', '#ForeignMemory']
 categories:
   - Java

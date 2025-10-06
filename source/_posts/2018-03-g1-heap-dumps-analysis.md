@@ -1,6 +1,7 @@
 ---
 title: 使用 heap dump 分析 G1 堆内存问题
 date: 2018-03-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

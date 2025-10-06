@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Stream Kafka 压力治理
 date: 2021-10-26
+lang: zh-CN
 tags: ['#Spring', '#Kafka', '#Resilience']
 categories:
   - Java

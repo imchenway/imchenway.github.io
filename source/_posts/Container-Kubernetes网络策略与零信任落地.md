@@ -1,6 +1,7 @@
 ---
 title: Kubernetes 网络策略与零信任落地
 date: 2024-10-01
+lang: zh-CN
 tags: ['#Container']
 ---
 

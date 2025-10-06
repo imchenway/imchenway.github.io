@@ -1,6 +1,7 @@
 ---
 title: MySQL InnoDB Buffer Pool与自适应Hash优化
 date: 2023-12-16
+lang: zh-CN
 tags: ['#Database']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: 后缀自动机与后缀数组联合解题套路
 date: 2020-03-19
+lang: zh-CN
 tags: ['#Algorithm', '#String']
 categories:
   - Algorithms

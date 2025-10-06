@@ -1,6 +1,7 @@
 ---
 title: 数据加密与脱敏落地实践
 date: 2024-05-24
+lang: zh-CN
 tags: ['#Database']
 ---
 

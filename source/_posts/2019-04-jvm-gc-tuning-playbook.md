@@ -1,6 +1,7 @@
 ---
 title: JVM GC 调优手册：方法论与检查清单
 date: 2019-04-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#Tuning']
 categories:
   - JVM

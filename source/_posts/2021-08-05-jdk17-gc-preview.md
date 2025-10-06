@@ -1,6 +1,7 @@
 ---
 title: JDK 17 GC 演进与变化前瞻
 date: 2021-08-05
+lang: zh-CN
 tags: ['#JDK17', '#GC', '#JVM']
 categories:
   - JVM

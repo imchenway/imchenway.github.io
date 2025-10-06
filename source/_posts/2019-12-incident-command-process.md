@@ -1,6 +1,7 @@
 ---
 title: 事故指挥（Incident Command）流程与角色分工
 date: 2019-12-26
+lang: zh-CN
 tags: ['#SRE', '#IncidentResponse']
 categories:
   - Java

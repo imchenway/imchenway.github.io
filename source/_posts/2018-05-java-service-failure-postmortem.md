@@ -1,6 +1,7 @@
 ---
 title: Java 服务故障复盘模板：指标、日志与流程
 date: 2018-05-26
+lang: zh-CN
 tags: ['#Java', '#Postmortem']
 categories:
   - Java

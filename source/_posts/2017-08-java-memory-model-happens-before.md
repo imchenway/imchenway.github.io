@@ -1,6 +1,7 @@
 ---
 title: 深入理解 Java 内存模型与 happens-before 规则
 date: 2017-08-26
+lang: zh-CN
 tags: ['#Java', '#JMM']
 categories:
   - Java

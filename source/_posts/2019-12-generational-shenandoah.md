@@ -1,6 +1,7 @@
 ---
 title: Generational Shenandoah：低延迟回收器的代际演进
 date: 2019-12-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#Shenandoah']
 categories:
   - JVM

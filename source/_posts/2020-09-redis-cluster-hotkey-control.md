@@ -1,6 +1,7 @@
 ---
 title: Redis Cluster 热点 Key 治理策略
 date: 2020-09-12
+lang: zh-CN
 tags: ['#Redis', '#Cluster', '#Performance']
 categories:
   - Java

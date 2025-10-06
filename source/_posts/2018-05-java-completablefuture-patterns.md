@@ -1,6 +1,7 @@
 ---
 title: CompletableFuture 常见模式与最佳实践
 date: 2018-05-05
+lang: zh-CN
 tags: ['#Java', '#Concurrency']
 categories:
   - Java

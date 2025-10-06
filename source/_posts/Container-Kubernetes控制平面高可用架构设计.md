@@ -1,6 +1,7 @@
 ---
 title: Kubernetes 控制平面高可用架构设计
 date: 2024-08-02
+lang: zh-CN
 tags: ['#Container']
 ---
 

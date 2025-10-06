@@ -1,6 +1,7 @@
 ---
 title: JVM垃圾收集与内存回收策略
 date: 2021-07-09
+lang: zh-CN
 tags: ['#JVM']
 ---
 

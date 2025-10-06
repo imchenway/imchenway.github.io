@@ -1,6 +1,7 @@
 ---
 title: JPMS 模块化项目的测试策略
 date: 2018-09-05
+lang: zh-CN
 tags: ['#Java', '#JPMS', '#Testing']
 categories:
   - Java

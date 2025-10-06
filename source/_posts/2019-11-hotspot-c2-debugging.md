@@ -2,6 +2,7 @@
 title: HotSpot C2 编译器调试：hsdis 与 CompileCommand
 
 date: 2019-11-12
+lang: zh-CN
 
 tags: ['#JVM', '#JIT', '#Debugging']
 

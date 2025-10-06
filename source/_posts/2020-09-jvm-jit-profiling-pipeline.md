@@ -1,6 +1,7 @@
 ---
 title: JIT Profiling 流水线：JFR + Async-profiler 双维度分析
 date: 2020-09-19
+lang: zh-CN
 tags: ['#JVM', '#JIT', '#Profiling']
 categories:
   - JVM

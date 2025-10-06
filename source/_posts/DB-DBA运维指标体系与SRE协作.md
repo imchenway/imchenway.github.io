@@ -1,6 +1,7 @@
 ---
 title: DBA运维指标体系与SRE协作
 date: 2024-07-13
+lang: zh-CN
 tags: ['#Database']
 ---
 

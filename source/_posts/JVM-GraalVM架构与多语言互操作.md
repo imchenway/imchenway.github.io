@@ -1,6 +1,7 @@
 ---
 title: GraalVM架构与多语言互操作
 date: 2021-08-08
+lang: zh-CN
 tags: ['#JVM']
 ---
 

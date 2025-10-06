@@ -1,6 +1,7 @@
 ---
 title: OPA/Gatekeeper 策略管控体系
 date: 2024-11-30
+lang: zh-CN
 tags: ['#Container']
 ---
 

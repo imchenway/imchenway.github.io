@@ -1,6 +1,7 @@
 ---
 title: GraalVM 多语言应用的测试体系
 date: 2021-05-12
+lang: zh-CN
 tags: ['#GraalVM', '#Testing', '#Polyglot']
 categories:
   - Java

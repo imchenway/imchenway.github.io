@@ -1,6 +1,7 @@
 ---
 title: Kafka Streams状态存储与容错机制
 date: 2023-07-09
+lang: zh-CN
 tags: ['#MQ']
 ---
 

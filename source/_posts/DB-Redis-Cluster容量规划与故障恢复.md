@@ -1,6 +1,7 @@
 ---
 title: Redis Cluster容量规划与故障恢复
 date: 2024-02-04
+lang: zh-CN
 tags: ['#Database']
 ---
 

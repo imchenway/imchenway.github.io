@@ -1,6 +1,7 @@
 ---
 title: JVM Native Memory Tracking (NMT) 深入解析
 date: 2019-05-12
+lang: zh-CN
 tags: ['#JVM', '#NMT', '#Troubleshooting']
 categories:
   - JVM

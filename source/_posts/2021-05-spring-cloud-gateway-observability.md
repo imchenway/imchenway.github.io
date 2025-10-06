@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Gateway 可观测性实战
 date: 2021-05-19
+lang: zh-CN
 tags: ['#Spring', '#Gateway', '#Observability']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: ZGC 内存碎片诊断手册
 date: 2021-07-05
+lang: zh-CN
 tags: ['#JVM', '#ZGC', '#Troubleshooting']
 categories:
   - JVM

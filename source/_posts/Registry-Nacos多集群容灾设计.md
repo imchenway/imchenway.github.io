@@ -1,6 +1,7 @@
 ---
 title: Nacos多集群注册配置容灾方案
 date: 2022-10-22
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

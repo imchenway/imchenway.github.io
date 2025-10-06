@@ -1,6 +1,7 @@
 ---
 title: 边缘计算下的 K3s/AKS Edge 部署实践
 date: 2025-01-29
+lang: zh-CN
 tags: ['#Container']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: 分布式数据库选型与评估框架
 date: 2024-07-03
+lang: zh-CN
 tags: ['#Database']
 ---
 

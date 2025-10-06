@@ -1,6 +1,7 @@
 ---
 title: 技术领导者的成长路径与能力模型
 date: 2025-09-26
+lang: zh-CN
 tags: ['#TPM']
 ---
 

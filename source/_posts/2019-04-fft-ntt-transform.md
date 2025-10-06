@@ -1,6 +1,7 @@
 ---
 title: FFT 与 NTT：快速多项式与卷积运算
 date: 2019-04-26
+lang: zh-CN
 tags: ['#Algorithm', '#FFT']
 categories:
   - Algorithms

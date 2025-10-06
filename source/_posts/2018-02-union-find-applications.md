@@ -1,6 +1,7 @@
 ---
 title: 并查集（Union-Find）应用与优化
 date: 2018-02-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure']
 categories:
   - Algorithms

@@ -1,6 +1,7 @@
 ---
 title: RSocket 响应式通信模式
 date: 2020-11-12
+lang: zh-CN
 tags: ['#Java', '#RSocket', '#Reactive']
 categories:
   - Java

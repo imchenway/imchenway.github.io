@@ -1,6 +1,7 @@
 ---
 title: Kafka KRaft架构与元数据一致性
 date: 2023-05-20
+lang: zh-CN
 tags: ['#MQ']
 ---
 

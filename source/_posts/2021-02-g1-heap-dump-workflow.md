@@ -1,6 +1,7 @@
 ---
 title: G1 堆 dump 分析工作流
 date: 2021-02-05
+lang: zh-CN
 tags: ['#JVM', '#GC', '#Heap']
 categories:
   - JVM

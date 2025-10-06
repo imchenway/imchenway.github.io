@@ -1,6 +1,7 @@
 ---
 title: MQ与Serverless集成的冷启动优化
 date: 2023-11-26
+lang: zh-CN
 tags: ['#MQ']
 ---
 

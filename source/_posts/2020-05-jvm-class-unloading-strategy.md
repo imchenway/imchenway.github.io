@@ -1,6 +1,7 @@
 ---
 title: JVM 类卸载策略与元空间治理
 date: 2020-05-12
+lang: zh-CN
 tags: ['#JVM', '#Metaspace', '#ClassLoader']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: HotSpot 对象布局解析：Mark Word 与压缩指针
 date: 2017-10-12
+lang: zh-CN
 tags: ['#JVM', '#Memory']
 categories:
   - JVM

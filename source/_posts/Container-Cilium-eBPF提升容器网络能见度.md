@@ -1,6 +1,7 @@
 ---
 title: Cilium/eBPF 提升容器网络能见度
 date: 2024-10-11
+lang: zh-CN
 tags: ['#Container']
 ---
 

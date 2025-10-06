@@ -1,6 +1,7 @@
 ---
 title: StatefulSet 管理数据库的最佳实践
 date: 2024-10-21
+lang: zh-CN
 tags: ['#Container']
 ---
 

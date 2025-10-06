@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Gateway零信任入口设计
 date: 2022-03-06
+lang: zh-CN
 tags: ['#Spring']
 ---
 

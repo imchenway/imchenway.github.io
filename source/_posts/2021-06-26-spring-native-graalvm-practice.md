@@ -1,6 +1,7 @@
 ---
 title: Spring Native 与 GraalVM 原生镜像实践
 date: 2021-06-26
+lang: zh-CN
 tags: ['#Spring', '#GraalVM', '#NativeImage']
 categories:
   - Java

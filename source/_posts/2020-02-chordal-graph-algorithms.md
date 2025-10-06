@@ -1,6 +1,7 @@
 ---
 title: 弦图算法综述：最小顶点覆盖与最优着色
 date: 2020-02-19
+lang: zh-CN
 tags: ['#Algorithm', '#Graph', '#Chordal']
 categories:
   - Algorithms

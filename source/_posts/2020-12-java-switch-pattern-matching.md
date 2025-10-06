@@ -1,6 +1,7 @@
 ---
 title: Java 模式匹配 switch 的业务落地方案
 date: 2020-12-05
+lang: zh-CN
 tags: ['#Java', '#PatternMatching', '#Language']
 categories:
   - Java

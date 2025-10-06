@@ -1,6 +1,7 @@
 ---
 title: HotSpot即时编译管线与内联缓存
 date: 2021-07-29
+lang: zh-CN
 tags: ['#JVM']
 ---
 

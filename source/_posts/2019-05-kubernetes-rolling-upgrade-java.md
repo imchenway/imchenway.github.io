@@ -1,6 +1,7 @@
 ---
 title: Kubernetes 上的 Java 服务滚动升级策略
 date: 2019-05-26
+lang: zh-CN
 tags: ['#DevOps', '#Kubernetes', '#Deployment']
 categories:
   - Java

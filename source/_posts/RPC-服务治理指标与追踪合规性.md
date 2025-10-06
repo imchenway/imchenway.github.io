@@ -1,6 +1,7 @@
 ---
 title: 服务治理指标与追踪合规性
 date: 2023-04-30
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

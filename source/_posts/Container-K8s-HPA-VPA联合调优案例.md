@@ -1,6 +1,7 @@
 ---
 title: K8s HPA/VPA 联合调优案例
 date: 2024-09-11
+lang: zh-CN
 tags: ['#Container']
 ---
 

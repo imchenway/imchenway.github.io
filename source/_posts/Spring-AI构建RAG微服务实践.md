@@ -1,6 +1,7 @@
 ---
 title: Spring AI构建RAG微服务的最佳实践
 date: 2022-05-25
+lang: zh-CN
 tags: ['#Spring']
 ---
 

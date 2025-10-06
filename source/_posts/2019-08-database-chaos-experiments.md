@@ -1,6 +1,7 @@
 ---
 title: 数据库层混沌实验：连接中断、延迟与主从切换
 date: 2019-08-26
+lang: zh-CN
 tags: ['#ChaosEngineering', '#Database', '#Resilience']
 categories:
   - Java

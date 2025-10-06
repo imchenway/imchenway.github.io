@@ -1,6 +1,7 @@
 ---
 title: Java 异常处理策略：可读性与可恢复性的平衡
 date: 2017-11-05
+lang: zh-CN
 tags: ['#Java']
 categories:
   - Java

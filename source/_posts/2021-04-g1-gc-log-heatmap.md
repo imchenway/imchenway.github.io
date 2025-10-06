@@ -1,6 +1,7 @@
 ---
 title: 利用热力图展示 G1 GC 停顿曲线
 date: 2021-04-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#Visualization']
 categories:
   - JVM

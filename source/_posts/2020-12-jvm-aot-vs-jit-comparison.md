@@ -1,6 +1,7 @@
 ---
 title: AOT 与 JIT 在生产环境的取舍
 date: 2020-12-12
+lang: zh-CN
 tags: ['#JVM', '#AOT', '#JIT']
 categories:
   - JVM

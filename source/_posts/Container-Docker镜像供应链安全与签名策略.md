@@ -1,6 +1,7 @@
 ---
 title: Docker 镜像供应链安全与签名策略
 date: 2024-08-12
+lang: zh-CN
 tags: ['#Container']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: 工程文化建设路径与实践
 date: 2025-09-06
+lang: zh-CN
 tags: ['#TPM']
 ---
 

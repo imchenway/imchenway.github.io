@@ -1,6 +1,7 @@
 ---
 title: GraalVM Native Image 在 CI/CD 中的加速技巧
 date: 2020-08-26
+lang: zh-CN
 tags: ['#GraalVM', '#CI/CD', '#Performance']
 categories:
   - Java

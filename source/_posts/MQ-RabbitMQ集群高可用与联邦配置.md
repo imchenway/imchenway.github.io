@@ -1,6 +1,7 @@
 ---
 title: RabbitMQ集群高可用与联邦配置
 date: 2023-08-18
+lang: zh-CN
 tags: ['#MQ']
 ---
 

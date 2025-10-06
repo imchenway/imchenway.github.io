@@ -1,6 +1,7 @@
 ---
 title: SRE 错误预算与发布节奏管理
 date: 2018-10-26
+lang: zh-CN
 tags: ['#SRE', '#Reliability']
 categories:
   - Java

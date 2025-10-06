@@ -1,6 +1,7 @@
 ---
 title: 日志采样策略：降低成本并保持可见性
 date: 2019-10-26
+lang: zh-CN
 tags: ['#Logging', '#Observability']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: Spring WebFlux Functional Endpoints 实战
 date: 2019-04-19
+lang: zh-CN
 tags: ['#Spring', '#Reactive']
 categories:
   - Java

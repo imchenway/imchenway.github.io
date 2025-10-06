@@ -1,6 +1,7 @@
 ---
 title: Java Flight Recorder 事件订阅拓展
 date: 2021-07-12
+lang: zh-CN
 tags: ['#JFR', '#Observability', '#Java']
 categories:
   - Java

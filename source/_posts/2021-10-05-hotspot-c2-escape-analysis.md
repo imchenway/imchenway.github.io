@@ -1,6 +1,7 @@
 ---
 title: HotSpot C2 逃逸分析剖析
 date: 2021-10-05
+lang: zh-CN
 tags: ['#JVM', '#HotSpot', '#EscapeAnalysis']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: Kafka事务与Exactly Once语义实战
 date: 2023-05-10
+lang: zh-CN
 tags: ['#MQ']
 ---
 

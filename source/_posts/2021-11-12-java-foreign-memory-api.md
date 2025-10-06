@@ -1,6 +1,7 @@
 ---
 title: Foreign Memory API (JEP 412) 实践手记
 date: 2021-11-12
+lang: zh-CN
 tags: ['#Java', '#ForeignMemory', '#Performance']
 categories:
   - Java

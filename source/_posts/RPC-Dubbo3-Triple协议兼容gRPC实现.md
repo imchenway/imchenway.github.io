@@ -1,6 +1,7 @@
 ---
 title: Dubbo3 Triple协议与gRPC互通实践
 date: 2022-10-02
+lang: zh-CN
 tags: ['#RPC']
 ---
 

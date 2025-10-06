@@ -1,6 +1,7 @@
 ---
 title: JVM 对象分配速率调优与监控
 date: 2018-08-12
+lang: zh-CN
 tags: ['#JVM', '#Performance']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: 使用 JITWatch 分析 HotSpot JIT 优化
 date: 2019-08-12
+lang: zh-CN
 tags: ['#JVM', '#JIT', '#Profiling']
 categories:
   - JVM

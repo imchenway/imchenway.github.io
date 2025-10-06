@@ -1,6 +1,7 @@
 ---
 title: 多租户容器平台的隔离与配额治理
 date: 2025-01-09
+lang: zh-CN
 tags: ['#Container']
 ---
 

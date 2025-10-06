@@ -17,8 +17,9 @@ timezone: 'Asia/Shanghai'
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: https://imchenway.com
 root: /
-permalink: :year/:month/:day/:title/
+permalink: :lang/:title/
 permalink_defaults:
+  lang: zh-CN
 pretty_urls:
   trailing_index: true # Set to false to remove trailing index.html from permalinks
 
@@ -34,7 +35,7 @@ i18n_dir: :lang
 skip_render:
 
 # Writing
-new_post_name: :title.md # File name of new posts
+new_post_name: :lang/:title.md # File name of new posts
 default_layout: post
 titlecase: false # Transform title into titlecase
 external_link:
@@ -60,6 +61,7 @@ index_generator:
   path: ''
   per_page: 30
   order_by: -date
+  single_language_index: true
 
 # Category & Tag
 default_category: uncategorized

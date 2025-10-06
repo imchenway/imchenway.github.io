@@ -1,6 +1,7 @@
 ---
 title: StructuredTaskScope 实战笔记
 date: 2021-08-12
+lang: zh-CN
 tags: ['#Java', '#StructuredConcurrency', '#Loom']
 categories:
   - Java

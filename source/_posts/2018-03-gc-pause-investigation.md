@@ -1,6 +1,7 @@
 ---
 title: GC 停顿分析实战：定位 Young GC 与 Mixed GC 问题
 date: 2018-03-26
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

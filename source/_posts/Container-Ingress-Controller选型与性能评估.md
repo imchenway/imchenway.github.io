@@ -1,6 +1,7 @@
 ---
 title: Ingress Controller 选型与性能评估
 date: 2024-12-20
+lang: zh-CN
 tags: ['#Container']
 ---
 

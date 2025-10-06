@@ -1,6 +1,7 @@
 ---
 title: G1 GC 日志实时可视化方案
 date: 2020-07-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#Observability']
 categories:
   - JVM

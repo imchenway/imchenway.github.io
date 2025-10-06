@@ -1,6 +1,7 @@
 ---
 title: JVM中类加载的过程
 date: 2021-07-01
+lang: zh-CN
 tags: ['#JVM']
 ---
 

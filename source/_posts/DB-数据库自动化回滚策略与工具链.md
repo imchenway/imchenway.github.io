@@ -1,6 +1,7 @@
 ---
 title: 数据库自动化回滚策略与工具链
 date: 2024-05-04
+lang: zh-CN
 tags: ['#Database']
 ---
 

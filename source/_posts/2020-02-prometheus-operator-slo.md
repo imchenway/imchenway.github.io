@@ -1,6 +1,7 @@
 ---
 title: Prometheus Operator SLO 落地指南
 date: 2020-02-26
+lang: zh-CN
 tags: ['#Observability', '#SLO', '#Prometheus']
 categories:
   - Java

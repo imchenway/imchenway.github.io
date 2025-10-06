@@ -1,6 +1,7 @@
 ---
 title: MongoDB分片架构与路由优化实践
 date: 2024-01-15
+lang: zh-CN
 tags: ['#Database']
 ---
 

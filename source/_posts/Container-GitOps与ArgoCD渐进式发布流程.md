@@ -1,6 +1,7 @@
 ---
 title: GitOps 与 ArgoCD 渐进式发布流程
 date: 2024-11-10
+lang: zh-CN
 tags: ['#Container']
 ---
 

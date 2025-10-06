@@ -1,6 +1,7 @@
 ---
 title: Spring Retry与失败补偿机制
 date: 2022-08-13
+lang: zh-CN
 tags: ['#Spring']
 ---
 

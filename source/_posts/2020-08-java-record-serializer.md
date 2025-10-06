@@ -1,6 +1,7 @@
 ---
 title: 记录类型的序列化与兼容性策略
 date: 2020-08-05
+lang: zh-CN
 tags: ['#Java', '#Records', '#Serialization']
 categories:
   - Java

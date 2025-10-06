@@ -1,6 +1,7 @@
 ---
 title: JVM 远程诊断安全加固策略
 date: 2020-01-12
+lang: zh-CN
 tags: ['#JVM', '#Security', '#Monitoring']
 categories:
   - JVM

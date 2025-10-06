@@ -1,6 +1,7 @@
 ---
 title: 从 JNI 迁移至 Project Panama 的路线图
 date: 2020-03-05
+lang: zh-CN
 tags: ['#Java', '#Panama', '#JNI']
 categories:
   - Java

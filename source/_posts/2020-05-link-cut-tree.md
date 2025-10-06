@@ -1,6 +1,7 @@
 ---
 title: Link-Cut Tree（Splay 动态树）入门指南
 date: 2020-05-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure', '#DynamicTree']
 categories:
   - Algorithms

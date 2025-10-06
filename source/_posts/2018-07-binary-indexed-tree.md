@@ -1,6 +1,7 @@
 ---
 title: 树状数组（Binary Indexed Tree）原理与实现
 date: 2018-07-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure']
 categories:
   - Algorithms

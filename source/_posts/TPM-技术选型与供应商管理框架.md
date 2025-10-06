@@ -1,6 +1,7 @@
 ---
 title: 技术选型与供应商管理框架
 date: 2025-08-27
+lang: zh-CN
 tags: ['#TPM']
 ---
 

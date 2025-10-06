@@ -1,6 +1,7 @@
 ---
 title: Java Sealed Classes 设计与模式匹配
 date: 2019-10-05
+lang: zh-CN
 tags: ['#Java', '#SealedClasses']
 categories:
   - Java

@@ -1,5 +1,6 @@
 ---
 date: 2019-11-12
+lang: zh-CN
 tags: ['#LeetCode']
 ---
 

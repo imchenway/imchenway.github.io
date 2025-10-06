@@ -1,6 +1,7 @@
 ---
 title: Java 文本块（Text Blocks）实践与注意事项
 date: 2019-09-05
+lang: zh-CN
 tags: ['#Java', '#Language']
 categories:
   - Java

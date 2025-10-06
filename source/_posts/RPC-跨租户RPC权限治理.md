@@ -1,6 +1,7 @@
 ---
 title: 多租户RPC权限治理实践
 date: 2023-04-20
+lang: zh-CN
 tags: ['#RPC']
 ---
 

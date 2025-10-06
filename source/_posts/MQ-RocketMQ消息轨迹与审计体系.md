@@ -1,6 +1,7 @@
 ---
 title: RocketMQ消息轨迹与审计体系
 date: 2023-07-29
+lang: zh-CN
 tags: ['#MQ']
 ---
 

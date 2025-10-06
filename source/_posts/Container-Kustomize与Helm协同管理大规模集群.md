@@ -1,6 +1,7 @@
 ---
 title: Kustomize 与 Helm 协同管理大规模集群
 date: 2024-12-30
+lang: zh-CN
 tags: ['#Container']
 ---
 

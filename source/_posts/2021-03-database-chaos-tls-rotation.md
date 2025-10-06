@@ -1,6 +1,7 @@
 ---
 title: 数据库 TLS 证书轮换与混沌演练
 date: 2021-03-26
+lang: zh-CN
 tags: ['#Database', '#ChaosEngineering', '#Security']
 categories:
   - Java

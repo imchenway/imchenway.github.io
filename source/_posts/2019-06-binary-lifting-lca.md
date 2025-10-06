@@ -1,6 +1,7 @@
 ---
 title: 二进制提升（Binary Lifting）求最近公共祖先（LCA）
 date: 2019-06-19
+lang: zh-CN
 tags: ['#Algorithm', '#Tree']
 categories:
   - Algorithms

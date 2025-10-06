@@ -1,6 +1,7 @@
 ---
 title: 有向图权重挑战：Johnson 算法与 SPFA 评估
 date: 2018-06-19
+lang: zh-CN
 tags: ['#Algorithm', '#Graph']
 categories:
   - Algorithms

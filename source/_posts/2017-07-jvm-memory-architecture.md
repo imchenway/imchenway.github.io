@@ -1,6 +1,7 @@
 ---
 title: JVM 内存区域与对象生命周期全解析
 date: 2017-07-12
+lang: zh-CN
 tags: ['#JVM']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: JVM类加载器与双亲委派模型（JDK8）
 date: 2021-07-02
+lang: zh-CN
 tags: ['#JVM']
 ---
 

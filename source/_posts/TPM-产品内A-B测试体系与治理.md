@@ -1,6 +1,7 @@
 ---
 title: 产品内 A/B 测试体系与治理
 date: 2025-06-18
+lang: zh-CN
 tags: ['#TPM']
 ---
 

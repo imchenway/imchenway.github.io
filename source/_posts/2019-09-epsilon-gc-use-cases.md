@@ -1,6 +1,7 @@
 ---
 title: Epsilon GC 零垃圾收集器的应用场景
 date: 2019-09-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#Epsilon']
 categories:
   - JVM

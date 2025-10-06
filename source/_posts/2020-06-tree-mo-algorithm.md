@@ -1,6 +1,7 @@
 ---
 title: 树上莫队算法应用笔记
 date: 2020-06-19
+lang: zh-CN
 tags: ['#Algorithm', '#Tree', '#Mo']
 categories:
   - Algorithms

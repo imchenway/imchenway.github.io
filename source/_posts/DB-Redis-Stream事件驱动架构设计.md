@@ -1,6 +1,7 @@
 ---
 title: Redis Stream事件驱动架构设计
 date: 2024-02-24
+lang: zh-CN
 tags: ['#Database']
 ---
 

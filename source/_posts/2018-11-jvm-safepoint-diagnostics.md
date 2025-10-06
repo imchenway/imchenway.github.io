@@ -1,6 +1,7 @@
 ---
 title: JVM Safepoint 诊断：定位暂停时间与原因
 date: 2018-11-12
+lang: zh-CN
 tags: ['#JVM', '#Safepoint']
 categories:
   - JVM

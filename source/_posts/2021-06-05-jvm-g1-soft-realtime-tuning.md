@@ -1,6 +1,7 @@
 ---
 title: JVM G1 软实时调优案例
 date: 2021-06-05
+lang: zh-CN
 tags: ['#JVM', '#G1GC', '#Performance']
 categories:
   - JVM

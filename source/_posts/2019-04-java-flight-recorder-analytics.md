@@ -1,6 +1,7 @@
 ---
 title: JFR Analytics：利用 Streams & SQL 分析事件数据
 date: 2019-04-05
+lang: zh-CN
 tags: ['#JVM', '#JFR', '#Analytics']
 categories:
   - JVM

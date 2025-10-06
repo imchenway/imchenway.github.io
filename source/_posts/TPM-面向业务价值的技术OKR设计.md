@@ -1,6 +1,7 @@
 ---
 title: 面向业务价值的技术 OKR 设计
 date: 2025-04-09
+lang: zh-CN
 tags: ['#TPM']
 ---
 

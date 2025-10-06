@@ -1,6 +1,7 @@
 ---
 title: VarHandle 编程模式：现代化替代 Unsafe
 date: 2019-07-05
+lang: zh-CN
 tags: ['#Java', '#VarHandle', '#Concurrency']
 categories:
   - Java

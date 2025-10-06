@@ -1,6 +1,7 @@
 ---
 title: Spring Security OAuth2.1的多租户落地
 date: 2022-05-15
+lang: zh-CN
 tags: ['#Spring']
 ---
 

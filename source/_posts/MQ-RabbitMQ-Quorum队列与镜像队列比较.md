@@ -1,6 +1,7 @@
 ---
 title: RabbitMQ Quorum队列与镜像队列比较
 date: 2023-06-29
+lang: zh-CN
 tags: ['#MQ']
 ---
 

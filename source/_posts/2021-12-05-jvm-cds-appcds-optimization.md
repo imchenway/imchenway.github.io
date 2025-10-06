@@ -1,6 +1,7 @@
 ---
 title: JVM CDS 与 AppCDS 冷启动优化
 date: 2021-12-05
+lang: zh-CN
 tags: ['#JVM', '#CDS', '#Startup']
 categories:
   - JVM

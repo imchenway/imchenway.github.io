@@ -1,6 +1,7 @@
 ---
 title: Mesh流量镜像与回放实践
 date: 2023-01-10
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

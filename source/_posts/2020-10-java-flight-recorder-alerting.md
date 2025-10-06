@@ -1,6 +1,7 @@
 ---
 title: 基于 JFR 的实时告警实践
 date: 2020-10-05
+lang: zh-CN
 tags: ['#JFR', '#Observability', '#Automation']
 categories:
   - JVM

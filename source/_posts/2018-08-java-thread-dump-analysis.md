@@ -1,6 +1,7 @@
 ---
 title: Java 线程转储（Thread Dump）分析指南
 date: 2018-08-26
+lang: zh-CN
 tags: ['#Java', '#Troubleshooting']
 categories:
   - Java

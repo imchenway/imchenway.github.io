@@ -1,6 +1,7 @@
 ---
 title: Spring Boot 3原生镜像构建流水线
 date: 2022-02-24
+lang: zh-CN
 tags: ['#Spring']
 ---
 

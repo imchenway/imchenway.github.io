@@ -1,6 +1,7 @@
 ---
 title: 故障演练 Runbook 标准化流程
 date: 2020-01-26
+lang: zh-CN
 tags: ['#SRE', '#ChaosEngineering', '#Runbook']
 categories:
   - Java

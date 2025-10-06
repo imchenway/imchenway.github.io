@@ -1,6 +1,7 @@
 ---
 title: SRE 与产品团队的责任边界划分
 date: 2025-03-30
+lang: zh-CN
 tags: ['#TPM']
 ---
 

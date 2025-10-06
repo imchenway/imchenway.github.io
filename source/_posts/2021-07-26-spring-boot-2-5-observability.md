@@ -1,6 +1,7 @@
 ---
 title: Spring Boot 2.5 可观测性新特性
 date: 2021-07-26
+lang: zh-CN
 tags: ['#Spring', '#Observability', '#Micrometer']
 categories:
   - Java

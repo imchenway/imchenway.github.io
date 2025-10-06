@@ -1,6 +1,7 @@
 ---
 title: 树形动态规划典型题与模板
 date: 2020-01-19
+lang: zh-CN
 tags: ['#Algorithm', '#Tree', '#DynamicProgramming']
 categories:
   - Algorithms

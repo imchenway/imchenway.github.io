@@ -1,6 +1,7 @@
 ---
 title: JVM启动参数最佳实践
 date: 2021-11-06
+lang: zh-CN
 tags: ['#JVM']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Service Mesh控制平面高可用设计
 date: 2023-03-21
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: GraalVM 多语言互操作：在 Java 中嵌入 JS/Python
 date: 2019-06-05
+lang: zh-CN
 tags: ['#Java', '#GraalVM', '#Polyglot']
 categories:
   - Java

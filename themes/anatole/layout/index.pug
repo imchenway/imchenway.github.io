@@ -1,18 +1,18 @@
 extends partial/layout
 block content
 	.autopagerize_page_element: .content
-		- var postsCollection = page.posts || site.posts;
-		- var filteredPosts = postsCollection;
-		- (function(){
+		- var postsCollection = page.posts;
+		- if (!postsCollection) {
 		- 	var indexLang = page.lang || page.language || (page.path && page.path.split('/')[0] === 'en' ? 'en' : (config.language ? config.language[0] : null));
-		- 	if (!indexLang) return;
-		- 	if (indexLang === 'en') {
-		- 		filteredPosts = postsCollection.filter(function(item){ return item.lang === 'en'; });
-		- 	} else {
-		- 		filteredPosts = postsCollection.filter(function(item){ return !item.lang || item.lang === 'zh-CN' || item.lang === 'zh'; });
+		- 	postsCollection = site.posts.sort('date', -1);
+		- 	if (indexLang) {
+		- 		postsCollection = postsCollection.filter(function(item) {
+		- 			if (indexLang === 'en') return item.lang === 'en';
+		- 			return !item.lang || item.lang === 'zh-CN' || item.lang === 'zh';
+		- 		});
 		- 	}
-		- })();
-		- filteredPosts.each(function (item) {
+		- }
+		- postsCollection.each(function (item) {
 			include mixins
 			+make_post(item, false)
 		- })

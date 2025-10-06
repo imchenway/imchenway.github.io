@@ -1,6 +1,7 @@
 ---
 title: 重链剖分（Heavy-Light Decomposition）与树上路径查询
 date: 2018-11-19
+lang: zh-CN
 tags: ['#Algorithm', '#Tree']
 categories:
   - Algorithms

@@ -1,6 +1,7 @@
 ---
 title: Apache Flink 状态备份与恢复策略
 date: 2020-10-19
+lang: zh-CN
 tags: ['#Flink', '#Streaming', '#State']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: eBPF在服务观测中的应用
 date: 2023-03-31
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

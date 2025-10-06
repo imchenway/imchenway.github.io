@@ -1,6 +1,7 @@
 ---
 title: Istio Ambient Mesh架构解读
 date: 2022-12-11
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

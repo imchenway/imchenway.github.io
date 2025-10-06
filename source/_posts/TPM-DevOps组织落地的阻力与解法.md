@@ -1,6 +1,7 @@
 ---
 title: DevOps 组织落地的阻力与解法
 date: 2025-04-29
+lang: zh-CN
 tags: ['#TPM']
 ---
 

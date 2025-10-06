@@ -1,6 +1,7 @@
 ---
 title: JVM模块化系统JPMS的落地实践
 date: 2022-01-05
+lang: zh-CN
 tags: ['#JVM']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Project Loom 虚拟线程预览（JDK 19）
 date: 2019-03-05
+lang: zh-CN
 tags: ['#Java', '#VirtualThreads']
 categories:
   - Java

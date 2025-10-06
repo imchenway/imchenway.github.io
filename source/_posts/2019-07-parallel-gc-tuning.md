@@ -1,6 +1,7 @@
 ---
 title: Parallel GC 调优与吞吐型服务实践
 date: 2019-07-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

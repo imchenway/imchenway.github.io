@@ -1,6 +1,7 @@
 ---
 title: 布隆过滤器在服务端缓存中的实践
 date: 2021-01-19
+lang: zh-CN
 tags: ['#Algorithm', '#Cache', '#BloomFilter']
 categories:
   - Algorithms

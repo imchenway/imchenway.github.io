@@ -1,6 +1,7 @@
 ---
 title: 云数据库成本优化与资源治理
 date: 2024-05-14
+lang: zh-CN
 tags: ['#Database']
 ---
 

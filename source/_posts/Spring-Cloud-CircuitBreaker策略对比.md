@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud CircuitBreaker策略对比
 date: 2022-09-02
+lang: zh-CN
 tags: ['#Spring']
 ---
 

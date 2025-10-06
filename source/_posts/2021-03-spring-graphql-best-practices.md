@@ -1,6 +1,7 @@
 ---
 title: Spring for GraphQL 最佳实践
 date: 2021-03-12
+lang: zh-CN
 tags: ['#Spring', '#GraphQL']
 categories:
   - Java

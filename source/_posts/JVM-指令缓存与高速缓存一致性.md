@@ -1,6 +1,7 @@
 ---
 title: JVM指令缓存与高速缓存一致性
 date: 2021-09-27
+lang: zh-CN
 tags: ['#JVM']
 ---
 

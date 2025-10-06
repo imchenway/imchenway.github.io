@@ -1,6 +1,7 @@
 ---
 title: 数据库模式版本管理与迁移
 date: 2024-04-04
+lang: zh-CN
 tags: ['#Database']
 ---
 

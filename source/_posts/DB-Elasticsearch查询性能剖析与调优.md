@@ -1,6 +1,7 @@
 ---
 title: Elasticsearch查询性能剖析与调优
 date: 2024-03-15
+lang: zh-CN
 tags: ['#Database']
 ---
 

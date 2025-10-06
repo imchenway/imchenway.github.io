@@ -1,6 +1,7 @@
 ---
 title: Redis持久化策略RDB与AOF取舍
 date: 2024-02-14
+lang: zh-CN
 tags: ['#Database']
 ---
 

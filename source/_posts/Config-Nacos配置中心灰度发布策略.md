@@ -1,6 +1,7 @@
 ---
 title: Nacos配置中心灰度发布策略
 date: 2022-11-01
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: JVM Thread-Local Handshakes 机制解析
 date: 2019-02-12
+lang: zh-CN
 tags: ['#JVM', '#Safepoint']
 categories:
   - JVM

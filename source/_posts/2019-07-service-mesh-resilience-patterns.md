@@ -1,6 +1,7 @@
 ---
 title: Service Mesh 弹性治理模式：重试、熔断、限流
 date: 2019-07-26
+lang: zh-CN
 tags: ['#ServiceMesh', '#Resilience', '#Istio']
 categories:
   - Java

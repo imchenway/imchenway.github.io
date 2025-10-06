@@ -1,6 +1,7 @@
 ---
 title: Dubbo Mesh与Istio Sidecar协同
 date: 2022-10-12
+lang: zh-CN
 tags: ['#RPC']
 ---
 

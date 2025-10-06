@@ -1,6 +1,7 @@
 ---
 title: RocketMQ 5多副本与存储体系解析
 date: 2023-05-30
+lang: zh-CN
 tags: ['#MQ']
 ---
 

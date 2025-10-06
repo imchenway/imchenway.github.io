@@ -1,6 +1,7 @@
 ---
 title: SLI/SLO 落地实践：指标、告警与反馈循环
 date: 2019-02-26
+lang: zh-CN
 tags: ['#SRE', '#Observability', '#SLO']
 categories:
   - Java

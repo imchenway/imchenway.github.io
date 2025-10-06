@@ -1,6 +1,7 @@
 ---
 title: JVM 类加载机制与双亲委派模型
 date: 2017-08-12
+lang: zh-CN
 tags: ['#JVM']
 categories:
   - JVM

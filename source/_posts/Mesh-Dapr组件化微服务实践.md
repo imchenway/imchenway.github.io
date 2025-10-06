@@ -1,6 +1,7 @@
 ---
 title: Dapr组件化微服务实践
 date: 2022-12-21
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Class数据共享与AppCDS
 date: 2021-09-07
+lang: zh-CN
 tags: ['#JVM']
 ---
 

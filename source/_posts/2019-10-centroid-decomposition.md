@@ -1,6 +1,7 @@
 ---
 title: 树的重心分解（Centroid Decomposition）实战
 date: 2019-10-19
+lang: zh-CN
 tags: ['#Algorithm', '#Tree']
 categories:
   - Algorithms

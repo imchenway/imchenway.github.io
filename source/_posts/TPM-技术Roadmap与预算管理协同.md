@@ -1,6 +1,7 @@
 ---
 title: 技术 Roadmap 与预算管理协同
 date: 2025-07-08
+lang: zh-CN
 tags: ['#TPM']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Sleuth与Zipkin全链路追踪
 date: 2022-07-14
+lang: zh-CN
 tags: ['#Spring']
 ---
 

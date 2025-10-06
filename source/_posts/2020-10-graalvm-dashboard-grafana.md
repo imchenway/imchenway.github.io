@@ -1,6 +1,7 @@
 ---
 title: 构建 GraalVM 运行时 Grafana 监控看板
 date: 2020-10-26
+lang: zh-CN
 tags: ['#GraalVM', '#Observability', '#Grafana']
 categories:
   - Java

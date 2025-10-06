@@ -1,6 +1,7 @@
 ---
 title: Sealed + 模式匹配构建策略引擎
 date: 2021-04-05
+lang: zh-CN
 tags: ['#Java', '#SealedClasses', '#PatternMatching']
 categories:
   - Java

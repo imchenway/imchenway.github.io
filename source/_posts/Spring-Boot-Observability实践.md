@@ -1,6 +1,7 @@
 ---
 title: Spring Boot Observability（Micrometer+OTel）实战
 date: 2022-06-14
+lang: zh-CN
 tags: ['#Spring']
 ---
 

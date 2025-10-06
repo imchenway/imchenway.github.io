@@ -1,6 +1,7 @@
 ---
 title: Kubernetes 成本优化与资源回收策略
 date: 2025-02-08
+lang: zh-CN
 tags: ['#Container']
 ---
 

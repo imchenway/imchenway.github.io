@@ -1,6 +1,7 @@
 ---
 title: Java 函数式接口与行为参数化实践
 date: 2017-10-05
+lang: zh-CN
 tags: ['#Java']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: Kafka Streams 有状态应用的平滑升级
 date: 2020-12-19
+lang: zh-CN
 tags: ['#Kafka', '#Streams', '#Upgrade']
 categories:
   - Java

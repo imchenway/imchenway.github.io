@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Config与Consul双活配置中心实践
 date: 2022-03-16
+lang: zh-CN
 tags: ['#Spring']
 ---
 

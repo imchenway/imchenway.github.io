@@ -1,6 +1,7 @@
 ---
 title: G1 垃圾回收参数深度解析
 date: 2017-12-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

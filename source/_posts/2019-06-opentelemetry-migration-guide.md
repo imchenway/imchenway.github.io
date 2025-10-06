@@ -1,6 +1,7 @@
 ---
 title: 从 OpenTracing 向 OpenTelemetry 迁移指南
 date: 2019-06-26
+lang: zh-CN
 tags: ['#Observability', '#Tracing', '#OpenTelemetry']
 categories:
   - Java

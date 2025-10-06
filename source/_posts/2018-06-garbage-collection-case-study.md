@@ -1,6 +1,7 @@
 ---
 title: GC 案例分析：一次生产环境停顿事件的排查记录
 date: 2018-06-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#CaseStudy']
 categories:
   - JVM

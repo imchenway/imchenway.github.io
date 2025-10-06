@@ -1,6 +1,7 @@
 ---
 title: Flink CDC 与 Exactly-Once 事务保障
 date: 2021-04-19
+lang: zh-CN
 tags: ['#Flink', '#CDC', '#ExactlyOnce']
 categories:
   - Java

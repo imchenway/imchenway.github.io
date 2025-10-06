@@ -1,6 +1,7 @@
 ---
 title: AI时代的性能预算与自适应优化策略
 date: 2025-10-04
+lang: zh-CN
 tags: ['#PerformanceBudget', '#AIInfrastructure', '#Observability', '#Automation', '#FinOps']
 categories:
   - Architecture

@@ -1,6 +1,7 @@
 ---
 title: 跨租户消息隔离与配额治理
 date: 2023-10-17
+lang: zh-CN
 tags: ['#MQ']
 ---
 

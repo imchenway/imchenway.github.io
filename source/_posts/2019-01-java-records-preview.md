@@ -1,6 +1,7 @@
 ---
 title: Java Records 预览特性实践（JDK 14）
 date: 2019-01-05
+lang: zh-CN
 tags: ['#Java', '#Records']
 categories:
   - Java

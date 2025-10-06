@@ -1,6 +1,7 @@
 ---
 title: 数位 DP 模板：计数问题统一解法
 date: 2019-03-19
+lang: zh-CN
 tags: ['#Algorithm', '#DynamicProgramming']
 categories:
   - Algorithms

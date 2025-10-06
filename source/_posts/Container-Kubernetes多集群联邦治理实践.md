@@ -1,6 +1,7 @@
 ---
 title: Kubernetes 多集群联邦治理实践
 date: 2024-07-23
+lang: zh-CN
 tags: ['#Container']
 ---
 

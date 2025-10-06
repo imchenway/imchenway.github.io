@@ -1,6 +1,7 @@
 ---
 title: MySQL复制延迟监控与治理方案
 date: 2023-12-26
+lang: zh-CN
 tags: ['#Database']
 ---
 

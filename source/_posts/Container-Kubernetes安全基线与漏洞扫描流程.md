@@ -1,6 +1,7 @@
 ---
 title: Kubernetes 安全基线与漏洞扫描流程
 date: 2024-12-10
+lang: zh-CN
 tags: ['#Container']
 ---
 

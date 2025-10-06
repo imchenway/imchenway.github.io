@@ -1,6 +1,7 @@
 ---
 title: Java 服务零停机数据库迁移策略
 date: 2019-11-26
+lang: zh-CN
 tags: ['#DevOps', '#Database', '#Migration']
 categories:
   - Java

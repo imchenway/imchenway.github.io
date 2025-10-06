@@ -1,6 +1,7 @@
 ---
 title: G1 Region 内部机制深度解析
 date: 2019-03-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

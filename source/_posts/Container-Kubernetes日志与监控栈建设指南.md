@@ -1,6 +1,7 @@
 ---
 title: Kubernetes 日志与监控栈建设指南
 date: 2024-11-20
+lang: zh-CN
 tags: ['#Container']
 ---
 

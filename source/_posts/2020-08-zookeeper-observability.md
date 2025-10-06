@@ -1,6 +1,7 @@
 ---
 title: ZooKeeper 可观测性体系建设
 date: 2020-08-12
+lang: zh-CN
 tags: ['#ZooKeeper', '#Observability', '#DevOps']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: JVM 逃逸分析与标量替换调优
 date: 2019-06-12
+lang: zh-CN
 tags: ['#JVM', '#Performance']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: CMS 垃圾回收器调优手册
 date: 2018-01-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

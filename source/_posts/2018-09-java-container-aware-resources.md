@@ -1,6 +1,7 @@
 ---
 title: Java 在容器中的资源感知与调优实践
 date: 2018-09-26
+lang: zh-CN
 tags: ['#Java', '#Performance', '#Containers']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: 混沌工程演练手册：设计、执行与复盘
 date: 2018-11-26
+lang: zh-CN
 tags: ['#SRE', '#ChaosEngineering']
 categories:
   - Java

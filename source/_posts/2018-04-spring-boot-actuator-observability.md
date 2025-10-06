@@ -1,6 +1,7 @@
 ---
 title: Spring Boot Actuator 与可观测性建设
 date: 2018-04-26
+lang: zh-CN
 tags: ['#Spring', '#Observability']
 categories:
   - Java

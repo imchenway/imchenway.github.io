@@ -1,6 +1,7 @@
 ---
 title: OpenFeign与HTTP/3互操作前瞻
 date: 2022-11-21
+lang: zh-CN
 tags: ['#RPC']
 ---
 

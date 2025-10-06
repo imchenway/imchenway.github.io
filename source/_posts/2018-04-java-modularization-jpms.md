@@ -1,6 +1,7 @@
 ---
 title: Java 9 模块化 (JPMS) 迁移指引
 date: 2018-04-05
+lang: zh-CN
 tags: ['#Java', '#JPMS']
 categories:
   - Java

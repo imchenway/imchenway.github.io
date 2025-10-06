@@ -1,6 +1,7 @@
 ---
 title: 多租户服务隔离与配额治理
 date: 2023-03-11
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

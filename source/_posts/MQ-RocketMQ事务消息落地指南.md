@@ -1,6 +1,7 @@
 ---
 title: RocketMQ事务消息落地指南
 date: 2023-06-09
+lang: zh-CN
 tags: ['#MQ']
 ---
 

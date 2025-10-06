@@ -1,6 +1,7 @@
 ---
 title: Java 泛型深入解析：类型擦除与边界应用
 date: 2018-02-05
+lang: zh-CN
 tags: ['#Java']
 categories:
   - Java

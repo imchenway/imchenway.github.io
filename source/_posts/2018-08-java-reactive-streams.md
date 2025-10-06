@@ -1,6 +1,7 @@
 ---
 title: Java Reactive Streams 标准与 Project Reactor 实战
 date: 2018-08-05
+lang: zh-CN
 tags: ['#Java', '#Reactive']
 categories:
   - Java

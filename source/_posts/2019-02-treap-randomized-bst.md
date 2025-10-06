@@ -1,6 +1,7 @@
 ---
 title: Treap 随机平衡二叉搜索树：实现与应用
 date: 2019-02-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure']
 categories:
   - Algorithms

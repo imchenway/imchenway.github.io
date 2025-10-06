@@ -1,6 +1,7 @@
 ---
 title: JVM是如何与操作系统交互的
 date: 2021-07-06
+lang: zh-CN
 tags: ['#JVM','#操作系统']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: 最大流 Dinic 算法的工程优化
 date: 2021-10-19
+lang: zh-CN
 tags: ['#Algorithms', '#MaxFlow', '#Optimization']
 categories:
   - Algorithms

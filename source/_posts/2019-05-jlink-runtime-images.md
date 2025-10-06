@@ -1,6 +1,7 @@
 ---
 title: 使用 jlink 构建精简 Java 运行时镜像
 date: 2019-05-05
+lang: zh-CN
 tags: ['#Java', '#JPMS', '#Deployment']
 categories:
   - Java

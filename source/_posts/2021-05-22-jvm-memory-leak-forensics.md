@@ -1,6 +1,7 @@
 ---
 title: JVM 内存泄漏事后取证流程
 date: 2021-05-22
+lang: zh-CN
 tags: ['#JVM', '#Profiling', '#Memory']
 categories:
   - JVM

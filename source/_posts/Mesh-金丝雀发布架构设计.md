@@ -1,6 +1,7 @@
 ---
 title: Service Mesh金丝雀发布架构设计
 date: 2022-12-01
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

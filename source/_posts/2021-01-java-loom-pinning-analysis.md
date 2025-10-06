@@ -1,6 +1,7 @@
 ---
 title: 虚拟线程固定风险与 Pinning 诊断
 date: 2021-01-05
+lang: zh-CN
 tags: ['#Java', '#Loom', '#Performance']
 categories:
   - Java

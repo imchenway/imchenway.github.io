@@ -1,6 +1,7 @@
 ---
 title: 数据驱动的研发绩效评估体系
 date: 2025-08-07
+lang: zh-CN
 tags: ['#TPM']
 ---
 

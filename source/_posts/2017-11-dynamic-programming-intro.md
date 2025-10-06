@@ -1,6 +1,7 @@
 ---
 title: 动态规划入门：状态定义与转移套路
 date: 2017-11-19
+lang: zh-CN
 tags: ['#Algorithm']
 categories:
   - Algorithms

@@ -1,6 +1,7 @@
 ---
 title: Spring Batch 数据脱敏流水线实践
 date: 2021-12-26
+lang: zh-CN
 tags: ['#Spring', '#Batch', '#DataMasking']
 categories:
   - Java

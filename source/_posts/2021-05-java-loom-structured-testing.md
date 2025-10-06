@@ -1,6 +1,7 @@
 ---
 title: 虚拟线程的结构化测试策略
 date: 2021-05-05
+lang: zh-CN
 tags: ['#Java', '#Loom', '#Testing']
 categories:
   - Java

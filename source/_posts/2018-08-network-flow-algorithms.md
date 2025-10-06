@@ -1,6 +1,7 @@
 ---
 title: 最大流与最小割：Edmonds-Karp、Dinic 与 ISAP
 date: 2018-08-19
+lang: zh-CN
 tags: ['#Algorithm', '#Graph']
 categories:
   - Algorithms

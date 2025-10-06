@@ -1,6 +1,7 @@
 ---
 title: 一致性哈希算法架构设计要点
 date: 2021-06-19
+lang: zh-CN
 tags: ['#Algorithms', '#Distributed', '#Hashing']
 categories:
   - Algorithms

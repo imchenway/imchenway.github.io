@@ -1,6 +1,7 @@
 ---
 title: 调优 G1 混合 GC：Region 策略与回收效率
 date: 2018-05-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

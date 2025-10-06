@@ -1,6 +1,7 @@
 ---
 title: 链表与栈高频题型归纳与模板
 date: 2017-09-19
+lang: zh-CN
 tags: ['#Algorithm']
 categories:
   - Algorithms

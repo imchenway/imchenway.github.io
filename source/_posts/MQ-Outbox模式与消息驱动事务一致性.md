@@ -1,6 +1,7 @@
 ---
 title: Outbox模式与消息驱动事务一致性
 date: 2023-09-07
+lang: zh-CN
 tags: ['#MQ']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: 二分查找与高频变体题型精讲
 date: 2017-08-19
+lang: zh-CN
 tags: ['#Algorithm']
 categories:
   - Algorithms

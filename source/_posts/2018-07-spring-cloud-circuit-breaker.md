@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Circuit Breaker 架构与落地建议
 date: 2018-07-26
+lang: zh-CN
 tags: ['#Spring', '#Resilience']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: 数据库容量预测与伸缩策略
 date: 2024-06-13
+lang: zh-CN
 tags: ['#Database']
 ---
 

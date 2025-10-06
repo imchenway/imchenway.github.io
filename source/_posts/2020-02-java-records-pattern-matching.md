@@ -1,6 +1,7 @@
 ---
 title: Java 记录类型与模式匹配的协同实践
 date: 2020-02-05
+lang: zh-CN
 tags: ['#Java', '#Records', '#PatternMatching']
 categories:
   - Java

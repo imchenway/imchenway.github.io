@@ -1,6 +1,7 @@
 ---
 title: MySQL InnoDB Cluster与MGR容错机制
 date: 2024-01-05
+lang: zh-CN
 tags: ['#Database']
 ---
 

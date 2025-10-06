@@ -1,6 +1,7 @@
 ---
 title: 混沌实验结合流量影子的闭环体系
 date: 2021-02-26
+lang: zh-CN
 tags: ['#ChaosEngineering', '#TrafficShadow', '#Observability']
 categories:
   - Java

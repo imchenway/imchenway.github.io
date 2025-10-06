@@ -1,6 +1,7 @@
 ---
 title: Spring Integration与企业事件流整合
 date: 2022-05-05
+lang: zh-CN
 tags: ['#Spring']
 ---
 

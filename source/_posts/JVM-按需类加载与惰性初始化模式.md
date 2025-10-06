@@ -1,6 +1,7 @@
 ---
 title: JVM按需类加载与惰性初始化模式
 date: 2022-01-25
+lang: zh-CN
 tags: ['#JVM']
 ---
 

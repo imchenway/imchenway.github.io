@@ -1,6 +1,7 @@
 ---
 title: WASM 与容器共存的云原生探索
 date: 2025-01-19
+lang: zh-CN
 tags: ['#Container']
 ---
 

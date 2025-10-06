@@ -1,6 +1,7 @@
 ---
 title: 偏向锁演进与调优策略
 date: 2020-06-12
+lang: zh-CN
 tags: ['#JVM', '#Lock', '#Performance']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: 记录类型与 ProGuard 混淆兼容攻略
 date: 2021-02-19
+lang: zh-CN
 tags: ['#Java', '#Records', '#Build']
 categories:
   - Java

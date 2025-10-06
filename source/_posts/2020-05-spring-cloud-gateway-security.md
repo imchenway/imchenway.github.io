@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Gateway 安全加固实践
 date: 2020-05-05
+lang: zh-CN
 tags: ['#Spring', '#Security', '#Gateway']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: 使用 GitHub + Hexo 搭建个人博客（图文深度教程 / Bilingual Guide）
 date: 2019-10-24
+lang: zh-CN
 updated: 2025-09-29
 tags:
   - '#Tools'

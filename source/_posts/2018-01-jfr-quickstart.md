@@ -1,6 +1,7 @@
 ---
 title: Java Flight Recorder 快速入门与常用分析
 date: 2018-01-26
+lang: zh-CN
 tags: ['#JVM', '#Observability']
 categories:
   - JVM

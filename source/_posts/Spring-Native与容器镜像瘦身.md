@@ -1,6 +1,7 @@
 ---
 title: Spring Native与容器镜像瘦身
 date: 2022-06-24
+lang: zh-CN
 tags: ['#Spring']
 ---
 

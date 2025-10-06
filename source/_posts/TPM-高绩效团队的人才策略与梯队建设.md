@@ -1,6 +1,7 @@
 ---
 title: 高绩效团队的人才策略与梯队建设
 date: 2025-09-16
+lang: zh-CN
 tags: ['#TPM']
 ---
 

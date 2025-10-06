@@ -1,6 +1,7 @@
 ---
 title: Spring Security 多租户鉴权策略
 date: 2021-11-26
+lang: zh-CN
 tags: ['#Spring', '#Security', '#MultiTenant']
 categories:
   - Java

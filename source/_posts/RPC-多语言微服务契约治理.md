@@ -1,6 +1,7 @@
 ---
 title: 多语言微服务的契约治理
 date: 2022-12-31
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

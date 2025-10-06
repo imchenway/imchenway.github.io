@@ -1,6 +1,7 @@
 ---
 title: Kafka连接器与CDC实时数据链路
 date: 2023-09-17
+lang: zh-CN
 tags: ['#MQ']
 ---
 

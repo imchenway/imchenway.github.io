@@ -1,6 +1,7 @@
 ---
 title: 混合云容器调度的架构模式
 date: 2025-02-18
+lang: zh-CN
 tags: ['#Container']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: JVM JIT热点探测与编译决策
 date: 2021-12-16
+lang: zh-CN
 tags: ['#JVM']
 ---
 

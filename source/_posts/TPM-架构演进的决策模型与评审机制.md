@@ -1,6 +1,7 @@
 ---
 title: 架构演进的决策模型与评审机制
 date: 2025-04-19
+lang: zh-CN
 tags: ['#TPM']
 ---
 

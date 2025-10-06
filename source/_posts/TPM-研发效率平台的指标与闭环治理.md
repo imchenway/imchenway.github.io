@@ -1,6 +1,7 @@
 ---
 title: 研发效率平台的指标与闭环治理
 date: 2025-05-19
+lang: zh-CN
 tags: ['#TPM']
 ---
 

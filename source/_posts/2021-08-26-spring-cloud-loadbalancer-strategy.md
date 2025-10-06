@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud LoadBalancer 智能路由策略
 date: 2021-08-26
+lang: zh-CN
 tags: ['#Spring', '#LoadBalancer', '#Resilience']
 categories:
   - Java

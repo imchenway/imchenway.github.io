@@ -1,6 +1,7 @@
 ---
 title: RabbitMQ延迟队列与死信策略设计
 date: 2023-06-19
+lang: zh-CN
 tags: ['#MQ']
 ---
 

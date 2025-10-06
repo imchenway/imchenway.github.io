@@ -2,6 +2,7 @@
 title: Java GC 压力测试流程与工具
 
 date: 2020-11-05
+lang: zh-CN
 
 tags: ['#JVM', '#GC', '#Testing']
 

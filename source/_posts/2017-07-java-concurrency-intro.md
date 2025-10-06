@@ -1,6 +1,7 @@
 ---
 title: Java 并发模型入门与线程安全初探
 date: 2017-07-26
+lang: zh-CN
 tags: ['#Java', '#Concurrency']
 categories:
   - Java

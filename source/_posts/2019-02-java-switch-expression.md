@@ -1,6 +1,7 @@
 ---
 title: Java Switch 表达式（JEP 361）的使用与陷阱
 date: 2019-02-05
+lang: zh-CN
 tags: ['#Java', '#Language']
 categories:
   - Java

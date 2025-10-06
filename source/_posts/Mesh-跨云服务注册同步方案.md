@@ -1,6 +1,7 @@
 ---
 title: 跨云环境下的服务注册同步
 date: 2023-02-19
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

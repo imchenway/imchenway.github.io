@@ -1,6 +1,7 @@
 ---
 title: G1 年轻代与混合回收预测模型
 date: 2021-01-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#G1']
 categories:
   - JVM

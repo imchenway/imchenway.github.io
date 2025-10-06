@@ -1,6 +1,7 @@
 ---
 title: Java 服务故障诊断手册：GC、线程与慢查询
 date: 2017-12-26
+lang: zh-CN
 tags: ['#Java', '#Observability']
 categories:
   - Java

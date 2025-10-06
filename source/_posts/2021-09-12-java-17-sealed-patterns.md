@@ -1,6 +1,7 @@
 ---
 title: Java 17 密封类设计模式
 date: 2021-09-12
+lang: zh-CN
 tags: ['#Java', '#SealedClasses', '#DesignPatterns']
 categories:
   - Java

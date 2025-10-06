@@ -1,6 +1,7 @@
 ---
 title: Java内存模型与并发语义
 date: 2021-10-07
+lang: zh-CN
 tags: ['#JVM']
 ---
 

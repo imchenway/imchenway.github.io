@@ -1,6 +1,7 @@
 ---
 title: JVM GC 日志快速入门与分析工具
 date: 2017-09-26
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

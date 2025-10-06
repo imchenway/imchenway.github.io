@@ -1,6 +1,7 @@
 ---
 title: 从 CMS 迁移到 G1 的步骤与监控指标
 date: 2017-11-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

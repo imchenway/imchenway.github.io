@@ -1,6 +1,7 @@
 ---
 title: 高风险项目的危机管理与复盘
 date: 2025-07-28
+lang: zh-CN
 tags: ['#TPM']
 ---
 

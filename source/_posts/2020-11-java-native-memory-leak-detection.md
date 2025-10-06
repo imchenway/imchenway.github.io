@@ -1,6 +1,7 @@
 ---
 title: Java 原生内存泄漏排查流程
 date: 2020-11-26
+lang: zh-CN
 tags: ['#JVM', '#NativeMemory', '#Troubleshooting']
 categories:
   - JVM

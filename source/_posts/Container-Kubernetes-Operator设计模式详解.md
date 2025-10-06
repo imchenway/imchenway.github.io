@@ -1,6 +1,7 @@
 ---
 title: Kubernetes Operator 设计模式详解
 date: 2024-09-01
+lang: zh-CN
 tags: ['#Container']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: Sidecar资源治理与调优策略
 date: 2023-01-20
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

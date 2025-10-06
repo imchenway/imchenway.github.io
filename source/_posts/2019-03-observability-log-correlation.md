@@ -1,6 +1,7 @@
 ---
 title: 日志、指标、追踪的三栖关联策略
 date: 2019-03-26
+lang: zh-CN
 tags: ['#Observability', '#Tracing', '#Logging']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: ZGC与Shenandoah延迟对比
 date: 2021-08-18
+lang: zh-CN
 tags: ['#JVM']
 ---
 

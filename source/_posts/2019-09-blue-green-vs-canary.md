@@ -1,6 +1,7 @@
 ---
 title: 蓝绿发布与金丝雀发布对比：何时选择哪一种？
 date: 2019-09-26
+lang: zh-CN
 tags: ['#DevOps', '#Release', '#SRE']
 categories:
   - Java

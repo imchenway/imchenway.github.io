@@ -1,6 +1,7 @@
 ---
 title: Elasticsearch索引生命周期管理与ILM策略
 date: 2024-03-05
+lang: zh-CN
 tags: ['#Database']
 ---
 

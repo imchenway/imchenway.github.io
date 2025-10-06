@@ -1,6 +1,7 @@
 ---
 title: 自动化回归与灰度策略的联动
 date: 2025-06-28
+lang: zh-CN
 tags: ['#TPM']
 ---
 

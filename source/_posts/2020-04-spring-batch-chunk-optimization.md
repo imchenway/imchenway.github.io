@@ -1,6 +1,7 @@
 ---
 title: Spring Batch Chunk 模式性能优化实战
 date: 2020-04-19
+lang: zh-CN
 tags: ['#Spring', '#Batch', '#Performance']
 categories:
   - Java

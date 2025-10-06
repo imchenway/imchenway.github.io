@@ -1,6 +1,7 @@
 ---
 title: Java 模块化测试流水线最佳实践
 date: 2020-01-05
+lang: zh-CN
 tags: ['#Java', '#JPMS', '#Testing']
 categories:
   - Java

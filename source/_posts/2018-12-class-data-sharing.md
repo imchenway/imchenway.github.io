@@ -1,6 +1,7 @@
 ---
 title: Class Data Sharing (CDS) 与 AppCDS 调优
 date: 2018-12-12
+lang: zh-CN
 tags: ['#JVM', '#CDS']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: TiDB HTAP架构与应用场景分析
 date: 2024-03-25
+lang: zh-CN
 tags: ['#Database']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: ZGC 升级实战：从测试到生产
 date: 2019-01-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#ZGC']
 categories:
   - JVM

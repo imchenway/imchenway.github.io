@@ -1,6 +1,7 @@
 ---
 title: 最小生成树算法：Kruskal 与 Prim 的工程实践
 date: 2018-04-19
+lang: zh-CN
 tags: ['#Algorithm', '#Graph']
 categories:
   - Algorithms

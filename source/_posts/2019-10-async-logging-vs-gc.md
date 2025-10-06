@@ -1,6 +1,7 @@
 ---
 title: 异步日志对 GC 与延迟的影响评估
 date: 2019-10-12
+lang: zh-CN
 tags: ['#Java', '#Logging', '#Performance']
 categories:
   - Java

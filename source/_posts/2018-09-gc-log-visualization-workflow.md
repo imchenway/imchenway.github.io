@@ -1,6 +1,7 @@
 ---
 title: GC 日志可视化工作流：从收集到洞察
 date: 2018-09-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#Observability']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: SQL 计划管理与自适应优化实践
 date: 2020-09-26
+lang: zh-CN
 tags: ['#Database', '#SQL', '#Performance']
 categories:
   - Java

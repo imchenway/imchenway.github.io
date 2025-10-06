@@ -1,6 +1,7 @@
 ---
 title: Spring Cache 多实现基准对比
 date: 2020-08-19
+lang: zh-CN
 tags: ['#Spring', '#Cache', '#Performance']
 categories:
   - Java

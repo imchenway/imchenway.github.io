@@ -1,6 +1,7 @@
 ---
 title: Spring Data Redis多活一致性方案
 date: 2022-04-15
+lang: zh-CN
 tags: ['#Spring']
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: G1 SATB 写屏障机制透视
 date: 2020-02-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#G1']
 categories:
   - JVM

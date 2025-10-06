@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Kubernetes与ConfigMap/Secret管理
 date: 2022-09-12
+lang: zh-CN
 tags: ['#Spring']
 ---
 

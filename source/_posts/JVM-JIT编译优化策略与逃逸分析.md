@@ -1,6 +1,7 @@
 ---
 title: JVM JIT编译优化策略与逃逸分析
 date: 2021-07-19
+lang: zh-CN
 tags: ['#JVM']
 ---
 

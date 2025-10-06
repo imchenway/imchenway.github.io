@@ -1,6 +1,7 @@
 ---
 title: REST API 合同测试落地方案
 date: 2021-01-26
+lang: zh-CN
 tags: ['#Testing', '#Contract', '#REST']
 categories:
   - Java

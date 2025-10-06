@@ -1,6 +1,7 @@
 ---
 title: Kafka消费者限流与反压治理
 date: 2023-07-19
+lang: zh-CN
 tags: ['#MQ']
 ---
 

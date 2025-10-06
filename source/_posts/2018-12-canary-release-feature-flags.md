@@ -1,6 +1,7 @@
 ---
 title: 金丝雀发布与 Feature Flag 协同流程
 date: 2018-12-26
+lang: zh-CN
 tags: ['#DevOps', '#Release', '#FeatureFlag']
 categories:
   - Java

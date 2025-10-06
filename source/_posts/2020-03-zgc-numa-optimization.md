@@ -1,6 +1,7 @@
 ---
 title: ZGC 的 NUMA 优化策略
 date: 2020-03-12
+lang: zh-CN
 tags: ['#JVM', '#GC', '#ZGC']
 categories:
   - JVM

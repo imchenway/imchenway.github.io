@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud LoadBalancer智能路由策略
 date: 2022-03-26
+lang: zh-CN
 tags: ['#Spring']
 ---
 

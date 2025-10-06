@@ -1,6 +1,7 @@
 ---
 title: Kubernetes CSI 与存储类治理
 date: 2024-10-31
+lang: zh-CN
 tags: ['#Container']
 ---
 

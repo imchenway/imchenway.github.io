@@ -1,6 +1,7 @@
 ---
 title: RocketMQ异地多活部署实践
 date: 2023-08-08
+lang: zh-CN
 tags: ['#MQ']
 ---
 

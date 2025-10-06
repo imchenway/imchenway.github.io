@@ -1,6 +1,7 @@
 ---
 title: 后缀自动机（Suffix Automaton）原理与实现
 date: 2019-07-19
+lang: zh-CN
 tags: ['#Algorithm', '#Automaton', '#String']
 categories:
   - Algorithms

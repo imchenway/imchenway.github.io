@@ -1,6 +1,7 @@
 ---
 title: Java 向量 API（Vector API）性能评估
 date: 2021-03-05
+lang: zh-CN
 tags: ['#Java', '#VectorAPI', '#Performance']
 categories:
   - Java

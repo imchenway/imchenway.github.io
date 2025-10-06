@@ -1,6 +1,7 @@
 ---
 title: Java StampedLock 模式：读写乐观锁的正确使用
 date: 2018-11-05
+lang: zh-CN
 tags: ['#Java', '#Concurrency']
 categories:
   - Java

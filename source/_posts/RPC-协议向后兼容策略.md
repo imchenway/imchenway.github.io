@@ -1,6 +1,7 @@
 ---
 title: RPC协议向后兼容策略
 date: 2023-04-10
+lang: zh-CN
 tags: ['#RPC']
 ---
 

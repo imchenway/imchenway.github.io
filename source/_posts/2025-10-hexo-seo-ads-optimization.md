@@ -1,6 +1,7 @@
 ---
 title: "打造高可见性的个人博客：一次 Hexo SEO 与 Adsense 优化实录"
 date: 2025-10-04
+lang: zh-CN
 tags: ['#SEO', '#Performance', '#Adsense']
 ---
 

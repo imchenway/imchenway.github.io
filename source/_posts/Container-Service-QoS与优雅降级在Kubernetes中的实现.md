@@ -1,6 +1,7 @@
 ---
 title: Service QoS 与优雅降级在 Kubernetes 中的实现
 date: 2024-09-21
+lang: zh-CN
 tags: ['#Container']
 ---
 

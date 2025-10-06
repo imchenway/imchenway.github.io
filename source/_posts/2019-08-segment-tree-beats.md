@@ -1,6 +1,7 @@
 ---
 title: Segment Tree Beats：处理复杂区间操作的高级技巧
 date: 2019-08-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure']
 categories:
   - Algorithms

@@ -1,6 +1,7 @@
 ---
 title: 分布式团队的远程协作机制
 date: 2025-06-08
+lang: zh-CN
 tags: ['#TPM']
 ---
 

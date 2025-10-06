@@ -1,6 +1,7 @@
 ---
 title: 并查集在线算法变体汇总
 date: 2021-08-19
+lang: zh-CN
 tags: ['#Algorithms', '#DisjointSet', '#Online']
 categories:
   - Algorithms

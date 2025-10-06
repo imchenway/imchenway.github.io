@@ -1,6 +1,7 @@
 ---
 title: 凸包算法：Graham Scan 与 Andrew Monotone Chain
 date: 2018-09-19
+lang: zh-CN
 tags: ['#Algorithm', '#ComputationalGeometry']
 categories:
   - Algorithms

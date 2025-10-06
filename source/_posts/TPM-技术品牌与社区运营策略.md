@@ -1,6 +1,7 @@
 ---
 title: 技术品牌与社区运营策略
 date: 2025-07-18
+lang: zh-CN
 tags: ['#TPM']
 ---
 

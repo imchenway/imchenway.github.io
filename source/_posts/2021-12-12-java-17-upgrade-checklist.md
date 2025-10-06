@@ -1,6 +1,7 @@
 ---
 title: Java 17 LTS 升级检查清单
 date: 2021-12-12
+lang: zh-CN
 tags: ['#Java', '#Upgrade', '#Checklist']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: 质量红线与发布闸门的实施策略
 date: 2025-05-29
+lang: zh-CN
 tags: ['#TPM']
 ---
 

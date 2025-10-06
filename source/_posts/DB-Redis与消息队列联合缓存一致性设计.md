@@ -1,6 +1,7 @@
 ---
 title: Redis与消息队列联合的缓存一致性设计
 date: 2024-04-24
+lang: zh-CN
 tags: ['#Database']
 ---
 

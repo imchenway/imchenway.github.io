@@ -1,6 +1,7 @@
 ---
 title: Li Chao Tree：动态维护线性函数的最小值
 date: 2019-09-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure']
 categories:
   - Algorithms

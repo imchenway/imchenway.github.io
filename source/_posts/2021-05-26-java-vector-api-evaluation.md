@@ -1,6 +1,7 @@
 ---
 title: Java 16 Vector API 落地评估
 date: 2021-05-26
+lang: zh-CN
 tags: ['#Java', '#VectorAPI', '#Performance']
 categories:
   - Java

@@ -1,6 +1,7 @@
 ---
 title: ZGC 低延迟垃圾回收器实践
 date: 2018-04-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

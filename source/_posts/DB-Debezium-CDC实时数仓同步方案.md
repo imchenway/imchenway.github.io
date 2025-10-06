@@ -1,6 +1,7 @@
 ---
 title: Debezium CDC与实时数仓同步方案
 date: 2024-04-14
+lang: zh-CN
 tags: ['#Database']
 ---
 

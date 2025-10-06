@@ -1,6 +1,7 @@
 ---
 title: 结合 Async-profiler 与 JFR 进行 CPU + 分配联合分析
 date: 2018-10-12
+lang: zh-CN
 tags: ['#JVM', '#Profiling']
 categories:
   - JVM

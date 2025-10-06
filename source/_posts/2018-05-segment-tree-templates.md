@@ -1,6 +1,7 @@
 ---
 title: 线段树与懒惰传播模板
 date: 2018-05-19
+lang: zh-CN
 tags: ['#Algorithm', '#DataStructure']
 categories:
   - Algorithms

@@ -1,6 +1,7 @@
 ---
 title: 数据湖与数据仓库融合架构
 date: 2024-06-23
+lang: zh-CN
 tags: ['#Database']
 ---
 

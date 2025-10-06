@@ -1,6 +1,7 @@
 ---
 title: Shenandoah GC 概览：并发压缩与实现原理
 date: 2018-07-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

@@ -1,6 +1,7 @@
 ---
 title: GraalVM 与 JFR 集成监控指南
 date: 2020-07-26
+lang: zh-CN
 tags: ['#GraalVM', '#JFR', '#Monitoring']
 categories:
   - Java

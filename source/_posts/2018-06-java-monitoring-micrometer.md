@@ -1,6 +1,7 @@
 ---
 title: Micrometer 指标体系设计：从 Spring 应用到 Prometheus
 date: 2018-06-05
+lang: zh-CN
 tags: ['#Java', '#Observability']
 categories:
   - Java

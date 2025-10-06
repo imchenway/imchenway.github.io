@@ -1,6 +1,7 @@
 ---
 title: API Gateway与Service Mesh的职责边界
 date: 2023-01-30
+lang: zh-CN
 tags: ['#ServiceMesh']
 ---
 

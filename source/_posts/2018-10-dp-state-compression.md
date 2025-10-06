@@ -1,6 +1,7 @@
 ---
 title: 状态压缩动态规划：位运算技巧与案例
 date: 2018-10-19
+lang: zh-CN
 tags: ['#Algorithm', '#DynamicProgramming']
 categories:
   - Algorithms

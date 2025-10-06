@@ -1,6 +1,7 @@
 ---
 title: Spring Doc(OpenAPI)自动化文档体系
 date: 2022-09-22
+lang: zh-CN
 tags: ['#Spring']
 ---
 

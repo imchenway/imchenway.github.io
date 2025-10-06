@@ -1,6 +1,7 @@
 ---
 title: 安全驱动的蓝绿回滚策略
 date: 2020-12-26
+lang: zh-CN
 tags: ['#Security', '#DevOps', '#Release']
 categories:
   - Java

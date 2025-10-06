@@ -1,6 +1,7 @@
 ---
 title: JVM 垃圾回收器全景速览与选择指南
 date: 2017-09-12
+lang: zh-CN
 tags: ['#JVM', '#GC']
 categories:
   - JVM

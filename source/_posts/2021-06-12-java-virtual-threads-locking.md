@@ -1,6 +1,7 @@
 ---
 title: 虚拟线程环境下的锁策略设计
 date: 2021-06-12
+lang: zh-CN
 tags: ['#Java', '#VirtualThreads', '#Concurrency']
 categories:
   - Java

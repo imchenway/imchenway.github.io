@@ -1,6 +1,7 @@
 ---
 title: 低延迟日志系统架构设计
 date: 2021-11-05
+lang: zh-CN
 tags: ['#Logging', '#LowLatency', '#Architecture']
 categories:
   - Java

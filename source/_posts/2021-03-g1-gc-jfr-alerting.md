@@ -1,6 +1,7 @@
 ---
 title: 基于 JFR 的 G1 GC 告警体系
 date: 2021-03-19
+lang: zh-CN
 tags: ['#JVM', '#G1', '#JFR']
 categories:
   - JVM

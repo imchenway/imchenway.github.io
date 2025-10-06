@@ -1,6 +1,7 @@
 ---
 title: Reactive Redis Streams 实战指南
 date: 2020-06-05
+lang: zh-CN
 tags: ['#Java', '#Reactive', '#Redis']
 categories:
   - Java

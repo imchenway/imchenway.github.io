@@ -1,6 +1,7 @@
 ---
 title: Spring Cloud Task短任务编排
 date: 2022-08-23
+lang: zh-CN
 tags: ['#Spring']
 ---
 

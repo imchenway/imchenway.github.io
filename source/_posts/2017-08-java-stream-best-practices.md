@@ -1,6 +1,7 @@
 ---
 title: Java Stream API 实战与性能考量
 date: 2017-08-05
+lang: zh-CN
 tags: ['#Java']
 categories:
   - Java
