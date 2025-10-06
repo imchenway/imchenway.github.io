@@ -1,0 +1,180 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title> · DavidChan's Blog</title><meta name="description" content="本文解决以下问题#
+
+
+
+
+1. charles与shadowsocks共存
+2. 转发线上页面请求到本地工程
+3. 截取MacOSHttps请求
+
+
+
+
+
+1. charles与shadowsocks共存#
+shadowsocks改为全局模式（PAC模式无效，必须使用全局模式）
+全局模式下默认所有"><link rel="canonical" href="https://imchenway.com/zh-CN/MacOS%E4%B8%8BCharles%E4%B8%8EShadowsocks%E5%85%B1%E5%AD%98/"><meta property="og:type" content="article"><meta property="og:title" content="DavidChan's Blog"><meta property="og:description" content="本文解决以下问题# 1. charles与shadowsocks共存 2. 转发线上页面请求到本地工程 3. 截取MacOSHttps请求 1. charles与shadowsocks共存# shadowsocks改为全局模式（PAC模式无效，必须使用全局模式） 全局模式下默认所有互联网请求全部走shadowsocks"><meta property="og:url" content="https://imchenway.com/zh-CN/MacOS%E4%B8%8BCharles%E4%B8%8EShadowsocks%E5%85%B1%E5%AD%98/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="DavidChan's Blog"><meta name="twitter:description" content="本文解决以下问题# 1. charles与shadowsocks共存 2. 转发线上页面请求到本地工程 3. 截取MacOSHttps请求 1. charles与shadowsocks共存# shadowsocks改为全局模式（PAC模式无效，必须使用全局模式） 全局模式下默认所有互联网请求全部走shadowsocks"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a></a></h3></div><div class="post-content"><h3><span id="ben-wen-jie-jue-yi-xia-wen-ti">本文解决以下问题</span><a href="#ben-wen-jie-jue-yi-xia-wen-ti" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#1-charles-yu-shadowsocks-gong-cun">1. charles与shadowsocks共存</a></li>
+<li><a href="#2-zhuan-fa-xian-shang-ye-mian-qing-qiu-dao-ben-di-gong-cheng">2. 转发线上页面请求到本地工程</a></li>
+<li><a href="#3-jie-qu-macoshttps-qing-qiu">3. 截取MacOSHttps请求</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h3><span id="1-charles-yu-shadowsocks-gong-cun">1. charles与shadowsocks共存</span><a href="#1-charles-yu-shadowsocks-gong-cun" class="header-anchor">#</a></h3><ol>
+<li>shadowsocks改为全局模式（PAC模式无效，必须使用全局模式）<ol>
+<li>全局模式下默认所有互联网请求全部走shadowsocks</li>
+<li>此时如需访问内网地址<ol>
+<li>在Mac中打开 设置-&gt;网络-&gt;高级-&gt;代理，<code>Bypass proxy settings for these Hosts &amp; Domains:</code>中填入内网IP</li>
+<li>如图：<br> <img src="https://imchenway.com/images/logo.png" data-original="https://tva1.sinaimg.cn/large/006y8mN6gy1g8ubsuvcutj30je0fcgoz.jpg"></li>
+<li>如有多个地址，可配为134.<em>.</em>.*</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>查看shadowsocks代理的本地http和https的端口（如上图）<ol>
+<li>一般为<code>127.0.0.1:1087</code></li>
+</ol>
+</li>
+<li>在Charles菜单栏找到 <code>proxy -&gt; external proxy settings</code><ol>
+<li>在http和https中填入127.0.0.1:1087</li>
+<li>如图：<br> <img src="https://imchenway.com/images/logo.png" data-original="https://tva1.sinaimg.cn/large/006y8mN6gy1g8ubq4cl19j30f20chwgt.jpg"></li>
+<li>如有多个地址，可配为134.<em>.</em>.*</li>
+</ol>
+</li>
+<li>此时即可正常抓包，如果域名为内网地址，此时会无法访问<ol>
+<li>在Charles菜单栏找到 <code>proxy -&gt; external proxy settings</code></li>
+<li>在<code>ByPass external proxies for the following hosts：</code>中填入内网ip</li>
+</ol>
+</li>
+<li>此时已完美解决Charles和shadowsocks共存问题</li>
+</ol>
+<h3><span id="2-zhuan-fa-xian-shang-ye-mian-qing-qiu-dao-ben-di-gong-cheng">2. 转发线上页面请求到本地工程</span><a href="#2-zhuan-fa-xian-shang-ye-mian-qing-qiu-dao-ben-di-gong-cheng" class="header-anchor">#</a></h3><ol>
+<li>Charles菜单栏 -&gt; proxy -&gt; MacOs Proxy</li>
+<li>右键请求列表中的url或包，选中<code>Map Remote...</code></li>
+<li>填入对应的URL相关信息即可</li>
+</ol>
+<h3><span id="3-jie-qu-macoshttps-qing-qiu">3. 截取MacOSHttps请求</span><a href="#3-jie-qu-macoshttps-qing-qiu" class="header-anchor">#</a></h3><ol>
+<li>“Help” -&gt; “SSL Proxying” -&gt; “Install Charles Root Certificate”</li>
+</ol>
+<ul>
+<li>在<code>keychain</code>处将新安装的证书设置为永久信任</li>
+</ul>
+<ol start="2">
+<li>Preferences -&gt; Proxy -&gt; SSL Proxying Settings</li>
+</ol>
+<ul>
+<li>Add -&gt; 直接点击OK（截取所有https请求）<br><img src="https://imchenway.com/images/logo.png" data-original="https://tva1.sinaimg.cn/large/006y8mN6ly1g8u6eu1soqj30gj0cwdic.jpg"></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2020-03-28</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2020-04-java-grpc-reactor-integration/" title="Java gRPC 与 Reactor 的响应式整合">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2020-03-chaos-observability-loop/" title="混沌实验的数据闭环与指标看板">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>

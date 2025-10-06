@@ -1,0 +1,207 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Spring Cloud CircuitBreaker策略对比 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言
+API 概览
+策略对比
+Resilience4j 配置示例
+Sentinel 集成
+监控与报警
+实战经验
+总结
+参考资料
+
+
+
+
+
+引言#
+熔断器是微服务弹性设计的核心。Spring Cloud CircuitBreaker 抽象了 Resilience4j、Sentine"><link rel="canonical" href="https://imchenway.com/zh-CN/Spring-Cloud-CircuitBreaker%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94/"><meta property="og:type" content="article"><meta property="og:title" content="Spring Cloud CircuitBreaker策略对比"><meta property="og:description" content="本文目录# 引言 API 概览 策略对比 Resilience4j 配置示例 Sentinel 集成 监控与报警 实战经验 总结 参考资料 引言# 熔断器是微服务弹性设计的核心。Spring Cloud CircuitBreaker 抽象了 Resilience4j、Sentinel、Hystrix（已废弃）等实现。本"><meta property="og:url" content="https://imchenway.com/zh-CN/Spring-Cloud-CircuitBreaker%E7%AD%96%E7%95%A5%E5%AF%B9%E6%AF%94/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Spring Cloud CircuitBreaker策略对比"><meta name="twitter:description" content="本文目录# 引言 API 概览 策略对比 Resilience4j 配置示例 Sentinel 集成 监控与报警 实战经验 总结 参考资料 引言# 熔断器是微服务弹性设计的核心。Spring Cloud CircuitBreaker 抽象了 Resilience4j、Sentinel、Hystrix（已废弃）等实现。本"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Spring Cloud CircuitBreaker策略对比</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan">引言</a></li>
+<li><a href="#api-gai-lan">API 概览</a></li>
+<li><a href="#ce-lue-dui-bi">策略对比</a></li>
+<li><a href="#resilience4j-pei-zhi-shi-li">Resilience4j 配置示例</a></li>
+<li><a href="#sentinel-ji-cheng">Sentinel 集成</a></li>
+<li><a href="#jian-kong-yu-bao-jing">监控与报警</a></li>
+<li><a href="#shi-zhan-jing-yan">实战经验</a></li>
+<li><a href="#zong-jie">总结</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan">引言</span><a href="#yin-yan" class="header-anchor">#</a></h1><blockquote>
+<p>熔断器是微服务弹性设计的核心。Spring Cloud CircuitBreaker 抽象了 Resilience4j、Sentinel、Hystrix（已废弃）等实现。本文比较不同策略、实践案例与监控手段。</p>
+</blockquote>
+<h1><span id="api-gai-lan">API 概览</span><a href="#api-gai-lan" class="header-anchor">#</a></h1><ul>
+<li><code>ReactiveCircuitBreakerFactory</code>、<code>CircuitBreakerFactory</code>；</li>
+<li>注解 <code>@CircuitBreaker</code>, <code>@TimeLimiter</code>；</li>
+<li>支持 <code>Resilience4j</code>, <code>Sentinel</code>, <code>Spring Retry</code>；</li>
+<li>与 WebClient、RestTemplate、Gateway 集成。</li>
+</ul>
+<h1><span id="ce-lue-dui-bi">策略对比</span><a href="#ce-lue-dui-bi" class="header-anchor">#</a></h1><table>
+<thead>
+<tr>
+<th>实现</th>
+<th>特性</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Resilience4j</td>
+<td>熔断、限流、Bulkhead、缓存、Retry</td>
+<td>云原生日常推荐</td>
+</tr>
+<tr>
+<td>Sentinel</td>
+<td>流控、热点参数、系统保护、控制台</td>
+<td>大规模限流、规则动态管理</td>
+</tr>
+<tr>
+<td>Hystrix</td>
+<td>已停止维护</td>
+<td>不推荐</td>
+</tr>
+</tbody></table>
+<h1><span id="resilience4j-pei-zhi-shi-li">Resilience4j 配置示例</span><a href="#resilience4j-pei-zhi-shi-li" class="header-anchor">#</a></h1><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">resilience4j.circuitbreaker:</span></span><br><span class="line">  <span class="attr">instances:</span></span><br><span class="line">    <span class="attr">orderService:</span></span><br><span class="line">      <span class="attr">slidingWindowType:</span> <span class="string">COUNT_BASED</span></span><br><span class="line">      <span class="attr">slidingWindowSize:</span> <span class="number">50</span></span><br><span class="line">      <span class="attr">failureRateThreshold:</span> <span class="number">50</span></span><br><span class="line">      <span class="attr">waitDurationInOpenState:</span> <span class="string">10s</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>与 <code>@CircuitBreaker(name=&quot;orderService&quot;)</code> 配合。</li>
+</ul>
+<h1><span id="sentinel-ji-cheng">Sentinel 集成</span><a href="#sentinel-ji-cheng" class="header-anchor">#</a></h1><ul>
+<li>通过 <code>SentinelRestTemplate</code>, <code>SentinelGatewayFilter</code>；</li>
+<li>控制台动态配置规则；</li>
+<li>结合 <code>Nacos</code> 推送规则；</li>
+<li>注意引入 <code>spring-cloud-alibaba-sentinel</code>。</li>
+</ul>
+<h1><span id="jian-kong-yu-bao-jing">监控与报警</span><a href="#jian-kong-yu-bao-jing" class="header-anchor">#</a></h1><ul>
+<li>Resilience4j：Micrometer 指标 <code>resilience4j_circuitbreaker_state</code>；</li>
+<li>Sentinel：Dashboard、Prometheus exporter；</li>
+<li>对熔断、限流事件设置告警；</li>
+<li>与日志系统关联 <code>traceId</code>、<code>ruleId</code>。</li>
+</ul>
+<h1><span id="shi-zhan-jing-yan">实战经验</span><a href="#shi-zhan-jing-yan" class="header-anchor">#</a></h1><ul>
+<li>在 API Gateway 使用 Sentinel 实现热点参数限流；</li>
+<li>在内部服务使用 Resilience4j 配合异步 Bulkhead；</li>
+<li>K8s 中热更新配置，利用 ConfigMap 与 Sentinel 控制台；</li>
+<li>结合重试与补偿，确保业务流程最终完成。</li>
+</ul>
+<h1><span id="zong-jie">总结</span><a href="#zong-jie" class="header-anchor">#</a></h1><p>Spring Cloud CircuitBreaker 提供统一抽象。选择实现时需考虑场景、生态与监控体系。Resilience4j 适合通用场景，Sentinel 适合大规模限流需求。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] Spring Cloud CircuitBreaker Reference. <a target="_blank" rel="noopener" href="https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/">https://docs.spring.io/spring-cloud-circuitbreaker/docs/current/reference/html/</a></li>
+<li>[2] Resilience4j Documentation. <a target="_blank" rel="noopener" href="https://resilience4j.readme.io/">https://resilience4j.readme.io</a></li>
+<li>[3] Sentinel 官方文档. <a target="_blank" rel="noopener" href="https://sentinelguard.io/zh-cn/docs/">https://sentinelguard.io/zh-cn/docs/</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2022-09-02</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/zh-CN/Spring-Cloud-Kubernetes%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86%E5%AE%9E%E8%B7%B5/" title="Spring Cloud Kubernetes与ConfigMap/Secret管理">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/Spring-Cloud-Task%E7%9F%AD%E4%BB%BB%E5%8A%A1%E7%BC%96%E6%8E%92/" title="Spring Cloud Task短任务编排">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>

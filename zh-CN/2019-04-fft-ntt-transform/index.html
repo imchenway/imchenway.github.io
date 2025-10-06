@@ -1,0 +1,171 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>FFT 与 NTT：快速多项式与卷积运算 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+背景
+Cooley-Tukey FFT 模板
+多项式乘法步骤
+NTT 要点
+应用场景
+自检清单
+参考资料
+
+
+
+
+
+背景#快速傅里叶变换（FFT）用于 O(n log n) 求解多项式乘法、卷积等问题。Number Theoretic Transform (NTT) 是在模数域实"><link rel="canonical" href="https://imchenway.com/zh-CN/2019-04-fft-ntt-transform/"><meta property="og:type" content="article"><meta property="og:title" content="FFT 与 NTT：快速多项式与卷积运算"><meta property="og:description" content="本文目录# 背景 Cooley-Tukey FFT 模板 多项式乘法步骤 NTT 要点 应用场景 自检清单 参考资料 背景#快速傅里叶变换（FFT）用于 O(n log n) 求解多项式乘法、卷积等问题。Number Theoretic Transform (NTT) 是在模数域实现的变种，避免浮点误差，适合大整数与组"><meta property="og:url" content="https://imchenway.com/zh-CN/2019-04-fft-ntt-transform/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="FFT 与 NTT：快速多项式与卷积运算"><meta name="twitter:description" content="本文目录# 背景 Cooley-Tukey FFT 模板 多项式乘法步骤 NTT 要点 应用场景 自检清单 参考资料 背景#快速傅里叶变换（FFT）用于 O(n log n) 求解多项式乘法、卷积等问题。Number Theoretic Transform (NTT) 是在模数域实现的变种，避免浮点误差，适合大整数与组"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>FFT 与 NTT：快速多项式与卷积运算</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#bei-jing">背景</a></li>
+<li><a href="#cooley-tukey-fft-mo-ban">Cooley-Tukey FFT 模板</a></li>
+<li><a href="#duo-xiang-shi-cheng-fa-bu-zou">多项式乘法步骤</a></li>
+<li><a href="#ntt-yao-dian">NTT 要点</a></li>
+<li><a href="#ying-yong-chang-jing">应用场景</a></li>
+<li><a href="#zi-jian-qing-dan">自检清单</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="bei-jing">背景</span><a href="#bei-jing" class="header-anchor">#</a></h1><p>快速傅里叶变换（FFT）用于 O(n log n) 求解多项式乘法、卷积等问题。Number Theoretic Transform (NTT) 是在模数域实现的变种，避免浮点误差，适合大整数与组合计数。</p>
+<h1><span id="cooley-tukey-fft-mo-ban">Cooley-Tukey FFT 模板</span><a href="#cooley-tukey-fft-mo-ban" class="header-anchor">#</a></h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">FFT</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">fft</span><span class="params">(Complex[] a, <span class="type">boolean</span> invert)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> a.length;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>, j = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">bit</span> <span class="operator">=</span> n &gt;&gt; <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">for</span> (; j &gt;= bit; bit &gt;&gt;= <span class="number">1</span>) j -= bit;</span><br><span class="line">            j += bit;</span><br><span class="line">            <span class="keyword">if</span> (i &lt; j) &#123;</span><br><span class="line">                <span class="type">Complex</span> <span class="variable">tmp</span> <span class="operator">=</span> a[i];</span><br><span class="line">                a[i] = a[j];</span><br><span class="line">                a[j] = tmp;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> <span class="number">2</span>; len &lt;= n; len &lt;&lt;= <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="type">double</span> <span class="variable">ang</span> <span class="operator">=</span> <span class="number">2</span> * Math.PI / len * (invert ? -<span class="number">1</span> : <span class="number">1</span>);</span><br><span class="line">            <span class="type">Complex</span> <span class="variable">wlen</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Complex</span>(Math.cos(ang), Math.sin(ang));</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i += len) &#123;</span><br><span class="line">                <span class="type">Complex</span> <span class="variable">w</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Complex</span>(<span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; len / <span class="number">2</span>; ++j) &#123;</span><br><span class="line">                    <span class="type">Complex</span> <span class="variable">u</span> <span class="operator">=</span> a[i + j];</span><br><span class="line">                    <span class="type">Complex</span> <span class="variable">v</span> <span class="operator">=</span> a[i + j + len / <span class="number">2</span>].multiply(w);</span><br><span class="line">                    a[i + j] = u.add(v);</span><br><span class="line">                    a[i + j + len / <span class="number">2</span>] = u.subtract(v);</span><br><span class="line">                    w = w.multiply(wlen);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (invert) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; ++i) a[i] = a[i].divide(n);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1><span id="duo-xiang-shi-cheng-fa-bu-zou">多项式乘法步骤</span><a href="#duo-xiang-shi-cheng-fa-bu-zou" class="header-anchor">#</a></h1><ol>
+<li>Pad 到 2 的幂次长度；</li>
+<li>对两序列执行 FFT；</li>
+<li>点乘结果；</li>
+<li>执行逆 FFT；</li>
+<li>处理四舍五入。</li>
+</ol>
+<h1><span id="ntt-yao-dian">NTT 要点</span><a href="#ntt-yao-dian" class="header-anchor">#</a></h1><ul>
+<li>选择模数 p &#x3D; k * 2^n + 1，模意义下存在原根；</li>
+<li>常见模数：998244353 (primitive root 3)；</li>
+<li>NTT 避免浮点误差，适合大整数卷积、组合计数。</li>
+</ul>
+<h1><span id="ying-yong-chang-jing">应用场景</span><a href="#ying-yong-chang-jing" class="header-anchor">#</a></h1><ul>
+<li>大整数乘法、卷积、字符串匹配（FFT + hash）；</li>
+<li>图算法（卷积计数）、组合数学；</li>
+<li>图像处理中的快速卷积。</li>
+</ul>
+<h1><span id="zi-jian-qing-dan">自检清单</span><a href="#zi-jian-qing-dan" class="header-anchor">#</a></h1><ul>
+<li>是否处理精度误差（FFT）或模数选择（NTT）？</li>
+<li>是否对向量长度取最近的 2 次幂？</li>
+<li>是否在逆变换后进行四舍五入&#x2F;取模？</li>
+</ul>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>CP-Algorithms FFT &amp; NTT：<a target="_blank" rel="noopener" href="https://cp-algorithms.com/algebra/fft.html">https://cp-algorithms.com/algebra/fft.html</a></li>
+<li>MIT OCW 6.046 FFT 讲义：<a target="_blank" rel="noopener" href="https://ocw.mit.edu/.../lecture-18-fast-fourier-transform/">https://ocw.mit.edu/.../lecture-18-fast-fourier-transform/</a></li>
+<li>Competitive Programming 4 FFT 章节</li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2019-04-26</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2019-05-jlink-runtime-images/" title="使用 jlink 构建精简 Java 运行时镜像">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2019-04-spring-webflux-functional-endpoints/" title="Spring WebFlux Functional Endpoints 实战">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>拓扑排序与 DAG 动态规划 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+拓扑排序基础
+Kahn 算法模板
+DAG 动态规划
+常见问题
+自检清单
+参考资料
+
+
+
+
+
+拓扑排序基础#拓扑排序适用于有向无环图（DAG），提供线性序列使得每条有向边 (u, v) 中 u 都在 v 之前。典型算法包括 Kahn 算法（入度法）与 DFS 递归法。
+Kahn 算"><link rel="canonical" href="https://imchenway.com/zh-CN/2018-03-graph-topological-sort/"><meta property="og:type" content="article"><meta property="og:title" content="拓扑排序与 DAG 动态规划"><meta property="og:description" content="本文目录# 拓扑排序基础 Kahn 算法模板 DAG 动态规划 常见问题 自检清单 参考资料 拓扑排序基础#拓扑排序适用于有向无环图（DAG），提供线性序列使得每条有向边 (u, v) 中 u 都在 v 之前。典型算法包括 Kahn 算法（入度法）与 DFS 递归法。 Kahn 算法模板#123456789101112"><meta property="og:url" content="https://imchenway.com/zh-CN/2018-03-graph-topological-sort/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="拓扑排序与 DAG 动态规划"><meta name="twitter:description" content="本文目录# 拓扑排序基础 Kahn 算法模板 DAG 动态规划 常见问题 自检清单 参考资料 拓扑排序基础#拓扑排序适用于有向无环图（DAG），提供线性序列使得每条有向边 (u, v) 中 u 都在 v 之前。典型算法包括 Kahn 算法（入度法）与 DFS 递归法。 Kahn 算法模板#123456789101112"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>拓扑排序与 DAG 动态规划</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#tuo-bu-pai-xu-ji-chu">拓扑排序基础</a></li>
+<li><a href="#kahn-suan-fa-mo-ban">Kahn 算法模板</a></li>
+<li><a href="#dag-dong-tai-gui-hua">DAG 动态规划</a></li>
+<li><a href="#chang-jian-wen-ti">常见问题</a></li>
+<li><a href="#zi-jian-qing-dan">自检清单</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="tuo-bu-pai-xu-ji-chu">拓扑排序基础</span><a href="#tuo-bu-pai-xu-ji-chu" class="header-anchor">#</a></h1><p>拓扑排序适用于有向无环图（DAG），提供线性序列使得每条有向边 (u, v) 中 u 都在 v 之前。典型算法包括 Kahn 算法（入度法）与 DFS 递归法。</p>
+<h1><span id="kahn-suan-fa-mo-ban">Kahn 算法模板</span><a href="#kahn-suan-fa-mo-ban" class="header-anchor">#</a></h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Integer&gt; <span class="title function_">topoSort</span><span class="params">(<span class="type">int</span> n, List&lt;List&lt;Integer&gt;&gt; graph)</span> &#123;</span><br><span class="line">    <span class="type">int</span>[] indegree = <span class="keyword">new</span> <span class="title class_">int</span>[n];</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> <span class="number">0</span>; u &lt; n; u++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> v : graph.get(u)) indegree[v]++;</span><br><span class="line">    &#125;</span><br><span class="line">    Deque&lt;Integer&gt; queue = <span class="keyword">new</span> <span class="title class_">ArrayDeque</span>&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; n; i++) <span class="keyword">if</span> (indegree[i] == <span class="number">0</span>) queue.offer(i);</span><br><span class="line">    List&lt;Integer&gt; order = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    <span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">u</span> <span class="operator">=</span> queue.poll();</span><br><span class="line">        order.add(u);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> v : graph.get(u)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (--indegree[v] == <span class="number">0</span>) queue.offer(v);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (order.size() != n) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(<span class="string">&quot;graph has cycle&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> order;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1><span id="dag-dong-tai-gui-hua">DAG 动态规划</span><a href="#dag-dong-tai-gui-hua" class="header-anchor">#</a></h1><p>拓扑序可用于在 DAG 上进行 DP 或最短路径计算：</p>
+<ul>
+<li><strong>最长路径</strong>：在拓扑序上更新 <code>dist[v] = max(dist[v], dist[u] + w)</code>；</li>
+<li><strong>任务调度</strong>：计算最早完成时间；</li>
+<li><strong>课程安排</strong>：检测环并给出学习顺序。</li>
+</ul>
+<h1><span id="chang-jian-wen-ti">常见问题</span><a href="#chang-jian-wen-ti" class="header-anchor">#</a></h1><ul>
+<li>冲突检测：拓扑排序失败说明存在环。</li>
+<li>多解性：若有多个入度为 0 的节点，可使用优先队列输出字典序最小序列。</li>
+<li>边带权：单源最短路径问题可通过拓扑序实现 O(V+E) 算法。</li>
+</ul>
+<h1><span id="zi-jian-qing-dan">自检清单</span><a href="#zi-jian-qing-dan" class="header-anchor">#</a></h1><ul>
+<li>是否正确构建有向图并统计入度？</li>
+<li>是否在拓扑排序失败时提示环存在？</li>
+<li>是否利用拓扑序进行后续 DP 或调度计算？</li>
+</ul>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>MIT OCW 6.006 Lecture 19 DAG Algorithms：<a target="_blank" rel="noopener" href="https://ocw.mit.edu/.../lecture-19-dag-algorithms/">https://ocw.mit.edu/.../lecture-19-dag-algorithms/</a></li>
+<li>CLRS Chapter 22.4 Topological Sort</li>
+<li>LeetCode Graph 专题：<a target="_blank" rel="noopener" href="https://leetcode.com/tag/topological-sort/">https://leetcode.com/tag/topological-sort/</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2018-03-19</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2018-03-gc-pause-investigation/" title="GC 停顿分析实战：定位 Young GC 与 Mixed GC 问题">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2018-03-g1-heap-dumps-analysis/" title="使用 heap dump 分析 G1 堆内存问题">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>

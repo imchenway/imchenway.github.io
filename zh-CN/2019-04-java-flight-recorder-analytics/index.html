@@ -1,0 +1,166 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>JFR Analytics：利用 Streams & SQL 分析事件数据 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+JFR Analytics 概述
+Java API 示例
+Streaming API
+SQL 方式
+场景案例
+自检清单
+参考资料
+
+
+
+
+
+JFR Analytics 概述#JDK 14 引入 jdk.jfr.consumer 包，允许通过 Java API 读取 JFR 事件。"><link rel="canonical" href="https://imchenway.com/zh-CN/2019-04-java-flight-recorder-analytics/"><meta property="og:type" content="article"><meta property="og:title" content="JFR Analytics：利用 Streams &amp; SQL 分析事件数据"><meta property="og:description" content="本文目录# JFR Analytics 概述 Java API 示例 Streaming API SQL 方式 场景案例 自检清单 参考资料 JFR Analytics 概述#JDK 14 引入 jdk.jfr.consumer 包，允许通过 Java API 读取 JFR 事件。JDK 15+ 提供 jfr prin"><meta property="og:url" content="https://imchenway.com/zh-CN/2019-04-java-flight-recorder-analytics/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="JFR Analytics：利用 Streams &amp; SQL 分析事件数据"><meta name="twitter:description" content="本文目录# JFR Analytics 概述 Java API 示例 Streaming API SQL 方式 场景案例 自检清单 参考资料 JFR Analytics 概述#JDK 14 引入 jdk.jfr.consumer 包，允许通过 Java API 读取 JFR 事件。JDK 15+ 提供 jfr prin"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>JFR Analytics：利用 Streams &amp; SQL 分析事件数据</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#jfr-analytics-gai-shu">JFR Analytics 概述</a></li>
+<li><a href="#java-api-shi-li">Java API 示例</a></li>
+<li><a href="#streaming-api">Streaming API</a></li>
+<li><a href="#sql-fang-shi">SQL 方式</a></li>
+<li><a href="#chang-jing-an-li">场景案例</a></li>
+<li><a href="#zi-jian-qing-dan">自检清单</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="jfr-analytics-gai-shu">JFR Analytics 概述</span><a href="#jfr-analytics-gai-shu" class="header-anchor">#</a></h1><p>JDK 14 引入 <code>jdk.jfr.consumer</code> 包，允许通过 Java API 读取 JFR 事件。JDK 15+ 提供 <code>jfr print --events ...</code> 与 Flight Recorder Streaming API，将事件流转为实时分析数据。</p>
+<h1><span id="java-api-shi-li">Java API 示例</span><a href="#java-api-shi-li" class="header-anchor">#</a></h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Path</span> <span class="variable">recording</span> <span class="operator">=</span> Paths.get(<span class="string">&quot;profile.jfr&quot;</span>);</span><br><span class="line"><span class="keyword">try</span> (<span class="type">RecordingFile</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RecordingFile</span>(recording)) &#123;</span><br><span class="line">    <span class="keyword">while</span> (file.hasMoreEvents()) &#123;</span><br><span class="line">        <span class="type">RecordedEvent</span> <span class="variable">event</span> <span class="operator">=</span> file.readEvent();</span><br><span class="line">        <span class="keyword">if</span> (event.getEventType().getName().equals(<span class="string">&quot;jdk.ExecutionSample&quot;</span>)) &#123;</span><br><span class="line">            <span class="type">long</span> <span class="variable">cpuTime</span> <span class="operator">=</span> event.getLong(<span class="string">&quot;sampledThread.javaThreadId&quot;</span>);</span><br><span class="line">            <span class="comment">// 分析逻辑</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1><span id="streaming-api">Streaming API</span><a href="#streaming-api" class="header-anchor">#</a></h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">try</span> (<span class="type">var</span> <span class="variable">subscription</span> <span class="operator">=</span> FlightRecorder.registerEvent(ExecutionSampleEvent.class);</span><br><span class="line">     <span class="type">var</span> <span class="variable">stream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RecordingStream</span>()) &#123;</span><br><span class="line">    stream.onEvent(<span class="string">&quot;jdk.ExecutionSample&quot;</span>, event -&gt; &#123;</span><br><span class="line">        System.out.println(event.getStackTrace());</span><br><span class="line">    &#125;);</span><br><span class="line">    stream.startAsync();</span><br><span class="line">    Thread.sleep(Duration.ofMinutes(<span class="number">5</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1><span id="sql-fang-shi">SQL 方式</span><a href="#sql-fang-shi" class="header-anchor">#</a></h1><ul>
+<li>将 JFR 转换为 JSON&#x2F;CSV，并导入 ClickHouse&#x2F;BigQuery；</li>
+<li>使用 <code>jfr print --events jdk.GarbageCollection</code> 输出字段，借助 jq&#x2F;awk 转换；</li>
+<li>结合 Grafana Loki&#x2F;Tempo 形成统一可观测性视图。</li>
+</ul>
+<h1><span id="chang-jing-an-li">场景案例</span><a href="#chang-jing-an-li" class="header-anchor">#</a></h1><ul>
+<li>热点方法识别（ExecutionSample、ObjectAllocationInNewTLAB）；</li>
+<li>GC 分析（GarbageCollection、AllocationRequiringGC）；</li>
+<li>Safepoint &amp; Lock 分析（JavaMonitorEnter、SafepointBegin）。</li>
+</ul>
+<h1><span id="zi-jian-qing-dan">自检清单</span><a href="#zi-jian-qing-dan" class="header-anchor">#</a></h1><ul>
+<li>是否使用最新 JDK，启用 JFR Streaming API？</li>
+<li>是否设计事件过滤与聚合逻辑，避免数据洪流？</li>
+<li>是否与指标&#x2F;日志联动，形成闭环分析？</li>
+</ul>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>JFR Streaming API：<a target="_blank" rel="noopener" href="https://openjdk.org/jeps/349">https://openjdk.org/jeps/349</a></li>
+<li>JDK Flight Recorder Consumer API：<a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.jfr/jdk/jfr/consumer/package-summary.html">https://docs.oracle.com/en/java/javase/17/docs/api/jdk.jfr/jdk/jfr/consumer/package-summary.html</a></li>
+<li>JDK Mission Control 博客：<a target="_blank" rel="noopener" href="https://blogs.oracle.com/javamagazine/post/jdk-flight-recorder-streaming">https://blogs.oracle.com/javamagazine/post/jdk-flight-recorder-streaming</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2019-04-05</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2019-04-jvm-gc-tuning-playbook/" title="JVM GC 调优手册：方法论与检查清单">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2019-03-observability-log-correlation/" title="日志、指标、追踪的三栖关联策略">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>
