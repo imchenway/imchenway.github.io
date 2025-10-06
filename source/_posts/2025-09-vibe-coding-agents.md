@@ -2,6 +2,7 @@
 title: "Vibe Coding 代理抉择：Google Jules vs OpenAI Codex vs Claude Code"
 date: 2025-09-30
 lang: zh-CN
+lang_ref: vibe-coding-agents
 tags: ['#AI', '#Tools', '#VIBE']
 ---
 

@@ -2,6 +2,7 @@
 title: "Hardening a Hexo Blog: SEO, Performance, and AdSense Tune-Up"
 date: 2025-10-04
 lang: en
+lang_ref: hexo-seo-ads-optimization
 permalink: en/hexo-seo-ads-optimization/
 tags: ['#SEO', '#Performance', '#AdTech']
 ---
@@ -63,4 +64,3 @@ tags: ['#SEO', '#Performance', '#AdTech']
 - [2] Google Search Central, “Sitemaps overview,” https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview
 - [3] Google Search Central, “Localized versions,” https://developers.google.com/search/docs/specialty/international/localized-versions
 - [4] Google AdSense Help, “Create in-article ads,” https://support.google.com/adsense/answer/9183363
-

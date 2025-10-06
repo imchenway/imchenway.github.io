@@ -2,6 +2,7 @@
 title: "LLM 推理微服务的性能优化与成本控制"
 date: 2025-10-06
 lang: zh-CN
+lang_ref: llm-inference-microservices
 tags: ['#LLMInference', '#Performance', '#CostOptimization', '#EdgeComputing', '#Observability']
 ---
 

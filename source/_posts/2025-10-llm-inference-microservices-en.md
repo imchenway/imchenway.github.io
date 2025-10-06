@@ -2,6 +2,7 @@
 title: "Optimizing LLM Inference Microservices for Performance and Cost"
 date: 2025-10-06
 lang: en
+lang_ref: llm-inference-microservices
 permalink: en/llm-inference-microservices/
 tags: ['#LLMInference', '#Performance', '#CostOptimization', '#EdgeComputing', '#Observability']
 ---

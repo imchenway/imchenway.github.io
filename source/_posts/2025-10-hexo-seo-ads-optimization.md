@@ -2,6 +2,7 @@
 title: "打造高可见性的个人博客：一次 Hexo SEO 与 Adsense 优化实录"
 date: 2025-10-04
 lang: zh-CN
+lang_ref: hexo-seo-ads-optimization
 tags: ['#SEO', '#Performance', '#Adsense']
 ---
 
@@ -67,4 +68,3 @@ tags: ['#SEO', '#Performance', '#Adsense']
 - [2] Google Search Central《Sitemaps Overview》，https://developers.google.com/search/docs/crawling-indexing/sitemaps/overview
 - [3] Google Search Central《Localized Versions》，https://developers.google.com/search/docs/specialty/international/localized-versions
 - [4] Google AdSense《Create in-article ads》，https://support.google.com/adsense/answer/9183363
-

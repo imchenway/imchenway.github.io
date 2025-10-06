@@ -2,6 +2,7 @@
 title: "Performance Budgets and Adaptive Optimization in the Age of AI"
 date: 2025-10-04
 lang: en
+lang_ref: ai-performance-budget
 permalink: en/ai-performance-budgeting/
 tags: ['#PerformanceBudget', '#AIInfrastructure', '#Observability', '#Automation', '#FinOps']
 ---
