@@ -7,6 +7,21 @@ meta(name="X-UA-Compatible", content="IE=edge")
 - var canonicalUrl = full_url_for(page.path || '')
 - var ogType = page.layout === 'post' ? 'article' : 'website'
 - var siteName = config.title
+- var hreflangMap = {}
+- if (page.layout === 'post' && page.lang_ref) {
+-   const localizedPosts = site.posts.filter(post => post.lang_ref === page.lang_ref);
+-   localizedPosts.forEach(post => {
+-     const langCode = post.lang || post.language;
+-     if (langCode && !hreflangMap[langCode]) {
+-       const altPath = post.path || '';
+-       const altUrl = altPath ? full_url_for(altPath) : null;
+-       if (altUrl) {
+-         hreflangMap[langCode] = altUrl;
+-       }
+-     }
+-   });
+- }
+- var hreflangEntries = Object.keys(hreflangMap).map(langCode => ({ lang: langCode, url: hreflangMap[langCode] })).filter(item => item.url)
 meta(name="author", content= theme.author)
 title
     block site_title
@@ -15,6 +30,10 @@ block description
     meta(name="description", content= description)
 
 link(rel="canonical", href= canonicalUrl)
+if hreflangEntries.length
+    each alternate in hreflangEntries
+        link(rel="alternate", hreflang= alternate.lang, href= alternate.url)
+    link(rel="alternate", hreflang="x-default", href= canonicalUrl)
 meta(property="og:type", content= ogType)
 meta(property="og:title", content= pageTitle)
 meta(property="og:description", content= description)

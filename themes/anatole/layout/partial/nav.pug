@@ -33,23 +33,19 @@
   .information
     if languages.length === 2
       - const fallbackLang = languages.find(lang => lang !== currentLang);
-      - let langToggleHref = buildLangUrl(fallbackLang, '/');
+      - let langToggleHref = null;
       - if (fallbackLang) {
       -   const alternatePost = (page && page.lang_ref) ? site.posts.findOne({ lang: fallbackLang, lang_ref: page.lang_ref }) : null;
-      -   if (alternatePost) {
+      -   if (alternatePost && alternatePost.path) {
       -     langToggleHref = url_for(alternatePost.path);
-      -   } else if (page && page.path) {
-      -     const normalizedPath = page.path.replace(/^\/+/, '');
-      -     const langPrefix = currentLang ? `${currentLang}/` : '';
-      -     if (langPrefix && normalizedPath.indexOf(langPrefix) === 0) {
-      -       const rest = normalizedPath.substring(langPrefix.length);
-      -       langToggleHref = buildLangUrl(fallbackLang, rest);
-      -     } else {
-      -       langToggleHref = buildLangUrl(fallbackLang, normalizedPath);
+      -   } else if (page && page.layout !== 'post' && page.lang_ref) {
+      -     const alternatePage = site.pages ? site.pages.findOne({ lang: fallbackLang, lang_ref: page.lang_ref }) : null;
+      -     if (alternatePage && alternatePage.path) {
+      -       langToggleHref = url_for(alternatePage.path);
       -     }
       -   }
       - }
-      if fallbackLang
+      if fallbackLang && langToggleHref
         a.lang-toggle(href=langToggleHref)= __('languages.' + fallbackLang)
     .back_btn
       li
