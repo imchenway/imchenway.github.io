@@ -1,0 +1,313 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Agent Observability (AgentOps) Part 1/3: Turn Prompts, Tools, and Memory into Traces · DavidChan's Blog</title><meta name="description" content="Table of Contents#
+
+
+
+
+1. Why Agents Need Observability (Not Just Better Prompts)
+2. What to Observe: A Practical Inventory
+3. Trace Model: Represent "><link rel="canonical" href="https://imchenway.com/en/agentops-observability-part-1/"><link rel="alternate" hreflang="en" href="https://imchenway.com/en/agentops-observability-part-1/"><link rel="alternate" hreflang="zh-CN" href="https://imchenway.com/zh-CN/2026-01-agentops-observability-1/"><link rel="alternate" hreflang="x-default" href="https://imchenway.com/en/agentops-observability-part-1/"><meta property="og:type" content="article"><meta property="og:title" content="Agent Observability (AgentOps) Part 1/3: Turn Prompts, Tools, and Memory into Traces"><meta property="og:description" content="Table of Contents# 1. Why Agents Need Observability (Not Just Better Prompts) 2. What to Observe: A Practical Inventory 3. Trace Model: Represent an Agent Run a"><meta property="og:url" content="https://imchenway.com/en/agentops-observability-part-1/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Agent Observability (AgentOps) Part 1/3: Turn Prompts, Tools, and Memory into Traces"><meta name="twitter:description" content="Table of Contents# 1. Why Agents Need Observability (Not Just Better Prompts) 2. What to Observe: A Practical Inventory 3. Trace Model: Represent an Agent Run a"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/en/">Home</a></li><li><a href="/en/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/en/guestbook">Guestbook</a></li></div><div class="information"><a class="lang-toggle" href="/zh-CN/2026-01-agentops-observability-1/">中</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Agent Observability (AgentOps) Part 1/3: Turn Prompts, Tools, and Memory into Traces</a></h3></div><div class="post-content"><h3><span id="table-of-contents">Table of Contents</span><a href="#table-of-contents" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#1-why-agents-need-observability-not-just-better-prompts">1. Why Agents Need Observability (Not Just Better Prompts)</a></li>
+<li><a href="#2-what-to-observe-a-practical-inventory">2. What to Observe: A Practical Inventory</a></li>
+<li><a href="#3-trace-model-represent-an-agent-run-as-a-span-tree">3. Trace Model: Represent an Agent Run as a Span Tree</a><ul>
+<li><a href="#3-1-suggested-span-attributes-example">3.1 Suggested Span Attributes (Example)</a></li>
+<li><a href="#3-2-what-to-record-and-what-not-to">3.2 What to Record (and What Not to)</a></li>
+</ul>
+</li>
+<li><a href="#4-metrics-unify-slos-cost-budgets-and-quality-signals">4. Metrics: Unify SLOs, Cost Budgets, and Quality Signals</a></li>
+<li><a href="#5-logs-and-audits-replayable-accountable-and-redacted">5. Logs and Audits: Replayable, Accountable, and Redacted</a></li>
+<li><a href="#6-a-one-week-mvp-make-the-black-box-transparent">6. A One-Week MVP: Make the Black Box Transparent</a></li>
+<li><a href="#7-what-s-next">7. What’s Next</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="1-why-agents-need-observability-not-just-better-prompts">1. Why Agents Need Observability (Not Just Better Prompts)</span><a href="#1-why-agents-need-observability-not-just-better-prompts" class="header-anchor">#</a></h1><p>When teams move from a monolith to distributed systems, the biggest shift is not code size—it is <strong>loss of visibility</strong>. A single request fans out across services, queues, caches, and databases. Debugging by intuition stops working, so we lean on logs, metrics, and traces to answer three simple questions:</p>
+<ul>
+<li><strong>What happened?</strong> What steps did the request actually take?  </li>
+<li><strong>Why did it happen?</strong> Which dependency or decision caused the outcome?  </li>
+<li><strong>How do we fix it safely?</strong> Did the change improve correctness without blowing up latency or cost?</li>
+</ul>
+<p>Agent systems amplify the “black box” problem. A user-visible “one response” may involve planning, retrieval, multiple tool calls, retries, safety filters, fallbacks, and even human handoffs. Without observability, you will repeatedly hit the same failure modes:</p>
+<ul>
+<li>“Occasional hallucinations” or wrong tool executions with no way to reconstruct the decision path.</li>
+<li>Sudden cost spikes (tokens, retrieval, external APIs) without knowing which workflows or tenants caused them.</li>
+<li>Prompt or policy changes that “feel better” but lack measurable regression gates and risk controls.</li>
+</ul>
+<p>This is the first principle of AgentOps: <strong>treat an agent run like a production pipeline</strong>—each prompt render, retrieval step, tool call, and model inference should be traceable, aggregatable, alertable, and reviewable.</p>
+<p>This series is planned as three parts:</p>
+<ol>
+<li><strong>Foundations (this post)</strong>: what to observe + a unified Trace&#x2F;Metrics&#x2F;Logs model  </li>
+<li><strong>Implementation</strong>: a minimal MVP for instrumentation, dashboards, alerts, and replay  </li>
+<li><strong>Operations</strong>: connecting observability to SLOs, security audits, and postmortems</li>
+</ol>
+<h1><span id="2-what-to-observe-a-practical-inventory">2. What to Observe: A Practical Inventory</span><a href="#2-what-to-observe-a-practical-inventory" class="header-anchor">#</a></h1><p>Classic services observe HTTP latency, DB queries, cache hit rates, and queue depth. Agents need explicit telemetry for “reasoning-time” operations; otherwise you are stuck guessing the process from the final output.</p>
+<p>Break an agent run into six observable domains:</p>
+<ol>
+<li><p><strong>Task &#x2F; Session entry</strong></p>
+<ul>
+<li>who&#x2F;when (user&#x2F;tenant&#x2F;channel), what intent (task_type), and what “success” means</li>
+</ul>
+</li>
+<li><p><strong>Context assembly</strong></p>
+<ul>
+<li>prompt template + version, variable rendering, truncation&#x2F;compression, safety sanitisation</li>
+</ul>
+</li>
+<li><p><strong>Retrieval &#x2F; RAG</strong></p>
+<ul>
+<li>query generation, search&#x2F;rerank, document hits, score distributions, permission filtering</li>
+</ul>
+</li>
+<li><p><strong>Tools &#x2F; Actions</strong></p>
+<ul>
+<li>tool name, latency, error rate, retries, and dependency failure patterns (redacted inputs&#x2F;outputs)</li>
+</ul>
+</li>
+<li><p><strong>Model inference</strong></p>
+<ul>
+<li>model&#x2F;version, token usage, latency, refusals&#x2F;safety blocks, routing rationale</li>
+</ul>
+</li>
+<li><p><strong>Policies &#x2F; Guardrails</strong></p>
+<ul>
+<li>what triggered (budget, safety, permission), what action was taken (downgrade, retry, handoff)</li>
+</ul>
+</li>
+</ol>
+<p>With this inventory, you can finally attribute “latency&#x2F;cost&#x2F;quality&#x2F;risk” to concrete stages.</p>
+<h1><span id="3-trace-model-represent-an-agent-run-as-a-span-tree">3. Trace Model: Represent an Agent Run as a Span Tree</span><a href="#3-trace-model-represent-an-agent-run-as-a-span-tree" class="header-anchor">#</a></h1><p>The most practical approach is to model an agent run as a distributed trace: <strong>one root span + many child spans</strong>. You do not need perfect standardisation on day one, but you must ensure:</p>
+<ol>
+<li><strong>Correlation</strong>: everything ties back to the same run (<code>trace_id</code>, <code>session_id</code>)  </li>
+<li><strong>Aggregation</strong>: key fields support slicing (model&#x2F;tool&#x2F;tenant&#x2F;task_type)  </li>
+<li><strong>Replay</strong>: enough redacted context exists to reconstruct critical paths</li>
+</ol>
+<p>If you need a mental model, imagine a support agent that “looks fine” at the UI level but keeps producing expensive runs. Without traces, your team will argue about whether the model is “worse lately”. With traces, you can see the actual culprit: retrieval is returning low-confidence results, so the planner loops; a tool call is timing out and retrying; or a policy keeps downgrading to a smaller model and forcing extra turns.</p>
+<p>One practical naming tip: treat a single end-to-end user interaction as a <strong>session</strong>, and a single attempt to complete the task as a <strong>run</strong>. Use stable identifiers:</p>
+<ul>
+<li><code>session_id</code>: groups multiple runs and user turns into a conversation-level unit.</li>
+<li><code>run_id</code>: unique per attempt; useful when the same session retries or forks.</li>
+<li><code>trace_id</code>: your distributed tracing glue; it should cover every step inside a run (including asynchronous tool executions).</li>
+</ul>
+<p>Example trace shape (plain text):</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">agent.run (root)</span><br><span class="line">├── prompt.render</span><br><span class="line">├── guardrail.input_sanitize</span><br><span class="line">├── retrieval.query_generate</span><br><span class="line">├── retrieval.search</span><br><span class="line">├── retrieval.rerank</span><br><span class="line">├── model.infer (planner)</span><br><span class="line">├── tool.call (jira.createTicket)</span><br><span class="line">├── tool.call (payments.refund)</span><br><span class="line">├── model.infer (final)</span><br><span class="line">└── guardrail.output_filter</span><br></pre></td></tr></table></figure>
+
+<p>Two extra techniques make traces more useful in agent systems:</p>
+<ul>
+<li><strong>Span events for decisions</strong>: record “why” as structured events (e.g., <code>route.selected</code>, <code>guardrail.triggered</code>) instead of hiding reasoning in free-form logs.</li>
+<li><strong>Links for retrieval evidence</strong>: when you retrieve documents or memories, attach lightweight references (IDs, versions, hashes) so you can explain outputs without storing raw content in every span.</li>
+</ul>
+<h2><span id="3-1-suggested-span-attributes-example">3.1 Suggested Span Attributes (Example)</span><a href="#3-1-suggested-span-attributes-example" class="header-anchor">#</a></h2><p>To answer “what is slow&#x2F;expensive&#x2F;flaky”, each span type needs a minimal set of groupable attributes. Example (illustrative only):</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;trace_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;session_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tenant_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;acme&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;task_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;support_ticket&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;step&quot;</span><span class="punctuation">:</span> <span class="string">&quot;model.infer&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;model.name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;model.version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tokens.input&quot;</span><span class="punctuation">:</span> <span class="number">1234</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tokens.output&quot;</span><span class="punctuation">:</span> <span class="number">456</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;cost.usd&quot;</span><span class="punctuation">:</span> <span class="number">0.0123</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;latency.ms&quot;</span><span class="punctuation">:</span> <span class="number">850</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;retry.count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;policy.downgraded&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>The key is to treat <strong>cost and quality as first-class signals</strong>, not afterthoughts. Agents are “trade-off engines”, not pure compute.</p>
+<p>Design attributes with care to avoid self-inflicted telemetry outages:</p>
+<ul>
+<li>Prefer <strong>low-cardinality dimensions</strong> for slicing: <code>tenant_id</code>, <code>task_type</code>, <code>tool.name</code>, <code>model.name</code>.</li>
+<li>Avoid high-cardinality fields (raw prompts, full queries, user IDs) in metrics labels or span attributes. Use <strong>hashes</strong> or store data in a secure vault and keep only pointers in telemetry.</li>
+<li>Stamp versions everywhere: <code>prompt_version</code>, <code>policy_version</code>, <code>tool_schema_version</code>. When an incident happens, “what changed?” is the fastest path to a fix.</li>
+</ul>
+<h2><span id="3-2-what-to-record-and-what-not-to">3.2 What to Record (and What Not to)</span><a href="#3-2-what-to-record-and-what-not-to" class="header-anchor">#</a></h2><p>Observability is not “store everything forever”. Use tiering:</p>
+<ul>
+<li>Always: timings, model&#x2F;tool&#x2F;retrieval dimensions, error codes, retry counts  </li>
+<li>Sampled: rendered prompts, retrieved snippets, tool payload summaries (redacted)  </li>
+<li>Never: raw PII, secrets, complete business payloads, unredacted user inputs without controls</li>
+</ul>
+<p>In practice, teams often use a three-tier storage model:</p>
+<ol>
+<li><strong>Telemetry store (hot)</strong>: spans, metrics, and structured logs; fast queries; short retention.  </li>
+<li><strong>Replay store (secure)</strong>: encrypted, access-controlled, and TTL-limited artefacts (prompt renders, retrieval snapshots, tool payload summaries).  </li>
+<li><strong>System of record (business data)</strong>: your normal databases; do not duplicate sensitive payloads into observability systems.</li>
+</ol>
+<p>Align these rules with governance frameworks (for example, NIST AI RMF and the OWASP LLM Top 10).</p>
+<h1><span id="4-metrics-unify-slos-cost-budgets-and-quality-signals">4. Metrics: Unify SLOs, Cost Budgets, and Quality Signals</span><a href="#4-metrics-unify-slos-cost-budgets-and-quality-signals" class="header-anchor">#</a></h1><p>Traces answer “why this run failed”. Metrics answer “what is trending and when to page someone”. For agent systems, start with four metric groups:</p>
+<ol>
+<li><p><strong>Latency and reliability</strong></p>
+<ul>
+<li>end-to-end P50&#x2F;P95&#x2F;P99, success rate (separate “good answer” vs “action succeeded”), tool failure&#x2F;retry rates</li>
+</ul>
+</li>
+<li><p><strong>Cost and resources</strong></p>
+<ul>
+<li>token distributions and per-run cost, retrieval cost, external API costs, cache hit rate and savings</li>
+</ul>
+</li>
+<li><p><strong>Quality (start with weak supervision)</strong></p>
+<ul>
+<li>user feedback, sampled human pass rate, eval-based factual error rate, citation coverage rate</li>
+</ul>
+</li>
+<li><p><strong>Risk and guardrails</strong></p>
+<ul>
+<li>safety block rate, permission denial counts, downgrade&#x2F;handoff rates and recovery time</li>
+</ul>
+</li>
+</ol>
+<p>One operational nuance: “success” for agents is multi-layered. A run can be technically successful (no exceptions) but still unacceptable (wrong answer, wrong action, unsafe output). Many teams separate SLIs:</p>
+<ul>
+<li><strong>Action SLI</strong>: was the intended tool action executed correctly? (refund created, ticket opened, email sent)</li>
+<li><strong>Answer SLI</strong>: was the response acceptable? (human pass rate, eval score, user satisfaction)</li>
+<li><strong>Budget SLI</strong>: did the run stay within latency&#x2F;cost envelopes? (token caps, per-run cost ceilings)</li>
+</ul>
+<p>Once you define SLIs, you can adopt classic SRE practices like error budgets and burn rates: treat “bad answers” and “budget violations” as first-class budget consumers, not merely “ML quirks”.</p>
+<p>Once metrics and traces share the same dimensions, you can answer: “Is cost rising because tools are retrying, or because retrieval quality dropped and the agent is looping?”</p>
+<h1><span id="5-logs-and-audits-replayable-accountable-and-redacted">5. Logs and Audits: Replayable, Accountable, and Redacted</span><a href="#5-logs-and-audits-replayable-accountable-and-redacted" class="header-anchor">#</a></h1><p>Treat agent logs as two layers:</p>
+<ol>
+<li><strong>Runtime logs (ops view)</strong>: timeouts, dependency faults, retries, quota triggers  </li>
+<li><strong>Decision logs (governance view)</strong>: why a model&#x2F;tool was chosen, why a policy fired, why a downgrade happened</li>
+</ol>
+<p>Decision logs should be structured and bound to <code>trace_id</code>. A practical minimal schema:</p>
+<ul>
+<li>trace_id &#x2F; session_id &#x2F; tenant_id &#x2F; task_type</li>
+<li>planner decision summary (redacted)</li>
+<li>tool selection rationale (rule hit &#x2F; model judgement &#x2F; human override)</li>
+<li>guardrail hits (rule_id, severity, action)</li>
+<li>version stamps: prompt_version &#x2F; policy_version &#x2F; tool_schema_version</li>
+</ul>
+<p>This turns postmortems from “opinions” into “facts”.</p>
+<p>Two guardrails that matter in real organisations:</p>
+<ul>
+<li><strong>Redact at collection time</strong> when possible. If you rely on “query-time masking”, someone will eventually run the wrong query.  </li>
+<li><strong>Scope access by role</strong>. Ops engineers may need timings and error codes; security reviewers may need policy hits; only a small group should access replay artefacts.</li>
+</ul>
+<h1><span id="6-a-one-week-mvp-make-the-black-box-transparent">6. A One-Week MVP: Make the Black Box Transparent</span><a href="#6-a-one-week-mvp-make-the-black-box-transparent" class="header-anchor">#</a></h1><p>If you are starting from zero, ship an MVP before building an “agent platform”. A one-week MVP can achieve:</p>
+<ol>
+<li>every run has a trace_id with a span tree  </li>
+<li>model&#x2F;tool&#x2F;retrieval spans support basic aggregation (“slowest”, “most expensive”, “most failures”)  </li>
+<li>critical paths are replayable (prompt version + retrieved references + tool calls)</li>
+</ol>
+<p>Acceptance checklist:</p>
+<ul>
+<li><input disabled type="checkbox"> <code>agent.run</code> records tenant_id, task_type, final status (success&#x2F;failed&#x2F;downgraded&#x2F;handoff)</li>
+<li><input disabled type="checkbox"> every <code>tool.call</code> has tool.name, latency, status_code, retry.count (payloads redacted)</li>
+<li><input disabled type="checkbox"> every <code>model.infer</code> has model.name, tokens in&#x2F;out, latency, cost (if available)</li>
+<li><input disabled type="checkbox"> <code>retrieval.search</code> includes index_version, top_k, hit count, filtered count (auth)</li>
+<li><input disabled type="checkbox"> guardrail hits are traceable: rule_id, action, severity</li>
+</ul>
+<p>Common pitfalls to avoid in the first week:</p>
+<ul>
+<li>You generate a <code>trace_id</code> but lose it at the first async boundary (queue, background worker, tool runner).</li>
+<li>You log raw prompts and user payloads “temporarily”, and they stay forever in the log lake.</li>
+<li>Your metrics explode in cardinality because you tag everything with user_id or raw query text.</li>
+<li>You can see tool failures but not the <em>tool schema version</em>, so you cannot correlate breakage with schema changes.</li>
+</ul>
+<h1><span id="7-what-s-next">7. What’s Next</span><a href="#7-what-s-next" class="header-anchor">#</a></h1><p>This post introduced a practical inventory plus a unified Trace&#x2F;Metrics&#x2F;Logs model, with one goal: <strong>turn agent runs into explainable pipelines</strong>.</p>
+<p>In Part 2, I will make this concrete: how to instrument an agent workflow with an OpenTelemetry mindset, build dashboards and alerts without creating a “platform tax”, and implement safe replay patterns.</p>
+<h1><span id="references">References</span><a href="#references" class="header-anchor">#</a></h1><ul>
+<li>OpenTelemetry docs: <a target="_blank" rel="noopener" href="https://opentelemetry.io/docs/">https://opentelemetry.io/docs/</a>  </li>
+<li>OWASP Top 10 for LLM Applications: <a target="_blank" rel="noopener" href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">https://owasp.org/www-project-top-10-for-large-language-model-applications/</a>  </li>
+<li>NIST AI Risk Management Framework: <a target="_blank" rel="noopener" href="https://www.nist.gov/itl/ai-risk-management-framework">https://www.nist.gov/itl/ai-risk-management-framework</a>  </li>
+<li>Kubernetes docs (background on production observability patterns): <a target="_blank" rel="noopener" href="https://kubernetes.io/docs/">https://kubernetes.io/docs/</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-01-21</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2026-01-agentops-observability-1/" title="Agent 可观测性（AgentOps）①：把 Prompt / Tool / Memory 变成可追踪的 Trace">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>

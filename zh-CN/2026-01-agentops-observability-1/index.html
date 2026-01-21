@@ -1,0 +1,291 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Agent 可观测性（AgentOps）①：把 Prompt / Tool / Memory 变成可追踪的 Trace · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+1. 系列导读：为什么 Agent 需要“可观测性”
+2. 观测对象清单：Agent 系统到底要看什么
+3. Trace 模型：把一次 Agent 任务拆成 Span 树
+3.1 建议的 Span 属性（示例）
+3.2 追踪什么，不追踪什么
+
+
+4. 指标（Metrics）：把 "><link rel="canonical" href="https://imchenway.com/zh-CN/2026-01-agentops-observability-1/"><link rel="alternate" hreflang="en" href="https://imchenway.com/en/agentops-observability-part-1/"><link rel="alternate" hreflang="zh-CN" href="https://imchenway.com/zh-CN/2026-01-agentops-observability-1/"><link rel="alternate" hreflang="x-default" href="https://imchenway.com/zh-CN/2026-01-agentops-observability-1/"><meta property="og:type" content="article"><meta property="og:title" content="Agent 可观测性（AgentOps）①：把 Prompt / Tool / Memory 变成可追踪的 Trace"><meta property="og:description" content="本文目录# 1. 系列导读：为什么 Agent 需要“可观测性” 2. 观测对象清单：Agent 系统到底要看什么 3. Trace 模型：把一次 Agent 任务拆成 Span 树 3.1 建议的 Span 属性（示例） 3.2 追踪什么，不追踪什么 4. 指标（Metrics）：把 SLO、成本、质量联到同一张表 "><meta property="og:url" content="https://imchenway.com/zh-CN/2026-01-agentops-observability-1/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Agent 可观测性（AgentOps）①：把 Prompt / Tool / Memory 变成可追踪的 Trace"><meta name="twitter:description" content="本文目录# 1. 系列导读：为什么 Agent 需要“可观测性” 2. 观测对象清单：Agent 系统到底要看什么 3. Trace 模型：把一次 Agent 任务拆成 Span 树 3.1 建议的 Span 属性（示例） 3.2 追踪什么，不追踪什么 4. 指标（Metrics）：把 SLO、成本、质量联到同一张表 "><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/agentops-observability-part-1/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Agent 可观测性（AgentOps）①：把 Prompt / Tool / Memory 变成可追踪的 Trace</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#1-xi-lie-dao-du-wei-shi-me-agent-xu-yao-ke-guan-ce-xing">1. 系列导读：为什么 Agent 需要“可观测性”</a></li>
+<li><a href="#2-guan-ce-dui-xiang-qing-dan-agent-xi-tong-dao-di-yao-kan-shi-me">2. 观测对象清单：Agent 系统到底要看什么</a></li>
+<li><a href="#3-trace-mo-xing-ba-yi-ci-agent-ren-wu-chai-cheng-span-shu">3. Trace 模型：把一次 Agent 任务拆成 Span 树</a><ul>
+<li><a href="#3-1-jian-yi-de-span-shu-xing-shi-li">3.1 建议的 Span 属性（示例）</a></li>
+<li><a href="#3-2-zhui-zong-shi-me-bu-zhui-zong-shi-me">3.2 追踪什么，不追踪什么</a></li>
+</ul>
+</li>
+<li><a href="#4-zhi-biao-metrics-ba-slo-cheng-ben-zhi-liang-lian-dao-tong-yi-zhang-biao">4. 指标（Metrics）：把 SLO、成本、质量联到同一张表</a></li>
+<li><a href="#5-ri-zhi-yu-shen-ji-logs-ke-hui-fang-ke-zhui-ze-ke-tuo-min">5. 日志与审计（Logs）：可回放、可追责、可脱敏</a></li>
+<li><a href="#6-zui-xiao-luo-di-fang-an-mvp-yi-zhou-nei-ba-hei-xiang-da-kai">6. 最小落地方案（MVP）：一周内把黑箱打开</a></li>
+<li><a href="#7-jie-yu-xia-yi-pian-hui-xie-shi-me">7. 结语：下一篇会写什么</a></li>
+<li><a href="#can-kao-zi-liao">参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="1-xi-lie-dao-du-wei-shi-me-agent-xu-yao-ke-guan-ce-xing">1. 系列导读：为什么 Agent 需要“可观测性”</span><a href="#1-xi-lie-dao-du-wei-shi-me-agent-xu-yao-ke-guan-ce-xing" class="header-anchor">#</a></h1><p>当你把一个应用从“单体服务”演进到“分布式系统”，最大的变化往往不是代码量，而是<strong>系统变成了黑箱</strong>：一次请求跨越多个服务、多个队列、多个数据库，靠直觉排查很快失效，于是你需要日志、指标、追踪，来回答三个最朴素的问题：</p>
+<ul>
+<li><strong>发生了什么</strong>（What）：这次请求到底走了哪些步骤？  </li>
+<li><strong>为什么发生</strong>（Why）：是模型、检索、工具调用、还是上下文拼装出了问题？  </li>
+<li><strong>该怎么修</strong>（How）：修复后是否回归？成本与延迟是否仍受控？</li>
+</ul>
+<p>Agent（编排 + 工具调用 + 记忆 + 检索 + 模型推理）把黑箱进一步放大：同样是“生成一段回复”，背后可能发生了多轮规划、检索、调用、重试、回退、降级。没有可观测性，你会在以下场景反复踩坑：</p>
+<ul>
+<li>线上出现“偶发性胡说&#x2F;错调用&#x2F;死循环重试”，但你只能看到最终输出，无法定位中间决策链路；</li>
+<li>成本突然飙升（token、检索、外部 API 调用），但你不知道是哪类任务、哪条路径、哪个工具导致；</li>
+<li>你改了 Prompt、路由策略或 Guardrail，感觉“应该更好”，却缺少可量化的回归验证和风险闸门。</li>
+</ul>
+<p>因此，AgentOps 的第一性原理是：<strong>把一次 Agent 任务还原成“可追踪的流水线”</strong>，让每一次 Prompt、每一次检索、每一次工具调用、每一次模型推理，都能像分布式链路一样被观测、聚合、告警、复盘。</p>
+<p>本系列计划三篇：</p>
+<ol>
+<li><strong>基础篇（本文）</strong>：观测对象清单 + Trace&#x2F;Metric&#x2F;Log 的统一模型  </li>
+<li><strong>落地篇</strong>：最小可行方案（MVP）怎么埋点、怎么建看板、怎么做回放  </li>
+<li><strong>复盘篇</strong>：把可观测性接入 SLO&#x2F;错误预算&#x2F;安全审计，形成组织级闭环</li>
+</ol>
+<h1><span id="2-guan-ce-dui-xiang-qing-dan-agent-xi-tong-dao-di-yao-kan-shi-me">2. 观测对象清单：Agent 系统到底要看什么</span><a href="#2-guan-ce-dui-xiang-qing-dan-agent-xi-tong-dao-di-yao-kan-shi-me" class="header-anchor">#</a></h1><p>传统服务最常见的观测对象是：HTTP 请求、数据库查询、缓存命中、队列积压。Agent 系统需要把“推理相关”的对象显式建模，否则你会永远停留在“看结果猜过程”的状态。</p>
+<p>建议把 Agent 任务拆成 6 类观测对象（从用户视角到平台视角逐层展开）：</p>
+<ol>
+<li><p><strong>入口请求（Task &#x2F; Session）</strong></p>
+<ul>
+<li>谁在什么时候发起？（user&#x2F;tenant&#x2F;channel）</li>
+<li>目标是什么？（intent &#x2F; task_type）</li>
+<li>输出质量如何？（用户反馈&#x2F;点赞&#x2F;人工验收结果）</li>
+</ul>
+</li>
+<li><p><strong>上下文构建（Context Assembly）</strong></p>
+<ul>
+<li>Prompt 模板版本、变量填充结果、裁剪&#x2F;压缩策略是否触发</li>
+<li>安全净化（PII 脱敏、注入过滤）是否触发</li>
+</ul>
+</li>
+<li><p><strong>检索与知识（Retrieval &#x2F; RAG）</strong></p>
+<ul>
+<li>query 生成、向量检索&#x2F;关键词检索、重排（rerank）</li>
+<li>命中文档列表、分数分布、权限过滤是否生效</li>
+<li>新鲜度与一致性：索引版本、数据更新时间</li>
+</ul>
+</li>
+<li><p><strong>工具调用（Tools &#x2F; Actions）</strong></p>
+<ul>
+<li>调了哪个工具？参数是什么（需脱敏）？调用耗时&#x2F;失败率&#x2F;重试次数</li>
+<li>外部依赖（支付、CRM、工单等）返回的错误类型与频率</li>
+</ul>
+</li>
+<li><p><strong>模型推理（Model Inference）</strong></p>
+<ul>
+<li>使用的模型&#x2F;版本、输入&#x2F;输出 token、延迟、拒答&#x2F;安全拦截</li>
+<li>采样参数（temperature 等）或路由策略（为什么选这个模型）</li>
+</ul>
+</li>
+<li><p><strong>策略与护栏（Policy &#x2F; Guardrails）</strong></p>
+<ul>
+<li>是否触发：内容安全、工具权限、预算阈值、降级路径</li>
+<li>触发后做了什么动作：改写 Prompt、重试、切小模型、转人工</li>
+</ul>
+</li>
+</ol>
+<p>把这 6 类对象完整串起来，你才能真正回答：“一次任务的成本、延迟、质量、风险，分别由哪个环节贡献”。</p>
+<h1><span id="3-trace-mo-xing-ba-yi-ci-agent-ren-wu-chai-cheng-span-shu">3. Trace 模型：把一次 Agent 任务拆成 Span 树</span><a href="#3-trace-mo-xing-ba-yi-ci-agent-ren-wu-chai-cheng-span-shu" class="header-anchor">#</a></h1><p>最实用的做法是把 Agent 任务视作一次分布式调用链：<strong>一个 root span + 多个子 span</strong>。你不需要追求一开始就“完全标准化”，但要保证三件事：</p>
+<ol>
+<li><strong>能串起来</strong>：同一次任务的所有步骤可关联（trace_id + session_id）  </li>
+<li><strong>能聚合</strong>：关键字段可用于分组统计（模型名、工具名、tenant、task_type）  </li>
+<li><strong>能回放</strong>：必要上下文可在脱敏后重建（Prompt 版本、检索结果引用、工具调用摘要）</li>
+</ol>
+<p>下面是一个典型的 Trace 结构（纯文本示意）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">agent.run (root)</span><br><span class="line">├── prompt.render</span><br><span class="line">├── guardrail.input_sanitize</span><br><span class="line">├── retrieval.query_generate</span><br><span class="line">├── retrieval.search</span><br><span class="line">├── retrieval.rerank</span><br><span class="line">├── model.infer (planner)</span><br><span class="line">├── tool.call (jira.createTicket)</span><br><span class="line">├── tool.call (payments.refund)</span><br><span class="line">├── model.infer (final)</span><br><span class="line">└── guardrail.output_filter</span><br></pre></td></tr></table></figure>
+
+<h2><span id="3-1-jian-yi-de-span-shu-xing-shi-li">3.1 建议的 Span 属性（示例）</span><a href="#3-1-jian-yi-de-span-shu-xing-shi-li" class="header-anchor">#</a></h2><p>为了后续能统计“谁最慢、谁最贵、谁最不稳定”，每类 span 至少要有一组可聚合字段。示例（仅示意，字段名可按你团队规范调整）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;trace_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;session_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tenant_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;acme&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;task_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;support_ticket&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;span.kind&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INTERNAL&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;component&quot;</span><span class="punctuation">:</span> <span class="string">&quot;agent&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;step&quot;</span><span class="punctuation">:</span> <span class="string">&quot;model.infer&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;model.name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;model.version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;…&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tokens.input&quot;</span><span class="punctuation">:</span> <span class="number">1234</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tokens.output&quot;</span><span class="punctuation">:</span> <span class="number">456</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;cost.usd&quot;</span><span class="punctuation">:</span> <span class="number">0.0123</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;latency.ms&quot;</span><span class="punctuation">:</span> <span class="number">850</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;retry.count&quot;</span><span class="punctuation">:</span> <span class="number">1</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;policy.downgraded&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>关键点：<strong>把“成本与质量”也当作一等公民</strong>。Agent 不是纯计算服务，它是“质量&#x2F;成本&#x2F;风险”的权衡机器；只看延迟会误导你。</p>
+<h2><span id="3-2-zhui-zong-shi-me-bu-zhui-zong-shi-me">3.2 追踪什么，不追踪什么</span><a href="#3-2-zhui-zong-shi-me-bu-zhui-zong-shi-me" class="header-anchor">#</a></h2><p>可观测性不是“把一切都记录下来”。建议给出明确的分级策略：</p>
+<ul>
+<li>必追踪：span 时间线、模型&#x2F;工具&#x2F;检索的聚合字段、错误码与重试  </li>
+<li>可采样：Prompt 渲染结果、检索命中文档片段、工具入参&#x2F;出参摘要  </li>
+<li>禁止落盘：原始 PII、密钥、完整业务数据、未经授权的用户输入原文（或需严格脱敏&#x2F;加密&#x2F;访问控制）</li>
+</ul>
+<p>这类策略建议与安全团队对齐，并结合风险框架执行（可参考 NIST AI RMF 与 OWASP LLM Top 10 的治理思路）。</p>
+<h1><span id="4-zhi-biao-metrics-ba-slo-cheng-ben-zhi-liang-lian-dao-tong-yi-zhang-biao">4. 指标（Metrics）：把 SLO、成本、质量联到同一张表</span><a href="#4-zhi-biao-metrics-ba-slo-cheng-ben-zhi-liang-lian-dao-tong-yi-zhang-biao" class="header-anchor">#</a></h1><p>追踪解决“单次请求的因果链”，指标解决“整体趋势与告警”。对 Agent 系统来说，建议至少落地四组核心指标：</p>
+<ol>
+<li><p><strong>延迟与可靠性</strong></p>
+<ul>
+<li>端到端延迟 P50&#x2F;P95&#x2F;P99</li>
+<li>任务成功率（含“输出合格”与“动作执行成功”的区分）</li>
+<li>工具调用失败率&#x2F;重试率</li>
+</ul>
+</li>
+<li><p><strong>成本与资源</strong></p>
+<ul>
+<li>token 输入&#x2F;输出分布、单位任务成本</li>
+<li>检索成本（向量检索 QPS、重排开销）、外部 API 成本</li>
+<li>缓存命中率与节省量</li>
+</ul>
+</li>
+<li><p><strong>质量（可以从“弱监督”开始）</strong></p>
+<ul>
+<li>用户反馈（👍&#x2F;👎）、人工抽检通过率</li>
+<li>事实性错误率（基于抽样审核或 Evals）</li>
+<li>引用覆盖率（有多少回答带引用&#x2F;证据链）</li>
+</ul>
+</li>
+<li><p><strong>风险与护栏</strong></p>
+<ul>
+<li>安全拦截率（输入&#x2F;输出）</li>
+<li>越权工具调用拦截次数</li>
+<li>触发降级&#x2F;转人工的比例与恢复时间</li>
+</ul>
+</li>
+</ol>
+<p>把这些指标和 trace 的维度字段打通，你就能回答：“某租户的成本上升，是因为工具失败重试，还是因为 RAG 命中变差导致多轮推理？”</p>
+<h1><span id="5-ri-zhi-yu-shen-ji-logs-ke-hui-fang-ke-zhui-ze-ke-tuo-min">5. 日志与审计（Logs）：可回放、可追责、可脱敏</span><a href="#5-ri-zhi-yu-shen-ji-logs-ke-hui-fang-ke-zhui-ze-ke-tuo-min" class="header-anchor">#</a></h1><p>Agent 系统的日志最好分成两层：</p>
+<ol>
+<li><strong>运行日志（运维视角）</strong>：错误栈、超时、依赖故障、重试、配额触发  </li>
+<li><strong>决策日志（产品&#x2F;治理视角）</strong>：为什么选这个工具&#x2F;模型？为什么拒答&#x2F;降级？为什么触发某条策略？</li>
+</ol>
+<p>强烈建议给“决策日志”一个结构化格式，并与 trace_id 绑定。一个可落地的最小字段集合：</p>
+<ul>
+<li>trace_id &#x2F; session_id &#x2F; tenant_id &#x2F; task_type</li>
+<li>planner 输出摘要（脱敏后）</li>
+<li>工具选择理由（规则命中 &#x2F; 模型判断 &#x2F; 人工输入）</li>
+<li>Guardrail 命中项（哪条规则、证据是什么、采取了什么动作）</li>
+<li>重要版本号：prompt_version &#x2F; policy_version &#x2F; tool_schema_version</li>
+</ul>
+<p>有了这些字段，你的复盘会从“讨论观点”变成“对齐事实”。</p>
+<h1><span id="6-zui-xiao-luo-di-fang-an-mvp-yi-zhou-nei-ba-hei-xiang-da-kai">6. 最小落地方案（MVP）：一周内把黑箱打开</span><a href="#6-zui-xiao-luo-di-fang-an-mvp-yi-zhou-nei-ba-hei-xiang-da-kai" class="header-anchor">#</a></h1><p>如果你要从 0 到 1 落地，建议先做 MVP，而不是一口气建“全功能 Agent 平台”。一周内可以完成的 MVP 目标是：</p>
+<ol>
+<li><strong>每次任务都有 trace_id</strong>，并能看到基本的 span 树  </li>
+<li><strong>模型&#x2F;工具&#x2F;检索三类 span 可聚合统计</strong>（谁最慢、谁最贵、谁最常失败）  </li>
+<li><strong>能回放关键路径</strong>（至少能复现“用了哪些 Prompt 版本 + 命中了哪些文档 + 调了哪些工具”）</li>
+</ol>
+<p>Checklist（像测试一样可验收）：</p>
+<ul>
+<li><input disabled type="checkbox"> 每次 agent.run 都记录：tenant_id、task_type、最终状态（success&#x2F;failed&#x2F;downgraded&#x2F;handoff）</li>
+<li><input disabled type="checkbox"> 每个 tool.call 都有：tool.name、latency、status_code、retry.count（入参&#x2F;出参按策略脱敏）</li>
+<li><input disabled type="checkbox"> 每个 model.infer 都有：model.name、tokens.input&#x2F;output、latency、cost（若可得）</li>
+<li><input disabled type="checkbox"> retrieval.search 有：index_version、top_k、命中数量、过滤数量（权限）</li>
+<li><input disabled type="checkbox"> guardrail 命中可追踪：rule_id、action、severity</li>
+</ul>
+<h1><span id="7-jie-yu-xia-yi-pian-hui-xie-shi-me">7. 结语：下一篇会写什么</span><a href="#7-jie-yu-xia-yi-pian-hui-xie-shi-me" class="header-anchor">#</a></h1><p>本文把 Agent 可观测性拆成了“对象清单 + Trace&#x2F;Metric&#x2F;Log 的统一模型”，核心目标只有一个：<strong>让 Agent 任务从黑箱变成可解释的流水线</strong>。</p>
+<p>下一篇（落地篇）我会把这套模型进一步具体化：如何在不引入过多平台复杂度的前提下，用 OpenTelemetry 的思路把埋点、看板、告警、回放跑起来，并给出一套“从 0 到可用”的工程步骤与常见坑清单。</p>
+<h1><span id="can-kao-zi-liao">参考资料</span><a href="#can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>OpenTelemetry 官方文档：<a target="_blank" rel="noopener" href="https://opentelemetry.io/docs/">https://opentelemetry.io/docs/</a>  </li>
+<li>OWASP Top 10 for LLM Applications：<a target="_blank" rel="noopener" href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">https://owasp.org/www-project-top-10-for-large-language-model-applications/</a>  </li>
+<li>NIST AI Risk Management Framework：<a target="_blank" rel="noopener" href="https://www.nist.gov/itl/ai-risk-management-framework">https://www.nist.gov/itl/ai-risk-management-framework</a>  </li>
+<li>Kubernetes 文档（用于理解分布式链路与可观测实践背景）：<a target="_blank" rel="noopener" href="https://kubernetes.io/docs/">https://kubernetes.io/docs/</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-01-21</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/en/agentops-observability-part-1/" title="Agent Observability (AgentOps) Part 1/3: Turn Prompts, Tools, and Memory into Traces">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/en/mcp-agent-interface/" title="MCP: Connecting Agents to Tools and Data—Safely">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>
