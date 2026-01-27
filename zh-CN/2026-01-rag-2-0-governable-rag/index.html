@@ -1,0 +1,321 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>RAG 2.0：从向量检索到“结构化知识 + 图谱 + 权限治理” · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+1. 为什么“向量 + LLM”还不够：RAG 1.0 的常见失效点
+2. RAG 2.0 的定义：把检索当作“可治理的数据系统”
+3. 统一检索管道：Retrieve &amp;#x2F; Filter &amp;#x2F; Rerank &amp;#x2F; Ground
+3.1 Retrieve："><link rel="canonical" href="https://imchenway.com/zh-CN/2026-01-rag-2-0-governable-rag/"><link rel="alternate" hreflang="en" href="https://imchenway.com/en/rag-2-0-governable-rag/"><link rel="alternate" hreflang="zh-CN" href="https://imchenway.com/zh-CN/2026-01-rag-2-0-governable-rag/"><link rel="alternate" hreflang="x-default" href="https://imchenway.com/zh-CN/2026-01-rag-2-0-governable-rag/"><meta property="og:type" content="article"><meta property="og:title" content="RAG 2.0：从向量检索到“结构化知识 + 图谱 + 权限治理”"><meta property="og:description" content="本文目录# 1. 为什么“向量 + LLM”还不够：RAG 1.0 的常见失效点 2. RAG 2.0 的定义：把检索当作“可治理的数据系统” 3. 统一检索管道：Retrieve &amp;#x2F; Filter &amp;#x2F; Rerank &amp;#x2F; Ground 3.1 Retrieve：候选召回（多路并行，而非单点"><meta property="og:url" content="https://imchenway.com/zh-CN/2026-01-rag-2-0-governable-rag/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="RAG 2.0：从向量检索到“结构化知识 + 图谱 + 权限治理”"><meta name="twitter:description" content="本文目录# 1. 为什么“向量 + LLM”还不够：RAG 1.0 的常见失效点 2. RAG 2.0 的定义：把检索当作“可治理的数据系统” 3. 统一检索管道：Retrieve &amp;#x2F; Filter &amp;#x2F; Rerank &amp;#x2F; Ground 3.1 Retrieve：候选召回（多路并行，而非单点"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/rag-2-0-governable-rag/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>RAG 2.0：从向量检索到“结构化知识 + 图谱 + 权限治理”</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#1-wei-shi-me-xiang-liang-llm-huan-bu-gou-rag-1-0-de-chang-jian-shi-xiao-dian">1. 为什么“向量 + LLM”还不够：RAG 1.0 的常见失效点</a></li>
+<li><a href="#2-rag-2-0-de-ding-yi-ba-jian-suo-dang-zuo-ke-zhi-li-de-shu-ju-xi-tong">2. RAG 2.0 的定义：把检索当作“可治理的数据系统”</a></li>
+<li><a href="#3-tong-yi-jian-suo-guan-dao-retrieve-filter-rerank-ground">3. 统一检索管道：Retrieve &#x2F; Filter &#x2F; Rerank &#x2F; Ground</a><ul>
+<li><a href="#3-1-retrieve-hou-xuan-zhao-hui-duo-lu-bing-xing-er-fei-dan-dian-yi-lai">3.1 Retrieve：候选召回（多路并行，而非单点依赖）</a></li>
+<li><a href="#3-2-filter-quan-xian-yu-ce-lue-guo-lu-yue-zao-yue-hao">3.2 Filter：权限与策略过滤（越早越好）</a></li>
+<li><a href="#3-3-rerank-chong-pai-yu-yu-suan-kong-zhi-ba-xiang-guan-bian-ke-yong">3.3 Rerank：重排与预算控制（把“相关”变“可用”）</a></li>
+<li><a href="#3-4-ground-hui-da-bi-xu-dai-zheng-ju-yin-yong-ke-hui-fang">3.4 Ground：回答必须带证据（引用 + 可回放）</a></li>
+</ul>
+</li>
+<li><a href="#4-hun-he-jian-suo-bm25-xiang-liang-sql-ge-guan-yi-duan-lu">4. 混合检索：BM25、向量、SQL 各管一段路</a></li>
+<li><a href="#5-xin-xian-du-yu-yi-zhi-xing-cdc-suo-yin-ban-ben-yu-hui-gun">5. 新鲜度与一致性：CDC、索引版本与回滚</a><ul>
+<li><a href="#5-1-ba-suo-yin-dang-zuo-ke-ban-ben-hua-de-shu-ju-chan-wu">5.1 把索引当作“可版本化的数据产物”</a></li>
+<li><a href="#5-2-yong-cdc-ba-bian-geng-bian-cheng-zeng-liang-suo-yin">5.2 用 CDC 把“变更”变成“增量索引”</a></li>
+</ul>
+</li>
+<li><a href="#6-quan-xian-yu-duo-zu-hu-bie-ba-guo-lu-dang-cheng-jian-quan">6. 权限与多租户：别把“过滤”当成“鉴权”</a><ul>
+<li><a href="#6-1-quan-xian-yao-zai-jian-suo-ceng-ke-biao-da">6.1 权限要在检索层可表达</a></li>
+<li><a href="#6-2-quan-xian-bu-jin-shi-kan-bu-kan-huan-bao-gua-neng-bu-neng-bei-tui-duan">6.2 权限不仅是“看不看”，还包括“能不能被推断”</a></li>
+</ul>
+</li>
+<li><a href="#7-jie-gou-hua-zhi-shi-yu-tu-pu-shi-me-shi-hou-zhi-de-shang-tu">7. 结构化知识与图谱：什么时候值得“上图”</a></li>
+<li><a href="#8-ke-xin-hui-da-yin-yong-zhi-xin-du-yu-ju-da-yong-hu-ti-yan-de-yi-bu-fen">8. 可信回答：引用、置信度与拒答（用户体验的一部分）</a><ul>
+<li><a href="#8-1-yin-yong-citations-shi-zui-di-cheng-ben-de-ke-xin-du-gang-gan">8.1 引用（Citations）是最低成本的可信度杠杆</a></li>
+<li><a href="#8-2-zhi-xin-du-yu-ju-da-rang-xi-tong-zhi-dao-zi-ji-bu-zhi-dao">8.2 置信度与拒答：让系统知道“自己不知道”</a></li>
+</ul>
+</li>
+<li><a href="#9-mvp-luo-di-lu-xian-tu-jian-yi-an-jie-duan-jiao-fu">9. MVP 落地路线图（建议按阶段交付）</a></li>
+<li><a href="#10-can-kao-zi-liao">10. 参考资料</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="1-wei-shi-me-xiang-liang-llm-huan-bu-gou-rag-1-0-de-chang-jian-shi-xiao-dian">1. 为什么“向量 + LLM”还不够：RAG 1.0 的常见失效点</span><a href="#1-wei-shi-me-xiang-liang-llm-huan-bu-gou-rag-1-0-de-chang-jian-shi-xiao-dian" class="header-anchor">#</a></h1><p>很多团队第一次做 RAG（Retrieval‑Augmented Generation）时，会走一条最短路径：</p>
+<ol>
+<li>把文档切块、做向量；  </li>
+<li>用户提问 → 向量检索 TopK；  </li>
+<li>把检索结果塞进上下文，让模型回答。</li>
+</ol>
+<p>这条路能快速出 demo，但上生产后会反复踩同一类坑——不是模型不聪明，而是“检索与数据治理”没被当作系统来设计。最常见的失效点包括：</p>
+<ul>
+<li><strong>命中不了“关键字&#x2F;编号&#x2F;专有名词”</strong>：像“错误码 E1234”“工单 INC‑20391”“服务名 billing‑api”这种问题，语义向量不一定比传统关键词检索（如 BM25）更可靠。[1][2]</li>
+<li><strong>答对语义但答错事实</strong>：向量召回的块“看起来相关”，但缺少关键表格&#x2F;结构化字段（时间、版本、阈值、责任人），模型只能补全想象。</li>
+<li><strong>新鲜度不可控</strong>：文档更新了，索引没跟上；或者索引更新了，但你无法确认“答案基于哪一版数据”，导致线上纠错成本极高。[5]</li>
+<li><strong>权限与多租户漏洞</strong>：如果检索层没有权限语义，最糟糕的不是“答错”，而是<strong>把不该看的内容喂给模型</strong>（随后再怎么“输出过滤”都晚了）。[4]</li>
+<li><strong>不可解释、不可复盘</strong>：用户问“你依据什么？”你只能说“模型这么说”。没有引用、没有可追溯的检索链路，就没有可信度，也没有回归测试的抓手。</li>
+</ul>
+<p>把这些问题合起来，你会发现：RAG 的核心挑战不是“把文档喂给模型”，而是“让知识在工程上可检索、可治理、可追责”。</p>
+<h1><span id="2-rag-2-0-de-ding-yi-ba-jian-suo-dang-zuo-ke-zhi-li-de-shu-ju-xi-tong">2. RAG 2.0 的定义：把检索当作“可治理的数据系统”</span><a href="#2-rag-2-0-de-ding-yi-ba-jian-suo-dang-zuo-ke-zhi-li-de-shu-ju-xi-tong" class="header-anchor">#</a></h1><p>我把“RAG 2.0”总结成一句话：<strong>检索不只是一个向量搜索，而是一条可观测、可演进、可审计的检索管道</strong>。它的目标不是“偶尔答得惊艳”，而是长期稳定地满足这四个指标：</p>
+<ol>
+<li><strong>正确性</strong>：回答必须被证据支撑（grounded），并能给出可核验的引用；  </li>
+<li><strong>新鲜度</strong>：能说明答案依赖的数据版本&#x2F;时间，并控制索引延迟；  </li>
+<li><strong>安全性</strong>：权限与隔离在检索层生效，避免越权证据进入上下文；  </li>
+<li><strong>可运营性</strong>：可以监控、复盘、回放、回归测试，支持灰度与回滚。</li>
+</ol>
+<p>一个实用的心智模型是把 RAG 拆成四步（每一步都可以被度量、被治理）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">用户问题</span><br><span class="line">  -&gt; 候选召回（BM25 / 向量 / SQL / 图谱）</span><br><span class="line">  -&gt; 权限与策略过滤（tenant/role/ACL/敏感级别）</span><br><span class="line">  -&gt; 重排与上下文打包（rerank + 去重 + 去噪 + 预算控制）</span><br><span class="line">  -&gt; 生成回答（带引用 / 置信度 / 拒答与追问）</span><br></pre></td></tr></table></figure>
+
+<h1><span id="3-tong-yi-jian-suo-guan-dao-retrieve-x2f-filter-x2f-rerank-x2f-ground">3. 统一检索管道：Retrieve &#x2F; Filter &#x2F; Rerank &#x2F; Ground</span><a href="#3-tong-yi-jian-suo-guan-dao-retrieve-x2f-filter-x2f-rerank-x2f-ground" class="header-anchor">#</a></h1><p>RAG 2.0 的关键不是“选哪个向量库”，而是把管道结构固定下来，让能力可以逐层演进。</p>
+<h2><span id="3-1-retrieve-hou-xuan-zhao-hui-duo-lu-bing-xing-er-fei-dan-dian-yi-lai">3.1 Retrieve：候选召回（多路并行，而非单点依赖）</span><a href="#3-1-retrieve-hou-xuan-zhao-hui-duo-lu-bing-xing-er-fei-dan-dian-yi-lai" class="header-anchor">#</a></h2><p>建议把“候选召回”视作多路并行，典型组合是：</p>
+<ul>
+<li><strong>BM25（关键词&#x2F;倒排）</strong>：处理专有名词、编号、精确匹配、短 query；Lucene&#x2F;Elasticsearch 是最成熟的工程实现。[1][2]</li>
+<li><strong>向量检索</strong>：处理同义改写、口语化表达、跨语言；pgvector 等提供了把向量能力落在数据库里的路径。[3]</li>
+<li><strong>SQL&#x2F;结构化查询</strong>：处理“事实性字段”的精确读取（订单状态、SLA 阈值、配置开关、负责人映射）。</li>
+<li><strong>图谱&#x2F;关系查询（可选）</strong>：处理“关系链”问题（依赖、归属、影响面），在特定场景下比“文本块”更可靠。[6]</li>
+</ul>
+<h2><span id="3-2-filter-quan-xian-yu-ce-lue-guo-lu-yue-zao-yue-hao">3.2 Filter：权限与策略过滤（越早越好）</span><a href="#3-2-filter-quan-xian-yu-ce-lue-guo-lu-yue-zao-yue-hao" class="header-anchor">#</a></h2><p>过滤不只是“把结果列表删一删”，而是要保证两件事：</p>
+<ol>
+<li><strong>越权证据不会进入上下文</strong>：模型看见就可能复述。  </li>
+<li><strong>过滤规则可解释、可审计</strong>：知道“为什么这条证据可用&#x2F;不可用”。</li>
+</ol>
+<p>实践上，你可以把“Filter”拆成三类规则：</p>
+<ul>
+<li><strong>鉴权&#x2F;权限</strong>：tenant、role、ACL、行级权限（RLS）等；最好在数据源层或检索层就做掉。[4]</li>
+<li><strong>安全策略</strong>：敏感级别（PII、密钥、合同条款）、合规区域（地域&#x2F;数据驻留）。</li>
+<li><strong>业务策略</strong>：只允许某些数据源、只取最新版本、只取已发布文档等。</li>
+</ul>
+<h2><span id="3-3-rerank-chong-pai-yu-yu-suan-kong-zhi-ba-xiang-guan-bian-ke-yong">3.3 Rerank：重排与预算控制（把“相关”变“可用”）</span><a href="#3-3-rerank-chong-pai-yu-yu-suan-kong-zhi-ba-xiang-guan-bian-ke-yong" class="header-anchor">#</a></h2><p>候选集里“相关”不等于“可用”。重排阶段建议显式做三件事：</p>
+<ul>
+<li><strong>去重与聚合</strong>：同一文档多 chunk 命中时，合并成“文档级证据包”（便于引用）。  </li>
+<li><strong>去噪与裁剪</strong>：把“背景介绍”类内容降权，把“结论&#x2F;规则&#x2F;阈值&#x2F;步骤”类内容升权。  </li>
+<li><strong>预算控制</strong>：固定 token 预算，优先保留高置信证据；把“更多内容”变成链接而不是塞进上下文。</li>
+</ul>
+<h2><span id="3-4-ground-hui-da-bi-xu-dai-zheng-ju-yin-yong-ke-hui-fang">3.4 Ground：回答必须带证据（引用 + 可回放）</span><a href="#3-4-ground-hui-da-bi-xu-dai-zheng-ju-yin-yong-ke-hui-fang" class="header-anchor">#</a></h2><p>最低标准建议做到：</p>
+<ul>
+<li>回答中的关键结论能对应到 1–3 个引用来源（标题&#x2F;链接&#x2F;段落摘要）；</li>
+<li>记录本次检索的关键元数据：<code>query</code>、<code>index_version</code>、<code>doc_ids</code>、<code>scores</code>、过滤原因、最终上下文摘要；</li>
+<li>允许“回放”：当用户质疑或线上出错时，你能复现当时的证据集与决策链。</li>
+</ul>
+<h1><span id="4-hun-he-jian-suo-bm25-xiang-liang-sql-ge-guan-yi-duan-lu">4. 混合检索：BM25、向量、SQL 各管一段路</span><a href="#4-hun-he-jian-suo-bm25-xiang-liang-sql-ge-guan-yi-duan-lu" class="header-anchor">#</a></h1><p>把“检索”拆成不同类型的证据通道，往往比在一个向量库里硬凹更稳。</p>
+<p>下面是一个可落地的分工表（不是标准答案，但很少出错）：</p>
+<table>
+<thead>
+<tr>
+<th>问题类型</th>
+<th>主通道</th>
+<th>辅通道</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>专有名词&#x2F;编号&#x2F;报错信息（如 E1234、INC‑20391）</td>
+<td>BM25</td>
+<td>向量</td>
+<td>先命中精确 token，再用向量补同义。BM25 的工程实现成熟。[1][2]</td>
+</tr>
+<tr>
+<td>口语化&#x2F;同义改写（“怎么把告警静音？”）</td>
+<td>向量</td>
+<td>BM25</td>
+<td>向量负责语义，BM25 用于补关键字约束。</td>
+</tr>
+<tr>
+<td>强结构化事实（状态、时间、阈值、负责人）</td>
+<td>SQL</td>
+<td>BM25&#x2F;向量</td>
+<td>结构化字段尽量别让模型“猜”。</td>
+</tr>
+<tr>
+<td>关系链（“谁依赖谁&#x2F;影响面”）</td>
+<td>图谱&#x2F;CMDB</td>
+<td>文本检索</td>
+<td>关系优先，文本补解释。</td>
+</tr>
+</tbody></table>
+<p>一个经验法则：<strong>能用结构化字段回答的问题，不要用大段文本去逼模型推断。</strong> 这不是“模型能力不行”，而是工程上更便宜、更稳定、更可审计。</p>
+<h1><span id="5-xin-xian-du-yu-yi-zhi-xing-cdc-suo-yin-ban-ben-yu-hui-gun">5. 新鲜度与一致性：CDC、索引版本与回滚</span><a href="#5-xin-xian-du-yu-yi-zhi-xing-cdc-suo-yin-ban-ben-yu-hui-gun" class="header-anchor">#</a></h1><p>RAG 走向生产后，新鲜度往往成为最硬的 SLA：知识更新慢一小时，客服&#x2F;运维就会用脚投票。</p>
+<h2><span id="5-1-ba-suo-yin-dang-zuo-ke-ban-ben-hua-de-shu-ju-chan-wu">5.1 把索引当作“可版本化的数据产物”</span><a href="#5-1-ba-suo-yin-dang-zuo-ke-ban-ben-hua-de-shu-ju-chan-wu" class="header-anchor">#</a></h2><p>建议为每次索引构建&#x2F;增量更新生成一个可追踪的版本标识，例如：</p>
+<ul>
+<li><code>index_version</code>（时间戳或递增版本）</li>
+<li><code>watermark</code>（数据源最新同步位点）</li>
+<li><code>source_updated_at</code>（文档最后更新时间）</li>
+</ul>
+<p>当用户看到错误答案时，你至少能回答两个问题：</p>
+<ol>
+<li>当时系统用的是哪一版索引？  </li>
+<li>这条证据来自哪个数据源、何时更新？</li>
+</ol>
+<h2><span id="5-2-yong-cdc-ba-bian-geng-bian-cheng-zeng-liang-suo-yin">5.2 用 CDC 把“变更”变成“增量索引”</span><a href="#5-2-yong-cdc-ba-bian-geng-bian-cheng-zeng-liang-suo-yin" class="header-anchor">#</a></h2><p>当知识来自数据库&#x2F;业务系统时，CDC（Change Data Capture）通常是更稳的增量路径。Debezium 等工具提供了以日志方式捕获变更并驱动下游索引的工程方案。[5]</p>
+<p>你不一定要“一开始就全量 CDC”，但至少要规划：</p>
+<ul>
+<li>新增&#x2F;更新&#x2F;删除如何反映到索引；</li>
+<li>失败如何重试、如何幂等；</li>
+<li>发生数据污染时，如何回滚到上一个可信版本（索引回滚比“删库重建”要现实得多）。</li>
+</ul>
+<h1><span id="6-quan-xian-yu-duo-zu-hu-bie-ba-guo-lu-dang-cheng-jian-quan">6. 权限与多租户：别把“过滤”当成“鉴权”</span><a href="#6-quan-xian-yu-duo-zu-hu-bie-ba-guo-lu-dang-cheng-jian-quan" class="header-anchor">#</a></h1><p>RAG 的权限问题经常被低估：很多团队把权限当作“检索后过滤”，但这在工程上并不等价于“安全”。</p>
+<h2><span id="6-1-quan-xian-yao-zai-jian-suo-ceng-ke-biao-da">6.1 权限要在检索层可表达</span><a href="#6-1-quan-xian-yao-zai-jian-suo-ceng-ke-biao-da" class="header-anchor">#</a></h2><p>常见的可落地做法有三类（按隔离强度从强到弱）：</p>
+<ol>
+<li><strong>物理隔离</strong>：每租户独立索引&#x2F;库；成本高但最直观。  </li>
+<li><strong>逻辑隔离 + 强约束</strong>：同一索引内带 <code>tenant_id/acl_tags</code>，并在检索查询时做强制过滤（而不是拿到结果再过滤）。  </li>
+<li><strong>数据源层行级权限（RLS）</strong>：把权限交给数据库执行，检索层只拿“已授权的结果”。PostgreSQL 的 Row Level Security 提供了明确的机制来表达这类约束。[4]</li>
+</ol>
+<h2><span id="6-2-quan-xian-bu-jin-shi-kan-bu-kan-huan-bao-gua-neng-bu-neng-bei-tui-duan">6.2 权限不仅是“看不看”，还包括“能不能被推断”</span><a href="#6-2-quan-xian-bu-jin-shi-kan-bu-kan-huan-bao-gua-neng-bu-neng-bei-tui-duan" class="header-anchor">#</a></h2><p>即使最终结果被过滤，某些系统仍可能泄露侧信道信息（例如命中数、相似度分布、错误提示差异）。这也是为什么许多安全基线强调：把“策略与证据链”做成可审计、可复盘的系统工程，而不是零散的补丁。[7][8]</p>
+<h1><span id="7-jie-gou-hua-zhi-shi-yu-tu-pu-shi-me-shi-hou-zhi-de-shang-tu">7. 结构化知识与图谱：什么时候值得“上图”</span><a href="#7-jie-gou-hua-zhi-shi-yu-tu-pu-shi-me-shi-hou-zhi-de-shang-tu" class="header-anchor">#</a></h1><p>“上知识图谱”经常被当作 RAG 的银弹，但图谱真正擅长的是<strong>关系</strong>，而不是大段事实文本。它适合的典型场景：</p>
+<ul>
+<li>依赖关系（服务 → 依赖 → 下游 → 风险扩散）</li>
+<li>归属关系（服务&#x2F;组件 → owning team&#x2F;oncall）</li>
+<li>版本关系（组件 → 版本 → 变更记录 → 兼容性）</li>
+</ul>
+<p>图谱不适合的场景也很明确：</p>
+<ul>
+<li>你缺少稳定的实体&#x2F;关系抽取与维护流程；</li>
+<li>你的问题本质上是“从文档里找一段规则&#x2F;步骤”，倒排 + 向量足够；</li>
+<li>你想用图谱替代权限系统（通常会变成新的权限地狱）。</li>
+</ul>
+<p>如果要引入图谱，建议把它当作“证据通道之一”，和 BM25&#x2F;向量&#x2F;SQL 一样走同一套管道与引用输出。Neo4j 文档可作为图数据建模与查询的权威入口。[6]</p>
+<h1><span id="8-ke-xin-hui-da-yin-yong-zhi-xin-du-yu-ju-da-yong-hu-ti-yan-de-yi-bu-fen">8. 可信回答：引用、置信度与拒答（用户体验的一部分）</span><a href="#8-ke-xin-hui-da-yin-yong-zhi-xin-du-yu-ju-da-yong-hu-ti-yan-de-yi-bu-fen" class="header-anchor">#</a></h1><p>RAG 的终点不是“回答一段话”，而是“让用户敢用、敢依赖”。</p>
+<h2><span id="8-1-yin-yong-citations-shi-zui-di-cheng-ben-de-ke-xin-du-gang-gan">8.1 引用（Citations）是最低成本的可信度杠杆</span><a href="#8-1-yin-yong-citations-shi-zui-di-cheng-ben-de-ke-xin-du-gang-gan" class="header-anchor">#</a></h2><p>建议引用至少包含：</p>
+<ul>
+<li>证据来源（文档&#x2F;工单&#x2F;配置项&#x2F;表记录）</li>
+<li>标题&#x2F;标识（便于人工核对）</li>
+<li>可点击链接或可定位字段</li>
+<li>证据摘要（不要把整段敏感内容原样输出）</li>
+</ul>
+<h2><span id="8-2-zhi-xin-du-yu-ju-da-rang-xi-tong-zhi-dao-zi-ji-bu-zhi-dao">8.2 置信度与拒答：让系统知道“自己不知道”</span><a href="#8-2-zhi-xin-du-yu-ju-da-rang-xi-tong-zhi-dao-zi-ji-bu-zhi-dao" class="header-anchor">#</a></h2><p>你不需要一开始就做复杂的概率校准，也可以用工程启发式做第一版：</p>
+<ul>
+<li>Top1 与 TopK 的分差过小 → 可能语义不清，先追问澄清；</li>
+<li>命中证据过少&#x2F;证据互相矛盾 → 触发“谨慎模式”（列出证据差异、提示不确定）；</li>
+<li>权限过滤后结果为空 → 明确提示“无可用证据”而不是编造答案。</li>
+</ul>
+<h1><span id="9-mvp-luo-di-lu-xian-tu-jian-yi-an-jie-duan-jiao-fu">9. MVP 落地路线图（建议按阶段交付）</span><a href="#9-mvp-luo-di-lu-xian-tu-jian-yi-an-jie-duan-jiao-fu" class="header-anchor">#</a></h1><p>如果你要把 RAG 2.0 真正落到团队可复用的能力里，一个更现实的推进方式是“先稳再全”：</p>
+<ol>
+<li><strong>MVP（1–2 周）</strong>：混合召回（BM25 + 向量）+ 引用输出 + 基础日志（记录 doc_ids、scores、index_version）  </li>
+<li><strong>权限版本（2–4 周）</strong>：权限在检索层强制表达；补齐审计字段与越权防线（目标：越权证据进入上下文 &#x3D; 0）[4]  </li>
+<li><strong>新鲜度版本（4–8 周）</strong>：增量更新&#x2F;CDC、索引版本化、回滚机制（目标：索引延迟可量化、可告警）[5]  </li>
+<li><strong>质量闭环（持续）</strong>：离线评测集 + 线上回放回归；把“引用命中率&#x2F;事实正确率&#x2F;拒答率&#x2F;成本”纳入看板  </li>
+<li><strong>图谱增强（按需）</strong>：只为关系类问题引入，避免“为了上图而上图”[6]</li>
+</ol>
+<p>最后给一个面向测试&#x2F;验收的最小 Checklist（可直接放进评审）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">✅ RAG 2.0 最小验收清单（建议）</span><br><span class="line">- 回答必须带引用（可定位到文档/记录）</span><br><span class="line">- 记录并可回放：query、doc_ids、scores、index_version、过滤原因</span><br><span class="line">- 权限在检索层强制生效（越权证据不会进入上下文）</span><br><span class="line">- 索引新鲜度可量化（同步位点/延迟指标）并支持回滚</span><br><span class="line">- 当证据不足时可追问/拒答，而不是编造</span><br></pre></td></tr></table></figure>
+
+<h1><span id="10-can-kao-zi-liao">10. 参考资料</span><a href="#10-can-kao-zi-liao" class="header-anchor">#</a></h1><ul>
+<li>[1] Apache Lucene 官方文档：<a target="_blank" rel="noopener" href="https://lucene.apache.org/">https://lucene.apache.org/</a></li>
+<li>[2] Elasticsearch 相似度&#x2F;相关性（含 BM25）：<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-similarity.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-similarity.html</a></li>
+<li>[3] pgvector（PostgreSQL 向量扩展）：<a target="_blank" rel="noopener" href="https://github.com/pgvector/pgvector">https://github.com/pgvector/pgvector</a></li>
+<li>[4] PostgreSQL Row Level Security（行级权限）：<a target="_blank" rel="noopener" href="https://www.postgresql.org/docs/current/ddl-rowsecurity.html">https://www.postgresql.org/docs/current/ddl-rowsecurity.html</a></li>
+<li>[5] Debezium 文档（CDC &#x2F; 变更捕获）：<a target="_blank" rel="noopener" href="https://debezium.io/documentation/">https://debezium.io/documentation/</a></li>
+<li>[6] Neo4j 官方文档（图数据库）：<a target="_blank" rel="noopener" href="https://neo4j.com/docs/">https://neo4j.com/docs/</a></li>
+<li>[7] OWASP Top 10 for LLM Applications：<a target="_blank" rel="noopener" href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">https://owasp.org/www-project-top-10-for-large-language-model-applications/</a></li>
+<li>[8] NIST AI Risk Management Framework：<a target="_blank" rel="noopener" href="https://www.nist.gov/itl/ai-risk-management-framework">https://www.nist.gov/itl/ai-risk-management-framework</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-01-27</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/en/rag-2-0-governable-rag/" title="RAG 2.0: From Vectors to Structured Knowledge, Graphs, and Permission-Aware Retrieval">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/en/agentops-observability-part-1/" title="Agent Observability (AgentOps) Part 1/3: Turn Prompts, Tools, and Memory into Traces">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>
