@@ -1,0 +1,282 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>AI Gateway: Building a Governed Gateway Layer for LLM Calls (Auth, Rate Limits, Caching, Audit) · DavidChan's Blog</title><meta name="description" content="Table of Contents#
+
+
+
+
+Introduction: why “just call the model SDK” stops working at scale
+1. A minimal definition of an AI Gateway
+2. The contract: tu"><link rel="canonical" href="https://imchenway.com/en/ai-gateway-governance/"><link rel="alternate" hreflang="en" href="https://imchenway.com/en/ai-gateway-governance/"><link rel="alternate" hreflang="zh-CN" href="https://imchenway.com/zh-CN/2026-01-ai-gateway-governance/"><link rel="alternate" hreflang="x-default" href="https://imchenway.com/en/ai-gateway-governance/"><meta property="og:type" content="article"><meta property="og:title" content="AI Gateway: Building a Governed Gateway Layer for LLM Calls (Auth, Rate Limits, Caching, Audit)"><meta property="og:description" content="Table of Contents# Introduction: why “just call the model SDK” stops working at scale 1. A minimal definition of an AI Gateway 2. The contract: turning model ca"><meta property="og:url" content="https://imchenway.com/en/ai-gateway-governance/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="AI Gateway: Building a Governed Gateway Layer for LLM Calls (Auth, Rate Limits, Caching, Audit)"><meta name="twitter:description" content="Table of Contents# Introduction: why “just call the model SDK” stops working at scale 1. A minimal definition of an AI Gateway 2. The contract: turning model ca"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/en/">Home</a></li><li><a href="/en/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/en/guestbook">Guestbook</a></li></div><div class="information"><a class="lang-toggle" href="/zh-CN/2026-01-ai-gateway-governance/">中</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>AI Gateway: Building a Governed Gateway Layer for LLM Calls (Auth, Rate Limits, Caching, Audit)</a></h3></div><div class="post-content"><h3><span id="table-of-contents">Table of Contents</span><a href="#table-of-contents" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#introduction-why-just-call-the-model-sdk-stops-working-at-scale">Introduction: why “just call the model SDK” stops working at scale</a></li>
+<li><a href="#1-a-minimal-definition-of-an-ai-gateway">1. A minimal definition of an AI Gateway</a></li>
+<li><a href="#2-the-contract-turning-model-calls-into-an-evolvable-api">2. The contract: turning model calls into an evolvable API</a></li>
+<li><a href="#3-what-the-gateway-should-govern-a-practical-capability-checklist">3. What the gateway should govern (a practical capability checklist)</a><ul>
+<li><a href="#3-1-identity-and-authorization">3.1 Identity and authorization</a></li>
+<li><a href="#3-2-budgets-and-rate-limits-finops-becomes-real-time">3.2 Budgets and rate limits (FinOps becomes real‑time)</a></li>
+<li><a href="#3-3-routing-canarying-and-fallbacks">3.3 Routing, canarying, and fallbacks</a></li>
+<li><a href="#3-4-caching-exact-prompt-caching-vs-semantic-caching">3.4 Caching: exact prompt caching vs semantic caching</a></li>
+<li><a href="#3-5-reliability-timeouts-retries-circuit-breakers-idempotency">3.5 Reliability: timeouts, retries, circuit breakers, idempotency</a></li>
+<li><a href="#3-6-security-and-compliance-redaction-audit-injection-defenses">3.6 Security and compliance: redaction, audit, injection defenses</a></li>
+</ul>
+</li>
+<li><a href="#4-observability-make-each-model-call-a-replayable-span">4. Observability: make each model call a replayable span</a></li>
+<li><a href="#5-deployment-patterns-central-gateway-vs-sidecar-proxy">5. Deployment patterns: central gateway vs sidecar proxy</a><ul>
+<li><a href="#5-1-central-gateway">5.1 Central gateway</a></li>
+<li><a href="#5-2-per-service-sidecar-local-proxy">5.2 Per‑service sidecar &#x2F; local proxy</a></li>
+</ul>
+</li>
+<li><a href="#6-a-safe-rollout-plan-from-shadow-telemetry-to-hard-gates">6. A safe rollout plan: from “shadow telemetry” to hard gates</a></li>
+<li><a href="#7-a-representative-anonymised-scenario-collapsing-cost-chaos-into-operability">7. A representative (anonymised) scenario: collapsing cost chaos into operability</a></li>
+<li><a href="#conclusion-treat-llm-calls-as-a-governed-platform-capability">Conclusion: treat LLM calls as a governed platform capability</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="introduction-why-just-call-the-model-sdk-stops-working-at-scale">Introduction: why “just call the model SDK” stops working at scale</span><a href="#introduction-why-just-call-the-model-sdk-stops-working-at-scale" class="header-anchor">#</a></h1><p>Most teams ship their first LLM feature the same way: a product service calls a provider SDK directly. It is the fastest path to a demo—and often the fastest path to production. The problem is what happens next, when you go from “one team experimenting” to “many teams, many products, many models, many tenants”.</p>
+<p>The failure modes are surprisingly consistent:</p>
+<ul>
+<li><strong>Secrets and auth sprawl</strong>: provider API keys get copied into multiple services, environments, and pipelines. Rotations, least privilege, and auditing become hard to enforce.</li>
+<li><strong>Budgets are invisible</strong>: a single prompt change, a longer context window, or a retry loop can quietly double token spend. You only notice after the bill arrives.</li>
+<li><strong>Observability is fragmented</strong>: you can see the final response, but you cannot reconstruct which model was used, how many retries happened, whether a cache hit occurred, or which safety&#x2F;policy rules were triggered.</li>
+<li><strong>Provider jitter becomes your outage</strong>: upstream rate limits, regional hiccups, and long‑tail latency propagate straight into your product SLOs.</li>
+<li><strong>Security and compliance become “afterthought patches”</strong>: redaction, retention, data residency, prompt injection, and tool abuse are much easier to handle at a single enforcement point than inside every application.[4][5]</li>
+</ul>
+<p>At that stage, you do not need “yet another wrapper”. You need to treat model calls as a platform capability—governed the way mature teams govern APIs. That platform entry point is an <strong>AI Gateway</strong>.</p>
+<h1><span id="1-a-minimal-definition-of-an-ai-gateway">1. A minimal definition of an AI Gateway</span><a href="#1-a-minimal-definition-of-an-ai-gateway" class="header-anchor">#</a></h1><p>Here is a minimal definition that stays practical:</p>
+<ol>
+<li><strong>A stable contract</strong>: a single request&#x2F;response shape that your applications depend on, regardless of which provider or model you route to.  </li>
+<li><strong>A policy enforcement point</strong>: a place to apply authentication, quotas, budgets, rate limits, routing, caching, retries, redaction, and audit policies consistently.  </li>
+<li><strong>An evidence trail</strong>: traces, metrics, and audit logs that let you answer: who called what, at what cost, with what policy decisions, and how to replay the incident.</li>
+</ol>
+<p>Conceptually, it looks like this:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Client / Service / Agent</span><br><span class="line">        |</span><br><span class="line">        |  (canonical request + metadata: tenant/user/use_case/trace_id)</span><br><span class="line">        v</span><br><span class="line">     AI Gateway  ----------------------+</span><br><span class="line">        |                              |</span><br><span class="line">        | (auth/quota/budget/rate)      | (telemetry: traces/metrics/logs)</span><br><span class="line">        | (routing/canary/fallback)     |</span><br><span class="line">        v                              v</span><br><span class="line">  LLM Providers / Model APIs       Observability &amp; Audit Storage</span><br></pre></td></tr></table></figure>
+
+<h1><span id="2-the-contract-turning-model-calls-into-an-evolvable-api">2. The contract: turning model calls into an evolvable API</span><a href="#2-the-contract-turning-model-calls-into-an-evolvable-api" class="header-anchor">#</a></h1><p>Without a contract, governance fragments. Each team invents its own fields, error handling, and retry logic. Then “platform policies” cannot be applied uniformly because there is no single place to apply them.</p>
+<p>A pragmatic contract is less about “more fields” and more about <strong>clear semantics</strong>. At minimum, you want:</p>
+<ul>
+<li><strong>Identity and context</strong>: <code>tenant_id / user_id / channel / use_case / data_classification</code>  </li>
+<li><strong>Correlation</strong>: <code>trace_id / request_id</code> so you can join product traces with gateway spans.[3]  </li>
+<li><strong>Idempotency</strong>: <code>idempotency_key</code> to prevent duplicate charges or duplicate downstream actions during retries.  </li>
+<li><strong>Budgets</strong>: <code>max_tokens / max_cost / max_latency_ms</code> as first‑class constraints.  </li>
+<li><strong>Model intent, not model names</strong>: <code>model_family / quality_tier / region_preference</code> so you can swap implementations without rewriting apps.  </li>
+<li><strong>Compliance hooks</strong>: <code>redaction_profile / retention_policy / pii_mode</code>  </li>
+<li><strong>Normalized errors</strong>: map provider‑specific failures into your own categories (timeout, rate limit, auth, policy violation, upstream outage).</li>
+</ul>
+<p>Two properties matter most:</p>
+<ul>
+<li><strong>App stability</strong>: switching providers should not require product code rewrites.  </li>
+<li><strong>Platform evolution</strong>: version the contract, stay backwards‑compatible, and roll out changes gradually.</li>
+</ul>
+<h1><span id="3-what-the-gateway-should-govern-a-practical-capability-checklist">3. What the gateway should govern (a practical capability checklist)</span><a href="#3-what-the-gateway-should-govern-a-practical-capability-checklist" class="header-anchor">#</a></h1><p>Below is a capability breakdown organised by governance goals. Use it as a design review checklist.</p>
+<h2><span id="3-1-identity-and-authorization">3.1 Identity and authorization</span><a href="#3-1-identity-and-authorization" class="header-anchor">#</a></h2><p>Classic API auth (keys, OAuth, mTLS) is still relevant—but LLM usage needs additional policy dimensions:</p>
+<ul>
+<li><strong>Tenant and workload isolation</strong>: different tenants may require different billing, residency, or model allowlists.</li>
+<li><strong>Use‑case tiering</strong>: “customer support reply” and “financial summarization” should not share the same model set, max context, or tool permissions.</li>
+<li><strong>Least privilege</strong>: avoid “one master key for everything”. Gate access by model families, tool usage, and hard budget ceilings.[5]</li>
+</ul>
+<p>In practice, most teams converge to a policy mapping like: <code>(tenant, app, use_case) -&gt; policy</code>.</p>
+<h2><span id="3-2-budgets-and-rate-limits-finops-becomes-real-time">3.2 Budgets and rate limits (FinOps becomes real‑time)</span><a href="#3-2-budgets-and-rate-limits-finops-becomes-real-time" class="header-anchor">#</a></h2><p>LLM cost is not a fixed unit cost. It is a compound function of prompt length, output length, retries, retrieval context injection, and tool execution loops.</p>
+<p>An AI Gateway should offer budget controls at three layers:</p>
+<ol>
+<li><strong>Real‑time rate limits</strong>: per tenant&#x2F;app&#x2F;use‑case, and often by operation type (chat vs embeddings vs images).  </li>
+<li><strong>Periodic budgets</strong>: daily&#x2F;weekly&#x2F;monthly token or cost caps that can trigger automatic fallback behaviors.  </li>
+<li><strong>Per‑request constraints</strong>: enforce <code>max_tokens / max_cost / max_latency_ms</code> so a single call cannot blow up spend.</li>
+</ol>
+<p>The key difference from spreadsheets: budgets become <strong>enforced in seconds</strong>, not reviewed at month end.</p>
+<h2><span id="3-3-routing-canarying-and-fallbacks">3.3 Routing, canarying, and fallbacks</span><a href="#3-3-routing-canarying-and-fallbacks" class="header-anchor">#</a></h2><p>Once you have multiple models (or the same model in multiple regions), routing is no longer optional:</p>
+<ul>
+<li><strong>Quality tiers</strong>: the caller asks for <code>quality_tier=high/standard/cheap</code>; the gateway chooses the concrete model and parameters.</li>
+<li><strong>Residency‑aware routing</strong>: EU users route to EU regions; sensitive workloads route to private deployments.</li>
+<li><strong>Health‑based failover</strong>: timeouts or rate limits trigger automatic switches to backup models or degradations.</li>
+</ul>
+<p>This is also where you attach <strong>canaries and A&#x2F;B tests</strong>: feed 1% traffic to a new model, watch cost&#x2F;latency&#x2F;error signals, then ramp.</p>
+<h2><span id="3-4-caching-exact-prompt-caching-vs-semantic-caching">3.4 Caching: exact prompt caching vs semantic caching</span><a href="#3-4-caching-exact-prompt-caching-vs-semantic-caching" class="header-anchor">#</a></h2><p>Caching is one of the most effective levers to reduce cost, but it is also one of the easiest ways to create privacy and compliance problems.</p>
+<p>Two common patterns:</p>
+<ul>
+<li><strong>Exact prompt caching</strong>: same (or normalised) request → reuse response. Great for template‑driven and repetitive workloads.</li>
+<li><strong>Semantic caching</strong>: “similar questions” → “similar answers”. Useful for FAQs, but risky for time‑sensitive or compliance‑sensitive domains.</li>
+</ul>
+<p>Doing caching at the gateway has two advantages:</p>
+<ol>
+<li><strong>A single definition of “hit rate”</strong> across teams and services.  </li>
+<li><strong>A single enforcement point for safety</strong>: TTLs, tenant isolation, encryption, and retention policies must be consistent.[5]</li>
+</ol>
+<h2><span id="3-5-reliability-timeouts-retries-circuit-breakers-idempotency">3.5 Reliability: timeouts, retries, circuit breakers, idempotency</span><a href="#3-5-reliability-timeouts-retries-circuit-breakers-idempotency" class="header-anchor">#</a></h2><p>LLM failure modes go beyond basic HTTP errors: queueing, long‑tail latency, streaming interruptions, and content policy blocks are common.</p>
+<p>A gateway should productise reliability patterns for LLM semantics:</p>
+<ul>
+<li><strong>Timeout tiers</strong> by use case (interactive vs batch).</li>
+<li><strong>Retry policies</strong> with exponential backoff on retryable classes (e.g., 429&#x2F;5xx), and fast‑fail on non‑retryable classes (auth failures, policy violations).</li>
+<li><strong>Circuit breaking and isolation</strong> to avoid cascading failures.</li>
+<li><strong>Idempotency</strong> especially when an agent’s response triggers external actions.</li>
+</ul>
+<p>Many of these primitives are mature in Envoy‑style proxy stacks; the gateway’s job is to apply them with LLM‑aware policies.[2]</p>
+<h2><span id="3-6-security-and-compliance-redaction-audit-injection-defenses">3.6 Security and compliance: redaction, audit, injection defenses</span><a href="#3-6-security-and-compliance-redaction-audit-injection-defenses" class="header-anchor">#</a></h2><p>In production, security is not just “does the output contain banned content”. It is a broader set of risks:</p>
+<ul>
+<li><strong>Data leakage</strong>: PII or secrets entering prompts, logs, or caches, or leaking through retrieval citations.</li>
+<li><strong>Prompt injection and data poisoning</strong>: retrieved content can embed instructions that try to override policy or escalate tool usage.[4]</li>
+<li><strong>Auditability</strong>: when something goes wrong, you need to answer what happened and why—with evidence.[5]</li>
+</ul>
+<p>Most mature designs apply security in three layers:</p>
+<ol>
+<li><strong>Ingress classification and redaction</strong> (based on data classification).  </li>
+<li><strong>Policy constraints and allowlists</strong> (models, tools, sources).  </li>
+<li><strong>Audit and replay</strong> (policy decisions plus minimal necessary metadata).</li>
+</ol>
+<h1><span id="4-observability-make-each-model-call-a-replayable-span">4. Observability: make each model call a replayable span</span><a href="#4-observability-make-each-model-call-a-replayable-span" class="header-anchor">#</a></h1><p>When the system gets complex, observability becomes a survival requirement. One of the gateway’s biggest wins is that it turns LLM calls into first‑class telemetry:</p>
+<ul>
+<li><strong>Traces</strong>: each call is a span with dimensions like <code>model/provider/tenant/use_case</code>, linked to the product trace.[3]  </li>
+<li><strong>Metrics</strong>: request volume, success rate, p95&#x2F;p99 latency, token usage, cost estimates, cache hit rate, retries, rate‑limit events, policy triggers.  </li>
+<li><strong>Logs</strong>: structured metadata and policy decisions (with strict redaction&#x2F;retention policies).</li>
+</ul>
+<p>The goal is not “more logs”. The goal is to answer questions quickly:</p>
+<ul>
+<li>Which tenant&#x2F;use case caused the cost jump? Was it longer prompts or more retries?  </li>
+<li>Is latency worse because the provider is slow, because of queueing, or because cache hit rate dropped?  </li>
+<li>When a security incident triggers, can you reconstruct the decision chain and verify policies were applied?</li>
+</ul>
+<p>Aligning with OpenTelemetry helps avoid building a proprietary telemetry island.[3]</p>
+<h1><span id="5-deployment-patterns-central-gateway-vs-sidecar-proxy">5. Deployment patterns: central gateway vs sidecar proxy</span><a href="#5-deployment-patterns-central-gateway-vs-sidecar-proxy" class="header-anchor">#</a></h1><p>There is no single form factor. Two patterns are common:</p>
+<h2><span id="5-1-central-gateway">5.1 Central gateway</span><a href="#5-1-central-gateway" class="header-anchor">#</a></h2><p><strong>Pros</strong>: consistent policy enforcement, unified routing&#x2F;caching, single audit trail and cost dashboard.<br><strong>Cons</strong>: it becomes a critical path component; you need high availability, capacity planning, and often regional front doors.</p>
+<h2><span id="5-2-per-service-sidecar-x2f-local-proxy">5.2 Per‑service sidecar &#x2F; local proxy</span><a href="#5-2-per-service-sidecar-x2f-local-proxy" class="header-anchor">#</a></h2><p><strong>Pros</strong>: locality (lower cross‑network latency), natural fit with service meshes, smaller blast radius.<br><strong>Cons</strong>: policy distribution&#x2F;versioning becomes harder; unified caching and audit collection require extra work.</p>
+<p>If you run on Kubernetes, the Gateway API is a useful abstraction for standardising gateway configuration across implementations, while Envoy‑class proxies provide the mature data plane.[1][2]</p>
+<h1><span id="6-a-safe-rollout-plan-from-shadow-telemetry-to-hard-gates">6. A safe rollout plan: from “shadow telemetry” to hard gates</span><a href="#6-a-safe-rollout-plan-from-shadow-telemetry-to-hard-gates" class="header-anchor">#</a></h1><p>If you already have many services calling providers directly, a hard cutover is risky. A staged rollout is safer:</p>
+<ol>
+<li><strong>Shadow telemetry</strong>: mirror or proxy traffic through the gateway for metrics&#x2F;audit only, without changing responses.  </li>
+<li><strong>Contract first</strong>: migrate clients to the canonical gateway API while keeping behaviors stable.  </li>
+<li><strong>Soft enforcement</strong>: introduce timeouts&#x2F;rate limits&#x2F;basic redaction with “warn‑only” modes first.  </li>
+<li><strong>Hard gates</strong>: enable budgets, strict allowlists, caching policies, and audit retention requirements for high‑risk use cases.</li>
+</ol>
+<p>The principle is simple: <strong>build the evidence trail before you draw the red lines</strong>.</p>
+<h1><span id="7-a-representative-anonymised-scenario-collapsing-cost-chaos-into-operability">7. A representative (anonymised) scenario: collapsing cost chaos into operability</span><a href="#7-a-representative-anonymised-scenario-collapsing-cost-chaos-into-operability" class="header-anchor">#</a></h1><p>A common “scale pain” story looks like this:</p>
+<ul>
+<li>Three teams each integrated two providers; API keys lived in application env vars across multiple services.</li>
+<li>During a peak event, a customer‑facing assistant became more verbose; token usage doubled. At the same time, the provider rate‑limited intermittently, and application code retried multiple times—amplifying cost further.</li>
+<li>During the post‑mortem, teams could not reconstruct the chain: which tenants, which use cases, which prompt changes, which retries.</li>
+</ul>
+<p>With an AI Gateway, two small but hard moves usually unlock the rest:</p>
+<ol>
+<li><strong>Standardise metadata</strong>: every call must carry <code>tenant/use_case/trace_id</code>, recorded in a single audit trail.  </li>
+<li><strong>Make budgets enforceable</strong>: per‑request token caps and tenant‑level budget gates trigger automatic fallback to cheaper models or shorter template responses.</li>
+</ol>
+<p>Once those are in place, caching, routing, and fine‑grained permissions become incremental improvements rather than a full rewrite.</p>
+<h1><span id="conclusion-treat-llm-calls-as-a-governed-platform-capability">Conclusion: treat LLM calls as a governed platform capability</span><a href="#conclusion-treat-llm-calls-as-a-governed-platform-capability" class="header-anchor">#</a></h1><p>An AI Gateway does not make your model smarter. It makes your system more controllable, reliable, and scalable—because you introduce contracts, policies, telemetry, auditability, canaries, and rollbacks where they belong: at a single, governed entry point.</p>
+<p>If you see any of these signals—multi‑team integration sprawl, unexplained cost drift, stricter compliance demands, hard‑to‑reproduce incidents—you are likely at the point where an AI Gateway is no longer “nice to have”.</p>
+<h1><span id="references">References</span><a href="#references" class="header-anchor">#</a></h1><ul>
+<li>[1] Kubernetes SIGs, Gateway API Documentation, <a target="_blank" rel="noopener" href="https://gateway-api.sigs.k8s.io/">https://gateway-api.sigs.k8s.io/</a></li>
+<li>[2] Envoy Proxy Documentation, <a target="_blank" rel="noopener" href="https://www.envoyproxy.io/docs/envoy/latest/">https://www.envoyproxy.io/docs/envoy/latest/</a></li>
+<li>[3] OpenTelemetry Documentation, <a target="_blank" rel="noopener" href="https://opentelemetry.io/docs/">https://opentelemetry.io/docs/</a></li>
+<li>[4] OWASP Top 10 for Large Language Model Applications, <a target="_blank" rel="noopener" href="https://owasp.org/www-project-top-10-for-large-language-model-applications/">https://owasp.org/www-project-top-10-for-large-language-model-applications/</a></li>
+<li>[5] NIST AI Risk Management Framework (AI RMF), <a target="_blank" rel="noopener" href="https://www.nist.gov/itl/ai-risk-management-framework">https://www.nist.gov/itl/ai-risk-management-framework</a></li>
+</ul>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-01-29</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2026-01-ai-gateway-governance/" title="AI Gateway：把 LLM 调用升级为“可治理的网关层”（鉴权/限流/缓存/审计）">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>
