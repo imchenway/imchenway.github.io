@@ -1,0 +1,222 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Agentic Engineering 实战（2）：评估、回归与上线闸门 · DavidChan's Blog</title><meta name="description" content="本文目录#
+
+
+
+
+引言：为什么“看起来能跑”不足以上线
+1. 先定义一套“统一评分板”
+2. 回归测试分层：单步、流程、端到端
+2.1 单步测试（Step-level）
+2.2 流程测试（Workflow-level）
+2.3 端到端测试（E2E）
+
+
+3. 把“先失败”变成团队硬门禁
+4. 成本"><link rel="canonical" href="https://imchenway.com/zh-CN/2026-03-agentic-engineering-pipeline-2/"><link rel="alternate" hreflang="en" href="https://imchenway.com/en/agentic-engineering-pipeline-2/"><link rel="alternate" hreflang="zh-CN" href="https://imchenway.com/zh-CN/2026-03-agentic-engineering-pipeline-2/"><link rel="alternate" hreflang="x-default" href="https://imchenway.com/zh-CN/2026-03-agentic-engineering-pipeline-2/"><meta property="og:type" content="article"><meta property="og:title" content="Agentic Engineering 实战（2）：评估、回归与上线闸门"><meta property="og:description" content="本文目录# 引言：为什么“看起来能跑”不足以上线 1. 先定义一套“统一评分板” 2. 回归测试分层：单步、流程、端到端 2.1 单步测试（Step-level） 2.2 流程测试（Workflow-level） 2.3 端到端测试（E2E） 3. 把“先失败”变成团队硬门禁 4. 成本与安全必须并入同一闸门 4.1 "><meta property="og:url" content="https://imchenway.com/zh-CN/2026-03-agentic-engineering-pipeline-2/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Agentic Engineering 实战（2）：评估、回归与上线闸门"><meta name="twitter:description" content="本文目录# 引言：为什么“看起来能跑”不足以上线 1. 先定义一套“统一评分板” 2. 回归测试分层：单步、流程、端到端 2.1 单步测试（Step-level） 2.2 流程测试（Workflow-level） 2.3 端到端测试（E2E） 3. 把“先失败”变成团队硬门禁 4. 成本与安全必须并入同一闸门 4.1 "><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/">首页</a></li><li><a href="/archives">归档</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/guestbook">留言板</a></li></div><div class="information"><a class="lang-toggle" href="/en/agentic-engineering-pipeline-2/">EN</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Agentic Engineering 实战（2）：评估、回归与上线闸门</a></h3></div><div class="post-content"><h3><span id="ben-wen-mu-lu">本文目录</span><a href="#ben-wen-mu-lu" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#yin-yan-wei-shi-me-kan-qi-lai-neng-pao-bu-zu-yi-shang-xian">引言：为什么“看起来能跑”不足以上线</a></li>
+<li><a href="#1-xian-ding-yi-yi-tao-tong-yi-ping-fen-ban">1. 先定义一套“统一评分板”</a></li>
+<li><a href="#2-hui-gui-ce-shi-fen-ceng-dan-bu-liu-cheng-duan-dao-duan">2. 回归测试分层：单步、流程、端到端</a><ul>
+<li><a href="#2-1-dan-bu-ce-shi-step-level">2.1 单步测试（Step-level）</a></li>
+<li><a href="#2-2-liu-cheng-ce-shi-workflow-level">2.2 流程测试（Workflow-level）</a></li>
+<li><a href="#2-3-duan-dao-duan-ce-shi-e2e">2.3 端到端测试（E2E）</a></li>
+</ul>
+</li>
+<li><a href="#3-ba-xian-shi-bai-bian-cheng-tuan-dui-ying-men-jin">3. 把“先失败”变成团队硬门禁</a></li>
+<li><a href="#4-cheng-ben-yu-an-quan-bi-xu-bing-ru-tong-yi-zha-men">4. 成本与安全必须并入同一闸门</a><ul>
+<li><a href="#4-1-cheng-ben-zha-men">4.1 成本闸门</a></li>
+<li><a href="#4-2-an-quan-zha-men">4.2 安全闸门</a></li>
+</ul>
+</li>
+<li><a href="#5-fa-bu-zha-men-mo-ban-ke-zhi-jie-fu-yong">5. 发布闸门模板（可直接复用）</a></li>
+<li><a href="#6-chang-jian-fan-mo-shi-yu-jiu-pian">6. 常见反模式与纠偏</a><ul>
+<li><a href="#fan-mo-shi-1-zhi-kan-zheng-que-lu-bu-kan-bo-dong">反模式 1：只看正确率，不看波动</a></li>
+<li><a href="#fan-mo-shi-2-zhi-zuo-gong-neng-hui-gui-bu-zuo-yu-suan-hui-gui">反模式 2：只做功能回归，不做预算回归</a></li>
+<li><a href="#fan-mo-shi-3-an-quan-gui-ze-zhi-zai-wang-guan-zuo-bu-zai-ce-shi-zuo">反模式 3：安全规则只在网关做，不在测试做</a></li>
+<li><a href="#fan-mo-shi-4-ba-men-jin-dang-zu-li">反模式 4：把门禁当阻力</a></li>
+</ul>
+</li>
+<li><a href="#jie-yu-mei-you-zha-men-de-su-du-bu-shi-gong-cheng-su-du">结语：没有闸门的速度，不是工程速度</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="yin-yan-wei-shi-me-kan-qi-lai-neng-pao-bu-zu-yi-shang-xian">引言：为什么“看起来能跑”不足以上线</span><a href="#yin-yan-wei-shi-me-kan-qi-lai-neng-pao-bu-zu-yi-shang-xian" class="header-anchor">#</a></h1><p>在 Agent 项目里，最容易出现的错觉是：</p>
+<blockquote>
+<p>本地演示通过了，说明可以上线。</p>
+</blockquote>
+<p>现实往往相反：演示关注的是“能不能工作”，上线关注的是“在波动条件下能否持续工作”。</p>
+<p>这篇我们解决的是第二个问题：<strong>如何把评估（Eval）、回归（Regression）、风险控制（Safety&#x2F;Cost）整合成可执行上线闸门</strong>。</p>
+<h1><span id="1-xian-ding-yi-yi-tao-tong-yi-ping-fen-ban">1. 先定义一套“统一评分板”</span><a href="#1-xian-ding-yi-yi-tao-tong-yi-ping-fen-ban" class="header-anchor">#</a></h1><p>如果每个团队各自定义成功标准，最终会出现“都说自己通过了，但生产表现仍然不稳定”。</p>
+<p>对一线工程师最实用的是四维评分板：</p>
+<ol>
+<li><strong>正确性</strong>：回答是否满足需求，是否引用了正确上下文。</li>
+<li><strong>稳定性</strong>：同类输入多次运行，结果波动是否可接受。</li>
+<li><strong>成本</strong>：单请求 token、工具调用次数、总成本是否在预算内。</li>
+<li><strong>风险</strong>：越权调用、敏感信息泄露、错误自动执行是否被拦截。</li>
+</ol>
+<p>建议先定“红线阈值”，再谈优化目标。</p>
+<p>示例（仅示意）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">正确性 &gt;= 90%</span><br><span class="line">关键场景失败率 &lt;= 2%</span><br><span class="line">p95 延迟 &lt;= 3s</span><br><span class="line">单请求成本 &lt;= 目标预算上限</span><br><span class="line">高风险误执行 = 0</span><br></pre></td></tr></table></figure>
+
+<h1><span id="2-hui-gui-ce-shi-fen-ceng-dan-bu-liu-cheng-duan-dao-duan">2. 回归测试分层：单步、流程、端到端</span><a href="#2-hui-gui-ce-shi-fen-ceng-dan-bu-liu-cheng-duan-dao-duan" class="header-anchor">#</a></h1><p>很多团队只做一种测试，导致覆盖盲区。更稳妥的方式是三层并行：</p>
+<h2><span id="2-1-dan-bu-ce-shi-step-level">2.1 单步测试（Step-level）</span><a href="#2-1-dan-bu-ce-shi-step-level" class="header-anchor">#</a></h2><p>验证 Prompt 模板、检索召回、工具参数映射等局部逻辑。</p>
+<h2><span id="2-2-liu-cheng-ce-shi-workflow-level">2.2 流程测试（Workflow-level）</span><a href="#2-2-liu-cheng-ce-shi-workflow-level" class="header-anchor">#</a></h2><p>验证多步骤协作：计划 -&gt; 调工具 -&gt; 汇总 -&gt; 输出。</p>
+<h2><span id="2-3-duan-dao-duan-ce-shi-e2e">2.3 端到端测试（E2E）</span><a href="#2-3-duan-dao-duan-ce-shi-e2e" class="header-anchor">#</a></h2><p>模拟真实请求，验证完整链路在真实依赖下是否稳定。</p>
+<p>可执行原则：</p>
+<ul>
+<li>单步测试负责“快反馈”；</li>
+<li>流程测试负责“防协作断层”；</li>
+<li>E2E 负责“上线前真实风险确认”。</li>
+</ul>
+<h1><span id="3-ba-xian-shi-bai-bian-cheng-tuan-dui-ying-men-jin">3. 把“先失败”变成团队硬门禁</span><a href="#3-ba-xian-shi-bai-bian-cheng-tuan-dui-ying-men-jin" class="header-anchor">#</a></h1><p>Agentic Engineering 的关键不是“测试多”，而是“测试先”。</p>
+<p>在上线相关开发中，建议固定门禁顺序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(1) Baseline 绿</span><br><span class="line">(2) 新增/修改测试</span><br><span class="line">(3) 首次失败证据</span><br><span class="line">(4) 最小实现</span><br><span class="line">(5) 受影响测试 + 全量验证</span><br><span class="line">(6) 连续两轮通过</span><br><span class="line">(7) 才允许进入发布</span><br></pre></td></tr></table></figure>
+
+<p>这套顺序的意义在于：</p>
+<ul>
+<li>避免“先写再补测试”的回忆式验证；</li>
+<li>避免“偶发通过”被误判为稳定；</li>
+<li>避免“修功能时顺手削弱测试资产”。</li>
+</ul>
+<h1><span id="4-cheng-ben-yu-an-quan-bi-xu-bing-ru-tong-yi-zha-men">4. 成本与安全必须并入同一闸门</span><a href="#4-cheng-ben-yu-an-quan-bi-xu-bing-ru-tong-yi-zha-men" class="header-anchor">#</a></h1><p>很多团队把成本和安全放到“后续治理”。这是高风险做法。</p>
+<h2><span id="4-1-cheng-ben-zha-men">4.1 成本闸门</span><a href="#4-1-cheng-ben-zha-men" class="header-anchor">#</a></h2><p>至少要做三件事：</p>
+<ul>
+<li>请求级预算上限（max tokens &#x2F; max latency）；</li>
+<li>会话级预算告警（超过阈值触发降级）；</li>
+<li>发布级预算评估（新版本相比旧版本不可出现不可解释上涨）。</li>
+</ul>
+<h2><span id="4-2-an-quan-zha-men">4.2 安全闸门</span><a href="#4-2-an-quan-zha-men" class="header-anchor">#</a></h2><p>至少覆盖四类检查：</p>
+<ul>
+<li>权限不足时是否能正确拒绝；</li>
+<li>Prompt 注入输入是否触发防护；</li>
+<li>敏感字段是否被脱敏；</li>
+<li>高风险工具调用是否有审批&#x2F;二次确认。</li>
+</ul>
+<p>对一线工程师最重要的是：<strong>把“不可接受风险”写成可执行断言，而不是写成口号</strong>。</p>
+<h1><span id="5-fa-bu-zha-men-mo-ban-ke-zhi-jie-fu-yong">5. 发布闸门模板（可直接复用）</span><a href="#5-fa-bu-zha-men-mo-ban-ke-zhi-jie-fu-yong" class="header-anchor">#</a></h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">发布前必须满足：</span><br><span class="line">- Baseline: 通过</span><br><span class="line">- 新需求测试：已新增</span><br><span class="line">- 首次失败证据：已留存</span><br><span class="line">- 修复后验证：受影响测试通过</span><br><span class="line">- 全量验证：通过</span><br><span class="line">- 双轮一致性：通过</span><br><span class="line">- 成本阈值：通过</span><br><span class="line">- 安全阈值：通过</span><br><span class="line">- 回滚预案：已验证</span><br></pre></td></tr></table></figure>
+
+<p>配套角色建议：</p>
+<ul>
+<li>开发：提交变更与自测证据；</li>
+<li>评审：核对门禁是否完整；</li>
+<li>发布责任人：确认闸门通过并执行灰度；</li>
+<li>值班：观察关键指标并准备快速回退。</li>
+</ul>
+<h1><span id="6-chang-jian-fan-mo-shi-yu-jiu-pian">6. 常见反模式与纠偏</span><a href="#6-chang-jian-fan-mo-shi-yu-jiu-pian" class="header-anchor">#</a></h1><h2><span id="fan-mo-shi-1-zhi-kan-zheng-que-lu-bu-kan-bo-dong">反模式 1：只看正确率，不看波动</span><a href="#fan-mo-shi-1-zhi-kan-zheng-que-lu-bu-kan-bo-dong" class="header-anchor">#</a></h2><p>纠偏：引入“重复运行一致性”指标。</p>
+<h2><span id="fan-mo-shi-2-zhi-zuo-gong-neng-hui-gui-bu-zuo-yu-suan-hui-gui">反模式 2：只做功能回归，不做预算回归</span><a href="#fan-mo-shi-2-zhi-zuo-gong-neng-hui-gui-bu-zuo-yu-suan-hui-gui" class="header-anchor">#</a></h2><p>纠偏：把成本变化纳入发布对比表。</p>
+<h2><span id="fan-mo-shi-3-an-quan-gui-ze-zhi-zai-wang-guan-zuo-bu-zai-ce-shi-zuo">反模式 3：安全规则只在网关做，不在测试做</span><a href="#fan-mo-shi-3-an-quan-gui-ze-zhi-zai-wang-guan-zuo-bu-zai-ce-shi-zuo" class="header-anchor">#</a></h2><p>纠偏：把高风险场景做成固定回归用例。</p>
+<h2><span id="fan-mo-shi-4-ba-men-jin-dang-zu-li">反模式 4：把门禁当阻力</span><a href="#fan-mo-shi-4-ba-men-jin-dang-zu-li" class="header-anchor">#</a></h2><p>纠偏：把门禁结果可视化，证明其在减少事故和返工。</p>
+<h1><span id="jie-yu-mei-you-zha-men-de-su-du-bu-shi-gong-cheng-su-du">结语：没有闸门的速度，不是工程速度</span><a href="#jie-yu-mei-you-zha-men-de-su-du-bu-shi-gong-cheng-su-du" class="header-anchor">#</a></h1><p>Agentic Engineering 的质量核心，是把“上线前的侥幸”替换成“上线前的证据”。</p>
+<p>下一篇（Part 3）我们进入最后一块：<strong>上线后的可观测、回滚与复盘机制，如何决定这套流程能否长期稳定运行</strong>。</p>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-03-04</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/en/agentic-engineering-pipeline-2/" title="Agentic Engineering in Practice (2): Evals, Regression, and Release Gates">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/en/agentic-engineering-pipeline-3/" title="Agentic Engineering in Practice (3): Observability, Rollbacks, and Team Postmortems">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>

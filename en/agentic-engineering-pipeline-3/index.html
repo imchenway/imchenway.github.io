@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Agentic Engineering in Practice (3): Observability, Rollbacks, and Team Postmortems · DavidChan's Blog</title><meta name="description" content="Table of Contents#
+
+
+
+
+Introduction: the 72 hours after release determine long-term success
+1. Observability: not “more logs,” but “faster diagnosis”
+"><link rel="canonical" href="https://imchenway.com/en/agentic-engineering-pipeline-3/"><link rel="alternate" hreflang="en" href="https://imchenway.com/en/agentic-engineering-pipeline-3/"><link rel="alternate" hreflang="zh-CN" href="https://imchenway.com/zh-CN/2026-03-agentic-engineering-pipeline-3/"><link rel="alternate" hreflang="x-default" href="https://imchenway.com/en/agentic-engineering-pipeline-3/"><meta property="og:type" content="article"><meta property="og:title" content="Agentic Engineering in Practice (3): Observability, Rollbacks, and Team Postmortems"><meta property="og:description" content="Table of Contents# Introduction: the 72 hours after release determine long-term success 1. Observability: not “more logs,” but “faster diagnosis” 2. Alerting: d"><meta property="og:url" content="https://imchenway.com/en/agentic-engineering-pipeline-3/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Agentic Engineering in Practice (3): Observability, Rollbacks, and Team Postmortems"><meta name="twitter:description" content="Table of Contents# Introduction: the 72 hours after release determine long-term success 1. Observability: not “more logs,” but “faster diagnosis” 2. Alerting: d"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/en/">Home</a></li><li><a href="/en/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/en/guestbook">Guestbook</a></li></div><div class="information"><a class="lang-toggle" href="/zh-CN/2026-03-agentic-engineering-pipeline-3/">中</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Agentic Engineering in Practice (3): Observability, Rollbacks, and Team Postmortems</a></h3></div><div class="post-content"><h3><span id="table-of-contents">Table of Contents</span><a href="#table-of-contents" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#introduction-the-72-hours-after-release-determine-long-term-success">Introduction: the 72 hours after release determine long-term success</a></li>
+<li><a href="#1-observability-not-more-logs-but-faster-diagnosis">1. Observability: not “more logs,” but “faster diagnosis”</a></li>
+<li><a href="#2-alerting-define-what-triggers-action-before-incidents-happen">2. Alerting: define “what triggers action” before incidents happen</a></li>
+<li><a href="#3-rollback-rollback-readiness-is-trained-not-declared">3. Rollback: rollback readiness is trained, not declared</a></li>
+<li><a href="#4-postmortems-from-blame-to-mechanism-upgrades">4. Postmortems: from blame to mechanism upgrades</a></li>
+<li><a href="#5-team-operating-model-convert-heroics-into-defaults">5. Team operating model: convert heroics into defaults</a></li>
+<li><a href="#6-series-wrap-up-from-faster-output-to-stable-delivery">6. Series wrap-up: from “faster output” to “stable delivery”</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="introduction-the-72-hours-after-release-determine-long-term-success">Introduction: the 72 hours after release determine long-term success</span><a href="#introduction-the-72-hours-after-release-determine-long-term-success" class="header-anchor">#</a></h1><p>Teams often over-focus on the release moment and under-invest in post-release operations. In production:</p>
+<ul>
+<li>user inputs differ from your test sets,</li>
+<li>upstream dependencies fluctuate more than expected,</li>
+<li>latency and cost shift structurally during peak traffic,</li>
+<li>low-probability failures become frequent at scale.</li>
+</ul>
+<p>To close the loop in Agentic Engineering, three capabilities are non-negotiable:<br><strong>observability, rollback readiness, and postmortem discipline</strong>.</p>
+<h1><span id="1-observability-not-more-logs-but-faster-diagnosis">1. Observability: not “more logs,” but “faster diagnosis”</span><a href="#1-observability-not-more-logs-but-faster-diagnosis" class="header-anchor">#</a></h1><p>A practical observability model has four layers:</p>
+<ol>
+<li><strong>Task layer</strong>: did a user request succeed, and if not, in which failure class?</li>
+<li><strong>Inference layer</strong>: model latency, token use, retries, refusals.</li>
+<li><strong>Tool layer</strong>: tool-call success rates, latency, error classes, idempotency collisions.</li>
+<li><strong>Business layer</strong>: conversion, retention, handoff-to-human rate, complaint rate.</li>
+</ol>
+<p>If you only watch model metrics, you will misdiagnose many incidents. The model can return successfully while the tool path fails, producing business failure.</p>
+<p>A minimal telemetry schema should include:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">trace_id / request_id / tenant / use_case / model / tool / latency / tokens / cost / error_class</span><br></pre></td></tr></table></figure>
+
+<h1><span id="2-alerting-define-what-triggers-action-before-incidents-happen">2. Alerting: define “what triggers action” before incidents happen</span><a href="#2-alerting-define-what-triggers-action-before-incidents-happen" class="header-anchor">#</a></h1><p>Alerting is not about noticing anomalies. It is about triggering predefined actions.</p>
+<p>A practical 3-tier policy:</p>
+<ul>
+<li><strong>P1 (immediate rollback)</strong>: critical-path error spikes, unauthorized actions, sensitive-data leaks.</li>
+<li><strong>P2 (degraded mode)</strong>: sustained latency breaches, budget anomalies, persistent upstream throttling.</li>
+<li><strong>P3 (observe and optimize)</strong>: non-critical feature instability.</li>
+</ul>
+<p>Predefine the action map:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P1 -&gt; rollback immediately + notify on-call + freeze new releases</span><br><span class="line">P2 -&gt; degrade model/path + continue close observation</span><br><span class="line">P3 -&gt; create issue ticket + schedule in next iteration</span><br></pre></td></tr></table></figure>
+
+<h1><span id="3-rollback-rollback-readiness-is-trained-not-declared">3. Rollback: rollback readiness is trained, not declared</span><a href="#3-rollback-rollback-readiness-is-trained-not-declared" class="header-anchor">#</a></h1><p>Many systems are “rollback-capable in theory” but fail in real incidents. Common reasons:</p>
+<ol>
+<li>rollback depends on migrated data structures,</li>
+<li>old configs&#x2F;routes are not preserved,</li>
+<li>teams lack rehearsal and panic under pressure.</li>
+</ol>
+<p>Run one small rollback drill each iteration:</p>
+<ul>
+<li>simulate upstream timeout,</li>
+<li>simulate malformed model output,</li>
+<li>simulate tool permission failures,</li>
+<li>measure recovery time against target.</li>
+</ul>
+<p>Suggested SLO-style targets:</p>
+<ul>
+<li>traffic switchback within 5 minutes,</li>
+<li>core path recovery within 15 minutes,</li>
+<li>internal incident update within 30 minutes.</li>
+</ul>
+<h1><span id="4-postmortems-from-blame-to-mechanism-upgrades">4. Postmortems: from blame to mechanism upgrades</span><a href="#4-postmortems-from-blame-to-mechanism-upgrades" class="header-anchor">#</a></h1><p>A high-quality postmortem answers five questions:</p>
+<ol>
+<li>What exactly triggered the incident?</li>
+<li>Which guardrail should have blocked it but did not?</li>
+<li>Why didn’t observability trigger early enough?</li>
+<li>Why was rollback fast&#x2F;slow?</li>
+<li>Which mechanism changes prevent recurrence?</li>
+</ol>
+<p>Use a mechanism-first structure:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Timeline -&gt; Decision points -&gt; Guardrail failures -&gt; Reinforcements -&gt; Owner &amp; due date</span><br></pre></td></tr></table></figure>
+
+<p>A postmortem is only complete when conclusions are encoded back into gates, tests, and alert rules.</p>
+<h1><span id="5-team-operating-model-convert-heroics-into-defaults">5. Team operating model: convert heroics into defaults</span><a href="#5-team-operating-model-convert-heroics-into-defaults" class="header-anchor">#</a></h1><p>Agentic Engineering maturity is not measured by one expert’s skill. It is measured by whether a new engineer can deliver safely in two weeks.</p>
+<p>Institutionalize three assets:</p>
+<ul>
+<li><strong>Runbook</strong>: who does what in incidents and in what order.</li>
+<li><strong>Gate template</strong>: mandatory release checks for every change.</li>
+<li><strong>Postmortem knowledge base</strong>: historical failure patterns and prevention rules.</li>
+</ul>
+<p>These assets reduce quality variance caused by staffing changes.</p>
+<h1><span id="6-series-wrap-up-from-faster-output-to-stable-delivery">6. Series wrap-up: from “faster output” to “stable delivery”</span><a href="#6-series-wrap-up-from-faster-output-to-stable-delivery" class="header-anchor">#</a></h1><p>Across this three-part series:</p>
+<ul>
+<li>Part 1 built the requirement-to-release pipeline.</li>
+<li>Part 2 operationalized evals and quality gates.</li>
+<li>Part 3 closed the loop with operations and postmortems.</li>
+</ul>
+<p>That is the practical value of Agentic Engineering for frontline engineers:<br><strong>not replacing human decisions, but turning those decisions into executable, testable, reusable system behavior.</strong></p>
+<p>If you are adopting this in your team, start with a minimal loop:</p>
+<ol>
+<li>choose one critical path,</li>
+<li>instrument a minimal telemetry schema,</li>
+<li>enforce one release gate template,</li>
+<li>run one rollback drill.</li>
+</ol>
+<p>Once these are stable, expand to more agent-powered workflows with far lower risk.</p>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-03-04</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2026-03-agentic-engineering-pipeline-2/" title="Agentic Engineering 实战（2）：评估、回归与上线闸门">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2026-03-agentic-engineering-pipeline-3/" title="Agentic Engineering 实战（3）：可观测、回滚与组织复盘">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>

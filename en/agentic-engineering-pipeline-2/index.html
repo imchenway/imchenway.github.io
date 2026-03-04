@@ -1,0 +1,215 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="DavidChan,imchenway@gmail.com"><title>Agentic Engineering in Practice (2): Evals, Regression, and Release Gates · DavidChan's Blog</title><meta name="description" content="Table of Contents#
+
+
+
+
+Introduction: “works in demo” is not a release criterion
+1. Start with a unified scorecard
+2. Regression layering: step, workfl"><link rel="canonical" href="https://imchenway.com/en/agentic-engineering-pipeline-2/"><link rel="alternate" hreflang="en" href="https://imchenway.com/en/agentic-engineering-pipeline-2/"><link rel="alternate" hreflang="zh-CN" href="https://imchenway.com/zh-CN/2026-03-agentic-engineering-pipeline-2/"><link rel="alternate" hreflang="x-default" href="https://imchenway.com/en/agentic-engineering-pipeline-2/"><meta property="og:type" content="article"><meta property="og:title" content="Agentic Engineering in Practice (2): Evals, Regression, and Release Gates"><meta property="og:description" content="Table of Contents# Introduction: “works in demo” is not a release criterion 1. Start with a unified scorecard 2. Regression layering: step, workflow, end-to-end"><meta property="og:url" content="https://imchenway.com/en/agentic-engineering-pipeline-2/"><meta property="og:site_name" content="DavidChan's Blog"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Agentic Engineering in Practice (2): Evals, Regression, and Release Gates"><meta name="twitter:description" content="Table of Contents# Introduction: “works in demo” is not a release criterion 1. Start with a unified scorecard 2. Regression layering: step, workflow, end-to-end"><meta name="keywords" content="DavidChan,imchenway"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/typography-override.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><link rel="shortcut icon" type="image/png" href="/images/favicon.png"><script>var _hmt = _hmt || [];
+(function() {
+    var hm = document.createElement("script");
+    hm.type = 'text/javascript';hm.async = true;
+    hm.src = "https://hm.baidu.com/hm.js?542ea8c4a9ce535736e775029b1fad26";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+})();
+</script><script async="" src="https://www.googletagmanager.com/gtag/js?id=G-PJKTXDR70K"></script><script>window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-PJKTXDR70K');
+</script><script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1946575658110055"></script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="sidebar animated fadeInDown"><div class="logo-title"><div class="title"><h3 title=""><a href="/">DavidChan's Blog</a></h3><div class="description"><p>I hear and I forget. <br>I see and I remember. <br>I write and I understand.</p></div></div></div><ul class="social-links"><li><a href="/atom.xml"><i class="fa fa-rss"></i></a></li><li><a class="wechat-trigger" href="javascript:void(0);"><i class="fa fa-wechat"></i></a></li><h3 title=""></h3></ul><style>.wechat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2147483000;
+}
+.wechat-modal.is-active {
+  display: flex;
+}
+.wechat-modal__content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  z-index: 2147483001;
+}
+.wechat-modal__image {
+  max-width: 70vw;
+  max-height: 70vh;
+  display: block;
+}
+.wechat-modal__close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style><div class="wechat-modal" id="wechat-modal" style="display:none;"><div class="wechat-modal__content"><span class="wechat-modal__close">&times;</span><img class="wechat-modal__image" src="https://imchenway.com/images/logo.png" data-original="https://hypha-mall.oss-cn-hangzhou.aliyuncs.com/imchenway-wechat.jpg" alt="WeChat QR code"></div></div><script>document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.querySelector('.wechat-trigger');
+  var modal = document.getElementById('wechat-modal');
+  if (!trigger || !modal) return;
+  if (modal.parentNode !== document.body) {
+    document.body.appendChild(modal);
+  }
+  var closeBtn = modal.querySelector('.wechat-modal__close');
+  var show = function () {
+    modal.style.display = 'flex';
+    modal.classList.add('is-active');
+  };
+  var hide = function () {
+    modal.classList.remove('is-active');
+    modal.style.display = 'none';
+  };
+  hide();
+  trigger.addEventListener('click', function (event) {
+    event.preventDefault();
+    show();
+  });
+  closeBtn && closeBtn.addEventListener('click', hide);
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) hide();
+  });
+});</script></div><div class="main"><div class="page-top animated fadeInDown"><div class="nav"><li><a href="/en/">Home</a></li><li><a href="/en/archives">Archive</a></li><!--li--><!--  if is_current('about')--><!--    a.current(href="/about")= __('About')--><!--  else--><!--    a(href="/about")= __('About')--><li><a href="/en/guestbook">Guestbook</a></li></div><div class="information"><a class="lang-toggle" href="/zh-CN/2026-03-agentic-engineering-pipeline-2/">中</a><div class="back_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li></div></div></div><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>Agentic Engineering in Practice (2): Evals, Regression, and Release Gates</a></h3></div><div class="post-content"><h3><span id="table-of-contents">Table of Contents</span><a href="#table-of-contents" class="header-anchor">#</a></h3><div class="toc">
+
+<!-- toc -->
+
+<ul>
+<li><a href="#introduction-works-in-demo-is-not-a-release-criterion">Introduction: “works in demo” is not a release criterion</a></li>
+<li><a href="#1-start-with-a-unified-scorecard">1. Start with a unified scorecard</a></li>
+<li><a href="#2-regression-layering-step-workflow-end-to-end">2. Regression layering: step, workflow, end-to-end</a><ul>
+<li><a href="#2-1-step-level-tests">2.1 Step-level tests</a></li>
+<li><a href="#2-2-workflow-level-tests">2.2 Workflow-level tests</a></li>
+<li><a href="#2-3-end-to-end-tests">2.3 End-to-end tests</a></li>
+</ul>
+</li>
+<li><a href="#3-make-fail-first-a-hard-gate">3. Make “fail first” a hard gate</a></li>
+<li><a href="#4-cost-and-safety-belong-in-the-same-release-gate">4. Cost and safety belong in the same release gate</a><ul>
+<li><a href="#4-1-budget-gates">4.1 Budget gates</a></li>
+<li><a href="#4-2-safety-gates">4.2 Safety gates</a></li>
+</ul>
+</li>
+<li><a href="#5-reusable-release-gate-template">5. Reusable release gate template</a></li>
+<li><a href="#6-common-anti-patterns-and-corrections">6. Common anti-patterns and corrections</a><ul>
+<li><a href="#anti-pattern-1-tracking-correctness-only">Anti-pattern 1: tracking correctness only</a></li>
+<li><a href="#anti-pattern-2-functional-regression-without-budget-regression">Anti-pattern 2: functional regression without budget regression</a></li>
+<li><a href="#anti-pattern-3-safety-controls-only-at-gateway-level">Anti-pattern 3: safety controls only at gateway level</a></li>
+<li><a href="#anti-pattern-4-treating-gates-as-bureaucracy">Anti-pattern 4: treating gates as bureaucracy</a></li>
+</ul>
+</li>
+<li><a href="#conclusion-speed-without-gates-is-not-engineering-speed">Conclusion: speed without gates is not engineering speed</a></li>
+</ul>
+<!-- tocstop -->
+
+</div>
+
+<h1><span id="introduction-works-in-demo-is-not-a-release-criterion">Introduction: “works in demo” is not a release criterion</span><a href="#introduction-works-in-demo-is-not-a-release-criterion" class="header-anchor">#</a></h1><p>In agent-based systems, the most dangerous illusion is:</p>
+<blockquote>
+<p>“The demo works, so we can ship.”</p>
+</blockquote>
+<p>Demos prove possibility. Production requires repeatability under noisy conditions.</p>
+<p>This article focuses on one practical objective:<br><strong>combine evals, regression discipline, and risk controls into enforceable release gates.</strong></p>
+<h1><span id="1-start-with-a-unified-scorecard">1. Start with a unified scorecard</span><a href="#1-start-with-a-unified-scorecard" class="header-anchor">#</a></h1><p>Without a shared scorecard, each team declares success differently. The result is predictable: every team is “green,” while production quality remains unstable.</p>
+<p>A practical scorecard for frontline teams has four dimensions:</p>
+<ol>
+<li><strong>Correctness</strong>: does output satisfy task intent with valid evidence&#x2F;context?</li>
+<li><strong>Stability</strong>: how much does behavior vary across repeated runs?</li>
+<li><strong>Cost</strong>: per-request tokens, tool-call fan-out, and spend drift.</li>
+<li><strong>Risk</strong>: policy bypass, sensitive data leakage, unsafe auto-actions.</li>
+</ol>
+<p>Define hard red lines before optimization goals.</p>
+<p>Example thresholds (illustrative):</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Correctness &gt;= 90%</span><br><span class="line">Critical-path failure rate &lt;= 2%</span><br><span class="line">p95 latency &lt;= 3s</span><br><span class="line">Per-request cost &lt;= budget cap</span><br><span class="line">Unsafe high-risk action count = 0</span><br></pre></td></tr></table></figure>
+
+<h1><span id="2-regression-layering-step-workflow-end-to-end">2. Regression layering: step, workflow, end-to-end</span><a href="#2-regression-layering-step-workflow-end-to-end" class="header-anchor">#</a></h1><p>Teams that rely on a single test layer usually miss important failures. A safer pattern is to run three layers together:</p>
+<h2><span id="2-1-step-level-tests">2.1 Step-level tests</span><a href="#2-1-step-level-tests" class="header-anchor">#</a></h2><p>Validate local logic: prompt templates, retrieval quality, parameter mapping.</p>
+<h2><span id="2-2-workflow-level-tests">2.2 Workflow-level tests</span><a href="#2-2-workflow-level-tests" class="header-anchor">#</a></h2><p>Validate multi-step collaboration: planning -&gt; tool use -&gt; synthesis -&gt; final response.</p>
+<h2><span id="2-3-end-to-end-tests">2.3 End-to-end tests</span><a href="#2-3-end-to-end-tests" class="header-anchor">#</a></h2><p>Replay realistic requests against full dependencies to validate production behavior.</p>
+<p>Practical role split:</p>
+<ul>
+<li>Step-level gives fast feedback.</li>
+<li>Workflow-level protects orchestration integrity.</li>
+<li>E2E confirms release readiness.</li>
+</ul>
+<h1><span id="3-make-fail-first-a-hard-gate">3. Make “fail first” a hard gate</span><a href="#3-make-fail-first-a-hard-gate" class="header-anchor">#</a></h1><p>The key difference in Agentic Engineering is not “more tests.” It is <strong>tests-first sequencing</strong>.</p>
+<p>Recommended gate order:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(1) Baseline green</span><br><span class="line">(2) Add/update tests</span><br><span class="line">(3) Capture first failure</span><br><span class="line">(4) Minimal implementation</span><br><span class="line">(5) Run affected + full verification</span><br><span class="line">(6) Pass twice consecutively</span><br><span class="line">(7) Only then enter release</span><br></pre></td></tr></table></figure>
+
+<p>Why this works:</p>
+<ul>
+<li>Prevents memory-based testing (“I think it worked before”).</li>
+<li>Reduces accidental green from flaky runs.</li>
+<li>Protects long-term test assets from shortcut edits.</li>
+</ul>
+<h1><span id="4-cost-and-safety-belong-in-the-same-release-gate">4. Cost and safety belong in the same release gate</span><a href="#4-cost-and-safety-belong-in-the-same-release-gate" class="header-anchor">#</a></h1><p>Many teams delay budget and safety checks to “later governance.” That is costly.</p>
+<h2><span id="4-1-budget-gates">4.1 Budget gates</span><a href="#4-1-budget-gates" class="header-anchor">#</a></h2><p>At minimum:</p>
+<ul>
+<li>Request-level constraints (<code>max_tokens</code>, latency cap).</li>
+<li>Session-level alerts (automatic downgrade on threshold breach).</li>
+<li>Release-level comparison (new version cannot introduce unexplained cost inflation).</li>
+</ul>
+<h2><span id="4-2-safety-gates">4.2 Safety gates</span><a href="#4-2-safety-gates" class="header-anchor">#</a></h2><p>At minimum:</p>
+<ul>
+<li>Access denied flows must fail safely.</li>
+<li>Prompt-injection probes must be blocked.</li>
+<li>Sensitive fields must be redacted.</li>
+<li>High-risk tool actions must require approval&#x2F;confirmation.</li>
+</ul>
+<p>For frontline engineers, the practical takeaway is simple:<br><strong>convert non-negotiable risks into executable assertions.</strong></p>
+<h1><span id="5-reusable-release-gate-template">5. Reusable release gate template</span><a href="#5-reusable-release-gate-template" class="header-anchor">#</a></h1><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Release is allowed only if:</span><br><span class="line">- Baseline: pass</span><br><span class="line">- New tests: added</span><br><span class="line">- First-fail evidence: captured</span><br><span class="line">- Post-fix affected tests: pass</span><br><span class="line">- Full verification: pass</span><br><span class="line">- Double-run consistency: pass</span><br><span class="line">- Budget thresholds: pass</span><br><span class="line">- Safety thresholds: pass</span><br><span class="line">- Rollback plan: verified</span><br></pre></td></tr></table></figure>
+
+<p>Suggested role ownership:</p>
+<ul>
+<li>Developer: change set + self-verification evidence.</li>
+<li>Reviewer: gate completeness.</li>
+<li>Release owner: canary decision and launch control.</li>
+<li>On-call: production monitoring and fast rollback readiness.</li>
+</ul>
+<h1><span id="6-common-anti-patterns-and-corrections">6. Common anti-patterns and corrections</span><a href="#6-common-anti-patterns-and-corrections" class="header-anchor">#</a></h1><h2><span id="anti-pattern-1-tracking-correctness-only">Anti-pattern 1: tracking correctness only</span><a href="#anti-pattern-1-tracking-correctness-only" class="header-anchor">#</a></h2><p>Correction: include repeatability and variance metrics.</p>
+<h2><span id="anti-pattern-2-functional-regression-without-budget-regression">Anti-pattern 2: functional regression without budget regression</span><a href="#anti-pattern-2-functional-regression-without-budget-regression" class="header-anchor">#</a></h2><p>Correction: add cost delta table to release reports.</p>
+<h2><span id="anti-pattern-3-safety-controls-only-at-gateway-level">Anti-pattern 3: safety controls only at gateway level</span><a href="#anti-pattern-3-safety-controls-only-at-gateway-level" class="header-anchor">#</a></h2><p>Correction: encode risky scenarios as mandatory regression tests.</p>
+<h2><span id="anti-pattern-4-treating-gates-as-bureaucracy">Anti-pattern 4: treating gates as bureaucracy</span><a href="#anti-pattern-4-treating-gates-as-bureaucracy" class="header-anchor">#</a></h2><p>Correction: visualize prevented incidents and rework to show value.</p>
+<h1><span id="conclusion-speed-without-gates-is-not-engineering-speed">Conclusion: speed without gates is not engineering speed</span><a href="#conclusion-speed-without-gates-is-not-engineering-speed" class="header-anchor">#</a></h1><p>The quality core of Agentic Engineering is replacing pre-release luck with pre-release evidence.</p>
+<p>In Part 3, we complete the loop:<br><strong>how observability, rollback discipline, and postmortems determine long-term system stability.</strong></p>
+<hr>
+<p>本作品系原创，采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc-nd/4.≠0/deed.zh">知识共享署名-非商业性使用-禁止演绎 4.0 国际许可协议</a>进行许可，转载请注明出处。</p>
+
+<div id="gitalk-container"></div>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script><link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"><script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+		<script>
+		var gitalkConfig = {"enable":true,"owner":"imchenway","repo":"imchenway.github.io","admin":"imchenway","clientID":"7026ab2c4cdadba4d342","clientSecret":"8e00dadc2db335285be4c861e53ee1bf9f8cc713","distractionFreeMode":false,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"};
+	    gitalkConfig.id = md5(location.pathname);
+		var gitalk = new Gitalk(gitalkConfig);
+	    gitalk.render("gitalk-container");
+	    </script></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2026-03-04</span></div></div></div></div><div class="post-ad"><ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1946575658110055" data-ad-slot="8561874775"></ins><script>(adsbygoogle = window.adsbygoogle || []).push({});</script></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2026-03-agentic-engineering-pipeline-1/" title="Agentic Engineering 实战（1）：把需求到发布串成可复用流水线">上一篇</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/zh-CN/2026-03-agentic-engineering-pipeline-2/" title="Agentic Engineering 实战（2）：评估、回归与上线闸门">下一篇</a></li></ul></div></div></div></div></div><script defer src="/js/jquery.js"></script><script defer src="/js/jquery-migrate-1.2.1.min.js"></script><script defer src="/js/jquery.appear.js"></script>
+        <style>
+            [bg-lazy] {
+                background-image: none !important;
+                background-color: #eee !important;
+            }
+        </style>
+        <script>
+            window.imageLazyLoadSetting = {
+                isSPA: false,
+                preloadRatio: 1,
+                processImages: null,
+            };
+        </script><script>window.addEventListener("load",function(){var t=/\.(gif|jpg|jpeg|tiff|png)$/i,r=/^data:image\/[a-z\d\-\.\+]+;base64,/;Array.prototype.slice.call(document.querySelectorAll("img[data-original]")).forEach(function(a){var e=a.parentNode;"A"===e.tagName&&(t.test(e.href)||r.test(e.href))&&(e.href=a.dataset.original)})});</script><script>(r=>{r.imageLazyLoadSetting.processImages=t;var a=r.imageLazyLoadSetting.isSPA,o=r.imageLazyLoadSetting.preloadRatio||1,d=i();function i(){var t=Array.prototype.slice.call(document.querySelectorAll("img[data-original]")),e=Array.prototype.slice.call(document.querySelectorAll("[bg-lazy]"));return t.concat(e)}function t(t){(a||t)&&(d=i());for(var e,n=0;n<d.length;n++)0<=(e=(e=d[n]).getBoundingClientRect()).bottom&&0<=e.left&&e.top<=(r.innerHeight*o||document.documentElement.clientHeight*o)&&(()=>{var t,e,a,o,i=d[n];e=function(){d=d.filter(function(t){return i!==t}),r.imageLazyLoadSetting.onImageLoaded&&r.imageLazyLoadSetting.onImageLoaded(i)},(t=i).dataset.loaded||(t.hasAttribute("bg-lazy")?(t.removeAttribute("bg-lazy"),e&&e()):(a=new Image,o=t.getAttribute("data-original"),a.onload=function(){t.src=o,t.removeAttribute("data-original"),t.setAttribute("data-loaded",!0),e&&e()},a.onerror=function(){t.removeAttribute("data-original"),t.setAttribute("data-loaded",!1),t.src=o},t.src!==o&&(a.src=o)))})()}function e(){clearTimeout(t.tId),t.tId=setTimeout(t,500)}t(),document.addEventListener("scroll",e),r.addEventListener("resize",e),r.addEventListener("orientationchange",e)})(this);</script></body></html>
